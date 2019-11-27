@@ -16,13 +16,13 @@ struct rgb {
 
 struct main {
 	color: rgb {
-		when .r == 0xFF {
+		when r == 0xFF {
 			red = true;
 		}
-		when .g >= 0x80 {
+		when g >= 0x80 {
 			green = true;
 		}
-		when .b == 0xFF {
+		when b == 0xFF {
 			blue = true;
 		}
 	}

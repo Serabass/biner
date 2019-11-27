@@ -247,16 +247,19 @@ FromKeyword = "from"
 StructKeyword = "struct"
 WhenKeyword = "when"
 DefaultKeyword = "default"
+ThrowKeyword = "throw"
 
 Keyword
   = ImportKeyword
   / FromKeyword
   / StructKeyword
   / DefaultKeyword
+  / ThrowKeyword
 
 Statement
   = DirectiveStatement
   / WhenStatement
+  / DefaultStatement
   / StructDefinitionStatement
   / PropertyDefinitionStatement
   / PropertyAssignStatement
@@ -266,11 +269,18 @@ Statement
   / Block
   / StringLiteral
   / Digit
+  / ThrowStatement
 
-
+ReturnStatement
+ = "=" __ body: (Statement) {
+   return {
+     type: "ReturnStatement",
+     body
+   };
+ }
 
 StructDefinitionStatement
- = StructKeyword __ id: IdentifierName __ body: Block? {
+ = StructKeyword __ id: IdentifierName __ body: (Block / ReturnStatement)? {
    return {
      type: "StructDefinitionStatement",
      id,
@@ -295,7 +305,7 @@ OperatorStatement
  }
 
 PropertyAccessStatement
- = "." id: Identifier {
+ = id: Identifier {
    return {
      type: "PropertyAccessStatement",
      id,
@@ -304,7 +314,7 @@ PropertyAccessStatement
 
 WhenStatement
  = WhenKeyword
-   __ property: PropertyAccessStatement
+   __ property: PropertyAccessStatement?
    __ operator: OperatorStatement?
    __ value: Statement
    __ body: Block {
@@ -315,6 +325,22 @@ WhenStatement
     value,
     body
    }
+ }
+
+DefaultStatement
+ = DefaultKeyword __ body: Block {
+   return {
+     type: "DefaultStatement",
+     body,
+   };
+ }
+
+ThrowStatement
+ = ThrowKeyword __ body: Statement __ EOS {
+   return {
+     type: "ThrowStatement",
+     body,
+   };
  }
 
 PropertyDefinitionStatement

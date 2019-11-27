@@ -1,12 +1,12 @@
-#endianness LE;
+#endianness BE;
 
 /*
 
-| OPCODE | int |   val1  | float |      val2    |
-|  0005  |  04 |    01   |   06  |  00 00 00 00 |
+| OPCODE | int |   val1  | float32 |      val2    |
+|  0005  |  04 |    01   |   06    |  00 00 00 00 |
 
-| OPCODE | var |   val1  | float |      val2    |
-|  0005  |  02 |  01 02  |   06  |  00 00 00 00 |
+| OPCODE | var |   val1  | float32 |      val2    |
+|  0005  |  02 |  01 02  |   06    |  00 00 00 00 |
 
 | OPCODE |         string          |
 |  034A  | 31 31 31 31 00 CC CC CC |
@@ -31,29 +31,23 @@ struct decimalValue {
   }
 
   when 0x06 {
-    type = "float";
-    val: float;
+    type = "float32";
+    val: float32;
   }
 }
 
-struct string8 {
-  = fstring(8);
-} 
+// struct string8 = fstring(8);
 
-struct wstring8b {
-  = int8 {
-    = fstring(@);
-  }
-}
+// struct wstring8b = int8 {
+//   = fstring(@);
+// }
 
-struct wstring32b {
-  = int8 {
-    
-  }
+struct wstring32b = int8 {
+  a: float32;
 }
 
 struct main {
-  opcodes: int16 {
+  opcode: int16 {
     when 0x0005 {
       type = "opcode0005";
       val1: decimalValue;
@@ -75,8 +69,8 @@ struct main {
       val2: decimalValue;
     }
 
-    default {
-      throw "Unknown opcode: ${@}";
-    }
+    // default {
+    //   throw "Unknown opcode: ${@}";
+    // }
   }
 }

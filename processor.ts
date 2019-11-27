@@ -92,7 +92,6 @@ export class Processor {
               break;
 
             default:
-              console.log(stmt);
               let resss2 = this.executeNode(stmt, value);
           }
         }
@@ -116,7 +115,9 @@ export class Processor {
               let struct = this.structs[structName];
               let newStruct = {};
               let val2 = this.executeNode(struct, newStruct);
+
               value[propName] = newStruct;
+              console.log(value);
             } else {
               throw new Error(`Unknown struct name: ${structName}`);
             }
@@ -124,7 +125,6 @@ export class Processor {
 
         if (node.body) {
           let rrrrr = this.executeNode(node.body, value[propName]);
-          console.log(3333);
         }
 
         return value;
@@ -135,7 +135,15 @@ export class Processor {
       case "WhenStatement":
         let property = node.property;
         let operator = node.operator;
-        let realPropValue = this.executeNode(property, value);
+
+        let realPropValue = (() => {
+          if (property) {
+            return this.executeNode(property, value);
+          }
+
+          return value;
+        })();
+
         let value22 = this.executeNode(node.value, value);
 
         let opValue: Operator;
@@ -174,8 +182,12 @@ export class Processor {
 
         break;
       case "PropertyAssignStatement":
-        let propName1 = node.property.name;
-        value[node.property.name] = this.executeNode(node.value, value);
+        let val2 = value;
+        if (typeof value !== "object") {
+          val2 = value;
+          value = {};
+        }
+        value[node.property.name] = this.executeNode(node.value, val2);
         break;
 
       case "HexDigit":
@@ -187,9 +199,11 @@ export class Processor {
 
       case "TrueValue":
       case "FalseValue":
+      case "Literal":
         return node.value;
 
       default:
+        console.log(node);
         throw new Error(`Unknown node type: ${node.type}`);
     }
   }
@@ -203,6 +217,9 @@ export class Processor {
         break;
       case "StructDefinitionStatement":
         this.structs[node.id.name] = node;
+        break;
+      case "BlockStatement":
+        // console.log(node.body.body);
         break;
       default:
         throw new Error(`Unknown node type: ${node.type}`);
