@@ -2,6 +2,12 @@
 
 %%
 
+\x06....\x06....\x06....   return 'vector';
+\x02..     return 'var';
+\x04.      return 'int8';
+\x05..     return 'int16';
+\x06....   return 'float';
+
 \xA4\x03  return 'NAME_THREAD';
 \x6A\x01  return 'FADE';
 \x2C\x04  return 'SET_TOTAL_MISSIONS';
@@ -15,11 +21,9 @@
 \x53\x00  return 'CREATE_PLAYER_AT';
 \xF5\x01  return 'CREATE_EMULATED_ACTOR_FROM_PLAYER';
 \x17\x04  return 'START_MISSION';
-
-\x02..     return 'var';
-\x04.      return 'int8';
-\x05..     return 'int16';
-\x06....   return 'float';
+\x9B\x02  return 'INIT_OBJECT';
+\xC7\x01  return 'REMOVE_OBJECT_FROM_MISSION_CLEANUP_LIST';
+\x04\x00  return 'ASSIGN_INT1';
 
 .{8}      return 'b8';
 .         return 'b1';
@@ -42,6 +46,7 @@ expr
             next: $4
         };
    }
+
   | NAME_THREAD string8 expr {
         $$ = {
             opcode: "NAME_THREAD",
@@ -49,13 +54,15 @@ expr
             next: $3
         };
   }
+
   | SET_TOTAL_MISSIONS value expr {
         $$ = {
             opcode: "SET_TOTAL_MISSIONS",
             value: $2,
             next: $3
         };
-   }
+  }
+
   | SET_TOTAL_MISSIONS_POINTS value expr {
         $$ = {
             opcode: "SET_TOTAL_MISSIONS_POINTS",
@@ -63,6 +70,7 @@ expr
             next: $3
         };
   }
+
   | SET_MAX_WANTED_LEVEL value expr {
         $$ = {
             opcode: "SET_MAX_WANTED_LEVEL",
@@ -70,6 +78,7 @@ expr
             next: $3
         };
   }
+
   | SET_TOTAL_HIDDEN_PACKAGES value expr {
         $$ = {
             opcode: "SET_TOTAL_HIDDEN_PACKAGES",
@@ -77,6 +86,7 @@ expr
             next: $3
         };
   }
+
   | SET_WB_CHECK value expr {
         $$ = {
             opcode: "SET_WB_CHECK",
@@ -84,6 +94,7 @@ expr
             next: $3
         };
   }
+
   | SET_CURRENT_TIME value value expr {
         $$ = {
             opcode: "SET_CURRENT_TIME",
@@ -92,6 +103,7 @@ expr
             next: $4
         };
   }
+
   | REQUEST_COLLISION_AT value value expr {
         $$ = {
             opcode: "REQUEST_COLLISION_AT",
@@ -100,17 +112,17 @@ expr
             next: $4
         };
   }
-  | CREATE_PLAYER_AT value value value value value expr {
+
+  | CREATE_PLAYER_AT value value value expr {
         $$ = {
             opcode: "CREATE_PLAYER_AT",
             model: $2,
-            x: $3,
-            y: $4,
-            z: $5,
-            var: $6,
-            next: $7
+            pos: $3,
+            var: $4,
+            next: $5
         };
   }
+
   | CREATE_EMULATED_ACTOR_FROM_PLAYER value value expr {
         $$ = {
             opcode: "CREATE_EMULATED_ACTOR_FROM_PLAYER",
@@ -119,6 +131,7 @@ expr
             next: $4,
         };
   }
+
   | START_MISSION value expr {
         $$ = {
             opcode: "START_MISSION",
@@ -126,8 +139,43 @@ expr
             next: $3,
         };
   }
+
+  | LOAD_SCENE_OR_SET_CAMPOS value expr {
+        $$ = {
+            opcode: "LOAD_SCENE_OR_SET_CAMPOS",
+            pos: $2,
+            next: $3,
+        };
+  }
+
+  | INIT_OBJECT value value value expr {
+        $$ = {
+            opcode: "INIT_OBJECT",
+            modelIndex: $2,
+            pos: $3,
+            var: $4,
+            next: $5,
+        };
+  }
+
+  | REMOVE_OBJECT_FROM_MISSION_CLEANUP_LIST value expr {
+        $$ = {
+            opcode: "REMOVE_OBJECT_FROM_MISSION_CLEANUP_LIST",
+            value: $2,
+            next: $3,
+        };
+  }
+
+  | ASSIGN_INT1 value value expr {
+        $$ = {
+            opcode: "ASSIGN_$_INT",
+            value: $2,
+            value2: $3,
+            next: $4,
+        };
+  }
+
   | b8 {
-        console.log($1.charCodeAt(0).toString(16), $1.charCodeAt(1).toString(16));
   }
   | EOF { }
   ;
@@ -146,6 +194,7 @@ value
       }
   }
   | int16 {
+      debugger;
       $$ = {
         type: 'int16',
         value: [$1.charCodeAt(1), $1.charCodeAt(2)]
@@ -155,8 +204,19 @@ value
       var buf = Buffer.from($1.substr(1), 'binary');
       $$ = {
         type: 'float',
-        value: Math.round(buf.readFloatLE() * 100) / 100
+        value: Math.round(buf.readFloatLE() * 1000) / 1000
       }
+  }
+  | vector {
+    var buf = Buffer.from($1.substr(1), 'binary');
+    $$ = {
+        type: 'vector',
+        value: {
+            x: Math.round(buf.readFloatLE() * 1000) / 1000,
+            y: Math.round(buf.readFloatLE(5) * 1000) / 1000,
+            z: Math.round(buf.readFloatLE(11) * 1000) / 1000,
+        }
+    };
   }
   ;
 

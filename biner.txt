@@ -1,0 +1,19 @@
+#endian BE;
+
+def main {
+  = int8 {
+    when @ : 0x0001 {
+
+    }
+  }
+}
+
+def vector3d {
+  when @.x : >100.0 {
+
+  }
+}
+
+def struct {
+  int8
+}

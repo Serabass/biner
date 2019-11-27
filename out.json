@@ -1,0 +1,227 @@
+{
+    "type": "Program",
+    "body": [
+        {
+            "type": "DirectiveStatement",
+            "id": {
+                "type": "Identifier",
+                "name": "endianness"
+            },
+            "value": {
+                "type": "Identifier",
+                "name": "BE"
+            }
+        },
+        {
+            "type": "StructDefinitionStatement",
+            "id": {
+                "type": "Identifier",
+                "name": "rgb"
+            },
+            "body": {
+                "type": "BlockStatement",
+                "body": {
+                    "type": "StatementList",
+                    "body": [
+                        {
+                            "type": "PropertyDefinitionStatement",
+                            "id": {
+                                "type": "Identifier",
+                                "name": "r"
+                            },
+                            "structName": {
+                                "type": "Identifier",
+                                "name": "int8"
+                            },
+                            "body": null
+                        },
+                        {
+                            "type": "PropertyDefinitionStatement",
+                            "id": {
+                                "type": "Identifier",
+                                "name": "g"
+                            },
+                            "structName": {
+                                "type": "Identifier",
+                                "name": "int8"
+                            },
+                            "body": null
+                        },
+                        {
+                            "type": "PropertyDefinitionStatement",
+                            "id": {
+                                "type": "Identifier",
+                                "name": "b"
+                            },
+                            "structName": {
+                                "type": "Identifier",
+                                "name": "int8"
+                            },
+                            "body": null
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "StructDefinitionStatement",
+            "id": {
+                "type": "Identifier",
+                "name": "main"
+            },
+            "body": {
+                "type": "BlockStatement",
+                "body": {
+                    "type": "StatementList",
+                    "body": [
+                        {
+                            "type": "PropertyDefinitionStatement",
+                            "id": {
+                                "type": "Identifier",
+                                "name": "color"
+                            },
+                            "structName": {
+                                "type": "Identifier",
+                                "name": "rgb"
+                            },
+                            "body": {
+                                "type": "BlockStatement",
+                                "body": {
+                                    "type": "StatementList",
+                                    "body": [
+                                        {
+                                            "type": "WhenStatement",
+                                            "property": {
+                                                "type": "ProperyAccessStatement",
+                                                "id": {
+                                                    "type": "Identifier",
+                                                    "name": "r"
+                                                }
+                                            },
+                                            "operator": null,
+                                            "value": {
+                                                "type": "HexDigit",
+                                                "value": [
+                                                    "0x",
+                                                    [
+                                                        "F",
+                                                        "F"
+                                                    ]
+                                                ]
+                                            },
+                                            "body": {
+                                                "type": "BlockStatement",
+                                                "body": {
+                                                    "type": "StatementList",
+                                                    "body": [
+                                                        {
+                                                            "type": "PropertyAssignStatement",
+                                                            "property": {
+                                                                "type": "Identifier",
+                                                                "name": "red"
+                                                            },
+                                                            "value": {
+                                                                "type": "TrueValue",
+                                                                "value": true
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "WhenStatement",
+                                            "property": {
+                                                "type": "ProperyAccessStatement",
+                                                "id": {
+                                                    "type": "Identifier",
+                                                    "name": "g"
+                                                }
+                                            },
+                                            "operator": {
+                                                "type": "OperatorStatement",
+                                                "operator": ">="
+                                            },
+                                            "value": {
+                                                "type": "HexDigit",
+                                                "value": [
+                                                    "0x",
+                                                    [
+                                                        "8",
+                                                        "0"
+                                                    ]
+                                                ]
+                                            },
+                                            "body": {
+                                                "type": "BlockStatement",
+                                                "body": {
+                                                    "type": "StatementList",
+                                                    "body": [
+                                                        {
+                                                            "type": "PropertyAssignStatement",
+                                                            "property": {
+                                                                "type": "Identifier",
+                                                                "name": "green"
+                                                            },
+                                                            "value": {
+                                                                "type": "TrueValue",
+                                                                "value": true
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "type": "WhenStatement",
+                                            "property": {
+                                                "type": "ProperyAccessStatement",
+                                                "id": {
+                                                    "type": "Identifier",
+                                                    "name": "b"
+                                                }
+                                            },
+                                            "operator": {
+                                                "type": "OperatorStatement",
+                                                "operator": "=="
+                                            },
+                                            "value": {
+                                                "type": "HexDigit",
+                                                "value": [
+                                                    "0x",
+                                                    [
+                                                        "F",
+                                                        "F"
+                                                    ]
+                                                ]
+                                            },
+                                            "body": {
+                                                "type": "BlockStatement",
+                                                "body": {
+                                                    "type": "StatementList",
+                                                    "body": [
+                                                        {
+                                                            "type": "PropertyAssignStatement",
+                                                            "property": {
+                                                                "type": "Identifier",
+                                                                "name": "blue"
+                                                            },
+                                                            "value": {
+                                                                "type": "TrueValue",
+                                                                "value": true
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
