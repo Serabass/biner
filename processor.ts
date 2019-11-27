@@ -7,6 +7,15 @@ import { BinaryReader } from "./binary-reader";
 
 export type Endian = "BE" | "LE";
 
+enum Operator {
+  EQ = "==",
+  GEQ = ">=",
+  LEQ = "<=",
+  NEQ = "!=",
+  G = ">",
+  L = "<"
+}
+
 export class Processor {
   public directives: { endian?: Endian } = {};
   public imports: any = {};
@@ -54,43 +63,121 @@ export class Processor {
 
   public run(structName: string = "main"): any {
     let value = {};
-    console.log(this.structs[structName].body.body.body[0].body.body);
-    value = this.executeNode(this.structs[structName], value);
-
+    this.executeNode(this.structs[structName], value);
     return value;
   }
 
-  public executeNode(node, value = {}) {
+  public readStruct(structName: string, value) {
+    let struct = this.structs[structName];
+    for (let prop of struct.body.body.body) {
+      let res = this.executeNode(prop, value);
+    }
+  }
+
+  public executeNode(node, value) {
     switch (node.type) {
       case "StructDefinitionStatement":
         let res = this.executeNode(node.body, value);
-        break;
+        return res;
+
       case "BlockStatement":
-        let res1 = this.executeNode(node.body);
+        let res1 = this.executeNode(node.body, value);
         break;
+
       case "StatementList":
         for (let stmt of node.body) {
-          let res = this.executeNode(stmt);
+          switch (stmt.type) {
+            case "WhenStatement":
+              this.executeNode(stmt, value);
+              break;
+
+            default:
+              console.log(stmt);
+              let resss2 = this.executeNode(stmt, value);
+          }
         }
-        break;
+        return value;
+
       case "PropertyDefinitionStatement":
         let propName = node.id.name;
         let structName = node.structName.name;
-        let res11 = this.executeNode(node.body);
 
-        return {
-          type: "AssignPropPlease222",
-          propName: propName,
-          structName: structName,
-          value: res11
-        };
+        switch (structName) {
+          case "int8":
+            value[propName] = this.reader.int8;
+            break;
+
+          case "int16":
+            value[propName] = this.reader.int16;
+            break;
+
+          default:
+            if (this.structs[structName]) {
+              let struct = this.structs[structName];
+              let newStruct = {};
+              let val2 = this.executeNode(struct, newStruct);
+              value[propName] = newStruct;
+            } else {
+              throw new Error(`Unknown struct name: ${structName}`);
+            }
+        }
+
+        if (node.body) {
+          let rrrrr = this.executeNode(node.body, value[propName]);
+          console.log(3333);
+        }
+
+        return value;
+
+      case "PropertyAccessStatement":
+        return value[node.id.name];
+
       case "WhenStatement":
         let property = node.property;
         let operator = node.operator;
-        let value22 = this.executeNode(node.value);
-        let res111 = this.executeNode(node.body);
+        let realPropValue = this.executeNode(property, value);
+        let value22 = this.executeNode(node.value, value);
+
+        let opValue: Operator;
+
+        if (!operator) {
+          opValue = Operator.EQ;
+        } else {
+          opValue = operator.operator;
+        }
+
+        let whenResult;
+        switch (opValue) {
+          case Operator.EQ:
+            whenResult = realPropValue == value22;
+            break;
+          case Operator.GEQ:
+            whenResult = realPropValue >= value22;
+            break;
+          case Operator.LEQ:
+            whenResult = realPropValue <= value22;
+            break;
+          case Operator.NEQ:
+            whenResult = realPropValue != value22;
+            break;
+          case Operator.G:
+            whenResult = realPropValue > value22;
+            break;
+          case Operator.L:
+            whenResult = realPropValue < value22;
+            break;
+        }
+
+        if (whenResult) {
+          let rrrrr = this.executeNode(node.body, value);
+        }
 
         break;
+      case "PropertyAssignStatement":
+        let propName1 = node.property.name;
+        value[node.property.name] = this.executeNode(node.value, value);
+        break;
+
       case "HexDigit":
         let [zerox, [...digits]] = node.value;
         let hexString = `${zerox}${digits.join("")}`;
@@ -98,24 +185,10 @@ export class Processor {
 
         return intValue;
 
-      case "PropertyAssignStatement":
-        let propName1 = node.property.name;
-        let value1;
+      case "TrueValue":
+      case "FalseValue":
+        return node.value;
 
-        switch (node.value.type) {
-          case "TrueValue":
-          case "FalseValue":
-            value1 = node.value.value;
-            break;
-          default:
-            throw new Error("qweqwew");
-        }
-
-        return {
-          type: "AssignPropPlease",
-          property: propName1,
-          value: value1
-        };
       default:
         throw new Error(`Unknown node type: ${node.type}`);
     }

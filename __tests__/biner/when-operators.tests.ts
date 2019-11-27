@@ -1,66 +1,18 @@
-import * as peg from "pegjs";
-import * as fs from 'fs';
-import * as path from 'path';
-import * as PEGUtil from 'pegjs-util';
-import * as ASTY from 'asty';
 import { Processor } from "../../processor";
 import { buf } from "../../util";
 
-describe('Biner simple tests using pegjs', () => {
-    it('scm 0005 int + float', () => {
-        let b = buf("|  0005  |  04 |    01   |   06  |  00 00 00 00 |");
-        let pr = Processor.readFile('scm', b);
-        let x = pr.run();
-        expect(x.opcodes).toBeInstanceOf(Array);
-        let [first] = x.opcodes;
-        expect(first.type).toBe('opcode0005');
-        expect(first.val1).toBe({
-            type: 'int',
-            val: 1,
-        });
-        expect(first.val2).toBe({
-            type: 'float',
-            val: 0,
-        });
-    });
-
-    it('scm 0005 var + float', () => {
-        let b = buf("|  0005  |  02 |  01 02  |   06  |  00 00 00 00 |");
-        let pr = Processor.readFile('scm', b);
-        let x = pr.run();
-        expect(x.opcodes).toBeInstanceOf(Array);
-        let [first] = x.opcodes;
-        expect(first.type).toBe('opcode0005');
-        expect(first.val1).toBe({
-            type: 'var',
-            val: 0x0201,
-        });
-        expect(first.val2).toBe({
-            type: 'float',
-            val: 0,
-        });
-    });
-
-    it('scm 034A string', () => {
-        let b = buf("|  034A  | 31 31 31 31 00 CC CC CC |");
-        let pr = Processor.readFile('scm', b);
-        let x = pr.run();
-        expect(x.opcodes).toBeInstanceOf(Array);
-        let [first] = x.opcodes;
-        expect(first.type).toBe('opcode034A');
-        expect(first.val1).toBe({
-            type: 'var',
-            name: '1111',
-        });
-    });
-
-    it('scm 0009', () => {
-        let b = buf("|  0009  |");
-        let pr = Processor.readFile('scm', b);
-        let x = pr.run();
-        expect(x.opcodes).toBeInstanceOf(Array);
-        let [first] = x.opcodes;
-        expect(first.type).toBe('opcode0009');
-        expect(Object.keys(first).length).toBe(1);
-    });
+describe("Biner simple tests using pegjs", () => {
+  it("when operators", () => {
+    let b = buf("| 00 81 00 |");
+    let pr = Processor.readFile("when operators", b);
+    let x = pr.run();
+    expect(x).toBeDefined();
+    expect(x.color).toBeDefined();
+    expect(Object.keys(x).length).toBe(1);
+    expect(Object.keys(x)).toEqual(["color"]);
+    expect(x.color.r).toBe(0x00);
+    expect(x.color.redBright).toBe(false);
+    expect(x.color.g).toBe(0x81);
+    expect(x.color.greenBright).toBe(true);
+  });
 });

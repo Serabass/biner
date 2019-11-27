@@ -261,7 +261,7 @@ Statement
   / PropertyDefinitionStatement
   / PropertyAssignStatement
   / StructAccessStatement
-  / LangConstant
+  / SystemConstant
   / Identifier
   / Block
   / StringLiteral
@@ -282,6 +282,9 @@ Operator
  = "=="
  / ">="
  / "<="
+ / "<"
+ / ">"
+ / "!="
 
 OperatorStatement
  = operator: Operator {
@@ -291,17 +294,17 @@ OperatorStatement
    };
  }
 
-ProperyAccessStatement
+PropertyAccessStatement
  = "." id: Identifier {
    return {
-     type: "ProperyAccessStatement",
+     type: "PropertyAccessStatement",
      id,
    };
  }
 
 WhenStatement
  = WhenKeyword
-   __ property: ProperyAccessStatement
+   __ property: PropertyAccessStatement
    __ operator: OperatorStatement?
    __ value: Statement
    __ body: Block {
@@ -355,7 +358,7 @@ FalseValue
    };
  }
 
-LangConstant
+SystemConstant
  = TrueValue
  / FalseValue
 

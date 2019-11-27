@@ -53,7 +53,7 @@ struct wstring32b {
 }
 
 struct main {
-  opcodes[]: int16[] {
+  opcodes: int16 {
     when 0x0005 {
       type = "opcode0005";
       val1: decimalValue;

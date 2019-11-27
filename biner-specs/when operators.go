@@ -1,12 +1,4 @@
-#endianness BE
-
-/*
-| r  g  b  |
-| FF 00 00 | => red: true
-
-| r  g  b  |
-| 00 00 FF | => blue: true
-*/
+#endianness BE;
 
 struct rgb {
 	r: int8;
@@ -16,29 +8,23 @@ struct rgb {
 
 struct main {
 	color: rgb {
-		when r >= 0x80 {
+		when .r >= 0x80 {
 			redBright = true;
 		}
-		when g >= 0xFF {
+		when .g >= 0x80 {
 			greenBright = true;
 		}
-		when b >= 0xFF {
+		when .b >= 0x80 {
 			blueBright = true;
 		}
-		when r < 0x80 {
+		when .r < 0x80 {
 			redBright = false;
 		}
-		when g < 0xFF {
+		when .g < 0x80 {
 			greenBright = false;
 		}
-		when b < 0xFF {
+		when .b < 0x80 {
 			blueBright = false;
 		}
 	}
 }
-
-
-/*
-| FF 00 00 | => redBright: true
-| 10 00 00 | => redBright: false
-*/

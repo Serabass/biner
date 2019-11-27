@@ -12,5 +12,6 @@
     "structs",
     "wstring",
     "zerox"
-  ]
+  ],
+  "editor.formatOnSave": true
 }

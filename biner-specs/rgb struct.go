@@ -16,7 +16,7 @@ struct rgb {
 
 struct main {
 	color: rgb {
-		when .r 0xFF {
+		when .r == 0xFF {
 			red = true;
 		}
 		when .g >= 0x80 {

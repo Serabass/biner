@@ -5,11 +5,14 @@ export class BinaryReader {
 
   public constructor(public endian: Endian, public buffer: Buffer) {}
 
-  public int8() {
-    return this.buffer.readInt8(++this.cursor);
+  /**
+   * TODO rename to UInt8 everywhere
+   */
+  public get int8() {
+    return this.buffer.readUInt8(this.cursor++);
   }
 
-  public int16() {
+  public get int16() {
     switch (this.endian) {
       case "BE": {
         let data = this.buffer.readInt16BE(this.cursor);
