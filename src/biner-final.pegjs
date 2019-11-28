@@ -283,9 +283,10 @@ Statement
   / ConstStatement
 
 ReturnStatement
- = "=" __ body: (Statement) {
+ = "=" __ id: Identifier __ body: Block {
    return {
      type: "ReturnStatement",
+     id,
      body
    };
  }
@@ -317,7 +318,7 @@ StructDefinitionStatement
  __ id: Identifier?
  __ generic: GenericType?
  __ parent: StructureInheritanceStatement?
- __ body: Block {
+ __ body: (Block / ReturnStatement) {
    return {
      type: "StructDefinitionStatement",
      id,
@@ -335,6 +336,14 @@ Operator
  / "<"
  / ">"
  / "!="
+
+ / "&&"
+ / "||"
+ / "^"
+ / "<<"
+ / ">>"
+ / "&"
+ 
 
 OperatorStatement
  = operator: Operator {

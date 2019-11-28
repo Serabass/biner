@@ -4,17 +4,9 @@ import * as ASTY from "asty";
 import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
 import { BinaryReader } from "./binary-reader";
+import { StatementHandler } from "./StatementHandler";
 
 export type Endian = "BE" | "LE";
-
-enum Operator {
-  EQ = "==",
-  GEQ = ">=",
-  LEQ = "<=",
-  NEQ = "!=",
-  G = ">",
-  L = "<"
-}
 
 export class Processor {
   public directives: { endian: Endian } = {
@@ -83,7 +75,7 @@ export class Processor {
     }
   }
 
-  private readUserStruct(structName: string) {
+  public readUserStruct(structName: string) {
     let struct;
     if (!this.structs[structName]) {
       if (!this.imports[structName]) {
@@ -101,41 +93,15 @@ export class Processor {
     return newStruct;
   }
 
-  private readNativeStruct(structName: string) {
+  public readNativeStruct(structName: string) {
     switch (structName) {
       case "int8":
-        return this.reader.int8;
-
       case "int16":
-        return this.reader.int16;
-
-      case "fstring8":
-        let length = this.reader.int8;
-        let str = [];
-
-        for (let i = 0; i < length; i++) {
-          str.push(String.fromCharCode(this.reader.int8));
-        }
-
-        return str.join("");
-
-      case "nstring":
-        let str1 = [];
-        let int8;
-        do {
-          int8 = this.reader.int8;
-          if (int8 != 0) {
-            str1.push(String.fromCharCode(int8));
-          }
-        } while (int8 != 0);
-
-        return str1.join("");
-
       case "float32":
-        return this.reader.float32;
-
       case "float64":
-        return this.reader.float64;
+      case "fstring8":
+      case "nstring":
+        return this.reader[structName];
     }
 
     throw new Error(`Unknown struct name: ${structName}`);
@@ -144,139 +110,30 @@ export class Processor {
   public executeNode(node, value) {
     switch (node.type) {
       case "StructureInheritanceStatement":
-        break;
+        return StatementHandler.StructureInheritanceStatement();
 
       case "StructDefinitionStatement":
-        let block = node.body;
-
-        if (node.parent) {
-          const structName = node.parent.id.name;
-          const struct = this.structs[structName];
-          let p = this.executeNode(struct, value);
-        }
-
-        switch (block.body.type) {
-          case "StatementList":
-            let children = block.body.body;
-            for (let child of children) {
-              switch (child.type) {
-                case "PropertyDefinitionStatement":
-                  let propName = child.id.name;
-                  let structName = child.structName.name;
-                  console.log(structName);
-
-                  switch (structName) {
-                    case "int8":
-                    case "int16":
-                    case "fstring8":
-                    case "nstring":
-                    case "float32":
-                    case "float64":
-                      value[propName] = this.readNativeStruct(structName);
-                      break;
-                    default:
-                      value[propName] = this.readUserStruct(structName);
-                  }
-
-                  if (child.body) {
-                    let rrrrr = this.executeNode(child.body, value[propName]);
-                  }
-
-                  return value;
-
-                default:
-                  throw new Error(`Unknown type: ${child.type}`);
-              }
-            }
-            break;
-
-          default:
-            throw new Error(`Unknown type: ${block.body.type}`);
-        }
-
-        // let res = this.executeNode(node.body, value);
-        return 1;
+        return StatementHandler.StructDefinitionStatement(node, this, value);
 
       case "BlockStatement":
-        let res1 = this.executeNode(node.body, value);
+        let res1 = StatementHandler.BlockStatement(node, this, value);
+        console.log(res1);
         break;
 
       case "StatementList":
-        for (let stmt of node.body) {
-          switch (stmt.type) {
-            case "WhenStatement":
-              this.executeNode(stmt, value);
-              break;
-
-            default:
-              let resss2 = this.executeNode(stmt, value);
-          }
-        }
-        return value;
+        return StatementHandler.StatementList(node, this, value);
 
       case "PropertyAccessStatement":
-        return value[node.id.name];
+        return StatementHandler.PropertyAccessStatement(node, this, value);
 
       case "WhenStatement":
-        let property = node.property;
-        let operator = node.operator;
+        return StatementHandler.WhenStatement(node, this, value);
 
-        let realPropValue = (() => {
-          if (property) {
-            return this.executeNode(property, value);
-          }
-
-          return value;
-        })();
-
-        let value22 = this.executeNode(node.value, value);
-
-        let opValue: Operator;
-
-        if (!operator) {
-          opValue = Operator.EQ;
-        } else {
-          opValue = operator.operator;
-        }
-
-        let whenResult;
-        switch (opValue) {
-          case Operator.EQ:
-            whenResult = realPropValue == value22;
-            break;
-          case Operator.GEQ:
-            whenResult = realPropValue >= value22;
-            break;
-          case Operator.LEQ:
-            whenResult = realPropValue <= value22;
-            break;
-          case Operator.NEQ:
-            whenResult = realPropValue != value22;
-            break;
-          case Operator.G:
-            whenResult = realPropValue > value22;
-            break;
-          case Operator.L:
-            whenResult = realPropValue < value22;
-            break;
-        }
-
-        if (whenResult) {
-          let rrrrr = this.executeNode(node.body, value);
-        }
-
-        break;
       case "PropertyAssignStatement":
-        let val2 = value;
-        if (typeof value !== "object") {
-          val2 = value;
-          value = {};
-        }
-        value[node.property.name] = this.executeNode(node.value, val2);
-        break;
+        return StatementHandler.PropertyAssignStatement(node, this, value);
 
       case "HexDigit":
-        return parseInt(node.value, 16);
+        return StatementHandler.HexDigit(node, this, value);
 
       case "TrueValue":
       case "FalseValue":
@@ -284,12 +141,7 @@ export class Processor {
         return node.value;
 
       case "Identifier":
-        if (this.consts[node.name]) {
-          let constValue = this.executeNode(this.consts[node.name], value);
-          return constValue;
-        }
-
-        throw new Error(`Unknown identifier ${node.name}`);
+        return StatementHandler.Identifier(node, this, value);
 
       default:
         console.log(node);
@@ -321,12 +173,26 @@ export class Processor {
           fields: {}
         };
 
-        for (let stmt of node.body.body.body) {
-          if (this.structMeta[name].fields[stmt.id.name]) {
-            throw new Error(`Struct field '${stmt.id.name}' already defined`);
-          }
+        switch (node.body.type) {
+          case "ReturnStatement":
+            console.log(node.body);
+            break;
 
-          this.structMeta[name].fields[stmt.id.name] = {};
+          case "BlockStatement":
+            for (let stmt of node.body.body.body) {
+              if (this.structMeta[name].fields[stmt.id.name]) {
+                throw new Error(
+                  `Struct field '${stmt.id.name}' already defined`
+                );
+              }
+
+              this.structMeta[name].fields[stmt.id.name] = {};
+            }
+
+            break;
+
+          default:
+            throw new Error(`Unknown type: ${node.body.type}`);
         }
 
         if (node.export) {

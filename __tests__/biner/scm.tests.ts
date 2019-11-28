@@ -1,7 +1,7 @@
 import { Processor } from "../../src/processor";
 import { buf, pathFix } from "../../util";
 
-xdescribe("Biner simple tests using pegjs", () => {
+describe("Biner simple tests using pegjs", () => {
   it("scm 0005 int + float", () => {
     let b = buf("|  0005  |  04 |    01   |   06  |  00 00 00 00 |");
     let pr = Processor.readFile(pathFix("scm"), b);

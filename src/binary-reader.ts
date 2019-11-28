@@ -56,4 +56,28 @@ export class BinaryReader {
       }
     }
   }
+
+  public get fstring8() {
+    let length = this.int8;
+    let str = [];
+
+    for (let i = 0; i < length; i++) {
+      str.push(String.fromCharCode(this.int8));
+    }
+
+    return str.join("");
+  }
+
+  public get nstring() {
+    let str1 = [];
+    let int8;
+    do {
+      int8 = this.int8;
+      if (int8 != 0) {
+        str1.push(String.fromCharCode(int8));
+      }
+    } while (int8 != 0);
+
+    return str1.join("");
+  }
 }
