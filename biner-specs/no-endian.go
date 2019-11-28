@@ -1,0 +1,4 @@
+
+struct {
+	val: int8;
+}

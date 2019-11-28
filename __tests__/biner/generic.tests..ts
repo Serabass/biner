@@ -1,5 +1,5 @@
 import { buf } from "../../util";
-import { Processor } from "../../processor";
+import { Processor } from "../../src/processor";
 
 xdescribe("Generic", () => {
   it("Test generic", () => {

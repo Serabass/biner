@@ -1,4 +1,4 @@
-import { Processor } from "../../processor";
+import { Processor } from "../../src/processor";
 import { buf } from "../../util";
 
 xdescribe("Biner simple tests using pegjs", () => {
