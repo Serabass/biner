@@ -143,6 +143,14 @@ export class Processor {
             value[propName] = str1.join("");
             break;
 
+          case "float32":
+            value[propName] = this.reader.float32;
+            break;
+
+          case "float64":
+            value[propName] = this.reader.float64;
+            break;
+
           default:
             let struct;
             if (!this.structs[structName]) {

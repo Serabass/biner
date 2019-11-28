@@ -7,5 +7,5 @@ export function buf(data: string) {
 }
 
 export function pathFix(specFileName: string) {
-  return path.join(".", "biner-specs", specFileName + ".go");
+  return path.join(".", "examples", specFileName + ".go");
 }

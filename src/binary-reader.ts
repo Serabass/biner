@@ -26,4 +26,34 @@ export class BinaryReader {
       }
     }
   }
+
+  public get float32() {
+    switch (this.endian) {
+      case "BE": {
+        let data = this.buffer.readFloatBE(this.cursor);
+        this.cursor += 4;
+        return data;
+      }
+      case "LE": {
+        let data = this.buffer.readFloatLE(this.cursor);
+        this.cursor += 4;
+        return data;
+      }
+    }
+  }
+
+  public get float64() {
+    switch (this.endian) {
+      case "BE": {
+        let data = this.buffer.readDoubleBE(this.cursor);
+        this.cursor += 8;
+        return data;
+      }
+      case "LE": {
+        let data = this.buffer.readDoubleLE(this.cursor);
+        this.cursor += 8;
+        return data;
+      }
+    }
+  }
 }
