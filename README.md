@@ -57,17 +57,17 @@ struct rgb {
 Возьмём вот такой пример из тестов:
 ```go
 struct {
-	color: rgb {
-		when r == 0xFF {
-			red = true;
-		}
-		when g == 0xFF {
-			green = true;
-		}
-		when b == 0xFF {
-			blue = true;
-		}
-	}
+  color: rgb {
+    when r == 0xFF {
+      red = true;
+    }
+    when g == 0xFF {
+      green = true;
+    }
+    when b == 0xFF {
+      blue = true;
+    }
+  }
 }
 ```
 
