@@ -13,6 +13,6 @@ struct rgbWithNested {
 	nested: rgb;
 }
 
-struct main {
+struct {
 	color: rgbWithNested;
 }

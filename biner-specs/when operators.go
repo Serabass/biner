@@ -6,7 +6,7 @@ struct rgb {
 	b: int8;
 }
 
-struct main {
+struct {
 	color: rgb {
 		when r >= 0x80 {
 			redBright = true;

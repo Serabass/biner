@@ -294,7 +294,7 @@ Generic // TODO Use List
 
 StructDefinitionStatement
  = StructKeyword 
- __ id: IdentifierName __ generic: (Generic __)? 
+ __ id: IdentifierName? __ generic: (Generic __)? 
  __ body: (Block / ReturnStatement)? {
    return {
      type: "StructDefinitionStatement",

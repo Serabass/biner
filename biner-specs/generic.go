@@ -6,7 +6,7 @@ struct vector<T> {
 	z: <T>;
 }
 
-struct main {
+struct {
 	color8: vector<int8>;
 	color16: vector<int16>;
 }

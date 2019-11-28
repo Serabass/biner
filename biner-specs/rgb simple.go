@@ -8,7 +8,7 @@
 | 00 00 FF | => blue: true
 */
 
-struct main {
+struct {
 	r: int8;
 	g: int8;
 	b: int8;

@@ -61,7 +61,7 @@ export class Processor {
     return this;
   }
 
-  public run(structName: string = "main"): any {
+  public run(structName: string = ""): any {
     let value = {};
     this.executeNode(this.structs[structName], value);
     return value;
@@ -108,6 +108,30 @@ export class Processor {
 
           case "int16":
             value[propName] = this.reader.int16;
+            break;
+
+          case "fstring8":
+            let length = this.reader.int8;
+            let str = [];
+
+            for (let i = 0; i < length; i++) {
+              str.push(String.fromCharCode(this.reader.int8));
+            }
+
+            value[propName] = str.join("");
+            break;
+
+          case "nstring":
+            let str1 = [];
+            let int8;
+            do {
+              int8 = this.reader.int8;
+              if (int8 != 0) {
+                str1.push(String.fromCharCode(int8));
+              }
+            } while (int8 != 0);
+
+            value[propName] = str1.join("");
             break;
 
           default:
@@ -215,7 +239,13 @@ export class Processor {
         this.reader = new BinaryReader(endian, this.buffer);
         break;
       case "StructDefinitionStatement":
-        this.structs[node.id.name] = node;
+        const name = node.id ? node.id.name : "";
+
+        if (this.structs[name]) {
+          throw new Error(`Struct '${name}' already defined`);
+        }
+
+        this.structs[name] = node;
         break;
       case "BlockStatement":
         // console.log(node.body.body);

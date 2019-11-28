@@ -14,7 +14,7 @@ struct rgb {
 	b: int8;
 }
 
-struct main {
+struct {
 	color: rgb {
 		when r == 0xFF {
 			red = true;
