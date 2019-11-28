@@ -279,12 +279,28 @@ ReturnStatement
    };
  }
 
+TypeList 
+  = head:Identifier tail:(__ Identifier)* {
+      return buildList(head, tail, 1);
+    }
+
+Generic // TODO Use List
+  = "<" __ id: TypeList __ ">" {
+    return {
+      type: "Generic",
+      id
+    };
+  }
+
 StructDefinitionStatement
- = StructKeyword __ id: IdentifierName __ body: (Block / ReturnStatement)? {
+ = StructKeyword 
+ __ id: IdentifierName __ generic: (Generic __)? 
+ __ body: (Block / ReturnStatement)? {
    return {
      type: "StructDefinitionStatement",
      id,
-     body
+     body,
+     generic
    };
  } 
 
@@ -314,10 +330,10 @@ PropertyAccessStatement
 
 WhenStatement
  = WhenKeyword
-   __ property: PropertyAccessStatement?
-   __ operator: OperatorStatement?
-   __ value: Statement
-   __ body: Block {
+  __ property: PropertyAccessStatement?
+  __ operator: OperatorStatement?
+  __ value: Statement
+  __ body: Block {
    return {
     type: "WhenStatement",
     property,
@@ -343,11 +359,33 @@ ThrowStatement
    };
  }
 
+GenericType
+ = "<" __ name: Identifier __ ">" {
+   return {
+     type: "GenericType",
+     name,
+   };
+ }
+
+PropertyType
+ = structName: Identifier
+ / genericType: GenericType {
+   return {
+     type: "PropertyType",
+     structName,
+     genericType
+   };
+ }
+
 PropertyDefinitionStatement
- = id: Identifier __ ":" __ structName: Identifier __ body: Block? __ EOS {
+ = id: Identifier
+  __ ":"
+  __ structName: (Identifier / GenericType)
+  __ generic: (Generic __)? 
+  __ body: Block? __ EOS {
    return {
      type: "PropertyDefinitionStatement",
-     id, structName, body
+     id, structName, body, generic
    };
  } 
 

@@ -117,7 +117,6 @@ export class Processor {
               let val2 = this.executeNode(struct, newStruct);
 
               value[propName] = newStruct;
-              console.log(value);
             } else {
               throw new Error(`Unknown struct name: ${structName}`);
             }
