@@ -6,20 +6,26 @@ describe("Biner simple tests using pegjs", () => {
     let b = buf("FF | 00 | 00");
     let pr = Processor.readFile(pathFix("rgb simple"), b);
     let result = pr.run();
-    expect(result.r).toBe(0xff);
-    expect(result.g).toBe(0x00);
-    expect(result.b).toBe(0x00);
-    expect(Object.keys(result).length).toBe(3);
+    expect(result).toBeDefined();
+    expect(result).toBe({
+      b: 0x00,
+      g: 0x00,
+      r: 0xff
+    });
   });
 
   it("rgb struct red", () => {
     let b = buf("FF | 00 | 00");
     let pr = Processor.readFile(pathFix("rgb struct"), b);
     let result = pr.run();
-    expect(result.color.r).toBe(0xff);
-    expect(result.color.g).toBe(0x00);
-    expect(result.color.b).toBe(0x00);
-    expect(result.color.red).toBeTruthy();
+    expect(result).toBe({
+      color: {
+        r: 0xff,
+        g: 0x00,
+        b: 0x00,
+        red: true
+      }
+    });
   });
 
   it("rgb struct green", () => {

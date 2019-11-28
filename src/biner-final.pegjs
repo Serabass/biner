@@ -63,6 +63,8 @@ BinaryDigit
 
 HexValue
   = value: ("0x" HexDigit) {
+        let [zerox, [...digits]] = value;
+        value = `${zerox}${digits.join("")}`;
     return {
       type: "HexDigit",
       value,
@@ -304,10 +306,8 @@ Generic // TODO Use List
 StructureInheritanceStatement
  = ":" __ id: Identifier {
    return {
-     type: {
        type: "StructureInheritanceStatement",
        id,
-     }
    };
  }
 
@@ -323,6 +323,7 @@ StructDefinitionStatement
      id,
      body,
      generic,
+     parent,
      export: !!isExport
    };
  }

@@ -1,9 +1,8 @@
-#endian BE;
 
 struct vector<T> {
-	x: <T>;
-	y: <T>;
-	z: <T>;
+	x: T;
+	y: T;
+	z: T;
 }
 
 struct {

@@ -83,11 +83,119 @@ export class Processor {
     }
   }
 
+  private readUserStruct(structName: string) {
+    let struct;
+    if (!this.structs[structName]) {
+      if (!this.imports[structName]) {
+        throw new Error(`Cannot find struct name: ${structName}`);
+      }
+
+      struct = this.imports[structName];
+    } else {
+      struct = this.structs[structName];
+    }
+
+    let newStruct = {};
+    let val2 = this.executeNode(struct, newStruct);
+
+    return newStruct;
+  }
+
+  private readNativeStruct(structName: string) {
+    switch (structName) {
+      case "int8":
+        return this.reader.int8;
+
+      case "int16":
+        return this.reader.int16;
+
+      case "fstring8":
+        let length = this.reader.int8;
+        let str = [];
+
+        for (let i = 0; i < length; i++) {
+          str.push(String.fromCharCode(this.reader.int8));
+        }
+
+        return str.join("");
+
+      case "nstring":
+        let str1 = [];
+        let int8;
+        do {
+          int8 = this.reader.int8;
+          if (int8 != 0) {
+            str1.push(String.fromCharCode(int8));
+          }
+        } while (int8 != 0);
+
+        return str1.join("");
+
+      case "float32":
+        return this.reader.float32;
+
+      case "float64":
+        return this.reader.float64;
+    }
+
+    throw new Error(`Unknown struct name: ${structName}`);
+  }
+
   public executeNode(node, value) {
     switch (node.type) {
+      case "StructureInheritanceStatement":
+        break;
+
       case "StructDefinitionStatement":
-        let res = this.executeNode(node.body, value);
-        return res;
+        let block = node.body;
+
+        if (node.parent) {
+          const structName = node.parent.id.name;
+          const struct = this.structs[structName];
+          let p = this.executeNode(struct, value);
+        }
+
+        switch (block.body.type) {
+          case "StatementList":
+            let children = block.body.body;
+            for (let child of children) {
+              switch (child.type) {
+                case "PropertyDefinitionStatement":
+                  let propName = child.id.name;
+                  let structName = child.structName.name;
+                  console.log(structName);
+
+                  switch (structName) {
+                    case "int8":
+                    case "int16":
+                    case "fstring8":
+                    case "nstring":
+                    case "float32":
+                    case "float64":
+                      value[propName] = this.readNativeStruct(structName);
+                      break;
+                    default:
+                      value[propName] = this.readUserStruct(structName);
+                  }
+
+                  if (child.body) {
+                    let rrrrr = this.executeNode(child.body, value[propName]);
+                  }
+
+                  return value;
+
+                default:
+                  throw new Error(`Unknown type: ${child.type}`);
+              }
+            }
+            break;
+
+          default:
+            throw new Error(`Unknown type: ${block.body.type}`);
+        }
+
+        // let res = this.executeNode(node.body, value);
+        return 1;
 
       case "BlockStatement":
         let res1 = this.executeNode(node.body, value);
@@ -104,75 +212,6 @@ export class Processor {
               let resss2 = this.executeNode(stmt, value);
           }
         }
-        return value;
-
-      case "PropertyDefinitionStatement":
-        let propName = node.id.name;
-        let structName = node.structName.name;
-
-        switch (structName) {
-          case "int8":
-            value[propName] = this.reader.int8;
-            break;
-
-          case "int16":
-            value[propName] = this.reader.int16;
-            break;
-
-          case "fstring8":
-            let length = this.reader.int8;
-            let str = [];
-
-            for (let i = 0; i < length; i++) {
-              str.push(String.fromCharCode(this.reader.int8));
-            }
-
-            value[propName] = str.join("");
-            break;
-
-          case "nstring":
-            let str1 = [];
-            let int8;
-            do {
-              int8 = this.reader.int8;
-              if (int8 != 0) {
-                str1.push(String.fromCharCode(int8));
-              }
-            } while (int8 != 0);
-
-            value[propName] = str1.join("");
-            break;
-
-          case "float32":
-            value[propName] = this.reader.float32;
-            break;
-
-          case "float64":
-            value[propName] = this.reader.float64;
-            break;
-
-          default:
-            let struct;
-            if (!this.structs[structName]) {
-              if (!this.imports[structName]) {
-                throw new Error(`Unknown struct name: ${structName}`);
-              }
-
-              struct = this.imports[structName];
-            } else {
-              struct = this.structs[structName];
-            }
-
-            let newStruct = {};
-            let val2 = this.executeNode(struct, newStruct);
-
-            value[propName] = newStruct;
-        }
-
-        if (node.body) {
-          let rrrrr = this.executeNode(node.body, value[propName]);
-        }
-
         return value;
 
       case "PropertyAccessStatement":
@@ -237,11 +276,7 @@ export class Processor {
         break;
 
       case "HexDigit":
-        let [zerox, [...digits]] = node.value;
-        let hexString = `${zerox}${digits.join("")}`;
-        let intValue = parseInt(hexString, 16);
-
-        return intValue;
+        return parseInt(node.value, 16);
 
       case "TrueValue":
       case "FalseValue":
