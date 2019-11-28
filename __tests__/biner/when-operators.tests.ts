@@ -1,10 +1,10 @@
 import { Processor } from "../../src/processor";
-import { buf } from "../../util";
+import { buf, pathFix } from "../../util";
 
 describe("Biner simple tests using pegjs", () => {
   it("when operators", () => {
     let b = buf("| 00 81 00 |");
-    let pr = Processor.readFile("when operators", b);
+    let pr = Processor.readFile(pathFix("when operators"), b);
     let x = pr.run();
     expect(x).toBeDefined();
     expect(x.color).toBeDefined();

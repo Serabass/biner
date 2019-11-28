@@ -246,6 +246,7 @@ DirectiveStatement
   }
 
 ImportKeyword = "import"
+ExportKeyword = "export"
 FromKeyword = "from"
 StructKeyword = "struct"
 WhenKeyword = "when"
@@ -255,6 +256,7 @@ ConstKeyword = "const"
 
 Keyword
   = ImportKeyword
+  / ExportKeyword
   / FromKeyword
   / StructKeyword
   / DefaultKeyword
@@ -266,6 +268,7 @@ Statement
   / WhenStatement
   / DefaultStatement
   / StructDefinitionStatement
+  / ImportStatement
   / PropertyDefinitionStatement
   / PropertyAssignStatement
   / StructAccessStatement
@@ -309,7 +312,8 @@ StructureInheritanceStatement
  }
 
 StructDefinitionStatement
- = StructKeyword
+ = isExport: ExportKeyword?
+ __ StructKeyword
  __ id: Identifier?
  __ generic: GenericType?
  __ parent: StructureInheritanceStatement?
@@ -318,7 +322,8 @@ StructDefinitionStatement
      type: "StructDefinitionStatement",
      id,
      body,
-     generic
+     generic,
+     export: !!isExport
    };
  }
 
@@ -456,9 +461,21 @@ ConstStatement
      };
    }
 
+ImportNamesList
+  = head:Identifier tail:(__ "," __ Identifier)* {
+      return buildList(head, tail, 3);
+    }
 
-
-
+ImportStatement
+ = ImportKeyword
+  __ imports: ImportNamesList 
+  __ FromKeyword 
+  __ fileName: StringLiteral EOS {
+   return {
+     type: "ImportStatement",
+    imports, fileName
+   };
+ };
 
 
 

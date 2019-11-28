@@ -1,10 +1,10 @@
 import { Processor } from "../../src/processor";
-import { buf } from "../../util";
+import { buf, pathFix } from "../../util";
 
 xdescribe("Biner simple tests using pegjs", () => {
   it("scm 0005 int + float", () => {
     let b = buf("|  0005  |  04 |    01   |   06  |  00 00 00 00 |");
-    let pr = Processor.readFile("scm", b);
+    let pr = Processor.readFile(pathFix("scm"), b);
     let x = pr.run();
     expect(x.opcode.type).toBe("opcode0005");
     expect(x.opcode.val1).toBe({
@@ -36,7 +36,7 @@ xdescribe("Biner simple tests using pegjs", () => {
 
   it("scm 034A string", () => {
     let b = buf("|  034A  | 31 31 31 31 00 CC CC CC |");
-    let pr = Processor.readFile("scm", b);
+    let pr = Processor.readFile(pathFix("scm"), b);
     let x = pr.run();
     expect(x.opcodes).toBeInstanceOf(Array);
     let [first] = x.opcodes;
@@ -49,7 +49,7 @@ xdescribe("Biner simple tests using pegjs", () => {
 
   it("scm 0009", () => {
     let b = buf("|  0009  |");
-    let pr = Processor.readFile("scm", b);
+    let pr = Processor.readFile(pathFix("scm"), b);
     let x = pr.run();
     expect(x.opcodes).toBeInstanceOf(Array);
     let [first] = x.opcodes;

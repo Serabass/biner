@@ -1,10 +1,10 @@
-import { buf } from "../../util";
+import { buf, pathFix } from "../../util";
 import { Processor } from "../../src/processor";
 
 describe("Nested structs", () => {
   it("Test nested", () => {
     let b = buf(" FF | 00 | 00 | FF | FF | FF ");
-    let pr = Processor.readFile("nested-struct", b);
+    let pr = Processor.readFile(pathFix("nested-struct"), b);
     let result = pr.run();
 
     expect(result.color.r).toBe(0xff);

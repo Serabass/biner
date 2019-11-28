@@ -21,6 +21,7 @@ export class Processor {
     endian: "BE"
   };
   public imports: any = {};
+  public exports: any = {};
   public consts: any = {};
   public structs: any = {};
   public structMeta: any = {};
@@ -29,8 +30,7 @@ export class Processor {
   public reader: BinaryReader;
 
   public static readFile(specFileName: string, buffer: Buffer): Processor {
-    let p = path.join(".", "biner-specs", specFileName + ".go");
-    let contents = fs.readFileSync(p).toString("utf-8");
+    let contents = fs.readFileSync(specFileName).toString("utf-8");
     let parserContents = fs
       .readFileSync("./src/biner-final.pegjs")
       .toString("utf-8");
@@ -48,10 +48,15 @@ export class Processor {
       return;
     }
 
-    return new Processor(actual.ast, buffer);
+    const res = new Processor(actual.ast, buffer, specFileName);
+    return res;
   }
 
-  public constructor(public ast: any, public buffer: Buffer) {
+  public constructor(
+    public ast: any,
+    public buffer: Buffer,
+    public path: string
+  ) {
     this.prepare();
     // fs.writeFileSync('./out.json', JSON.stringify(ast, null, 4));
   }
@@ -139,15 +144,21 @@ export class Processor {
             break;
 
           default:
-            if (this.structs[structName]) {
-              let struct = this.structs[structName];
-              let newStruct = {};
-              let val2 = this.executeNode(struct, newStruct);
+            let struct;
+            if (!this.structs[structName]) {
+              if (!this.imports[structName]) {
+                throw new Error(`Unknown struct name: ${structName}`);
+              }
 
-              value[propName] = newStruct;
+              struct = this.imports[structName];
             } else {
-              throw new Error(`Unknown struct name: ${structName}`);
+              struct = this.structs[structName];
             }
+
+            let newStruct = {};
+            let val2 = this.executeNode(struct, newStruct);
+
+            value[propName] = newStruct;
         }
 
         if (node.body) {
@@ -275,12 +286,44 @@ export class Processor {
           this.structMeta[name].fields[stmt.id.name] = {};
         }
 
+        if (node.export) {
+          this.exports[name] = node;
+        }
+
         break;
       case "BlockStatement":
         // console.log(node.body.body);
         break;
       case "ConstStatement":
         this.consts[node.id.name] = node.value;
+        break;
+      case "ImportStatement":
+        let fileName = node.fileName.value;
+
+        if (!/\.go/.test(fileName)) {
+          fileName += ".go";
+        }
+
+        const relPath = path.join(this.path, "..", fileName);
+        let importProcessor = Processor.readFile(relPath, Buffer.alloc(0));
+
+        let names = node.imports.map(id => id.name);
+
+        for (let name of names) {
+          if (this.imports[name]) {
+            throw new Error(`Struct with name '${name}' already import`);
+          }
+
+          if (!importProcessor.exports[name]) {
+            throw new Error(
+              `Module '${fileName}' has no export with name '${name}`
+            );
+          }
+
+          this.imports[name] = importProcessor.exports[name];
+        }
+
+        Object.entries(importProcessor.exports).forEach(([name, struct]) => {});
         break;
       default:
         throw new Error(`Unknown node type: ${node.type}`);

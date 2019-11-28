@@ -1,10 +1,10 @@
 import { Processor } from "../../src/processor";
-import { buf } from "../../util";
+import { buf, pathFix } from "../../util";
 
-describe("Inheritance", () => {
+xdescribe("Inheritance", () => {
   it("Simple Inheritance", () => {
     let b = buf("FF | 00 | 00 | FF");
-    let pr = Processor.readFile("inheritance", b);
+    let pr = Processor.readFile(pathFix("inheritance"), b);
     let result = pr.run();
     expect(result.val.r).toBe(0xff);
     expect(result.val.g).toBe(0x00);
