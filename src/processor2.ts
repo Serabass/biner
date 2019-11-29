@@ -1,10 +1,7 @@
-import * as path from "path";
 import * as fs from "fs";
 import * as ASTY from "asty";
 import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
-import { BinaryReader } from "./binary-reader";
-import { StatementHandler } from "./StatementHandler";
 
 export class Proc2 {
   public static readFile(

@@ -108,7 +108,7 @@ ReadableFieldBody
  }
 
 ReadFieldStatement
- = "@" typeName: Identifier
+ = typeName: Identifier
  __ body: ReadableFieldBody? {
      return {
        type: "ReadFieldStatement",
