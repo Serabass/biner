@@ -179,6 +179,18 @@ export class Processor {
             break;
 
           case "BlockStatement":
+            console.log(node.body.body);
+
+            switch (node.body.body.type) {
+              case "StatementList":
+                let rr = this.executeNode(node.body.body, value);
+                break;
+
+              default:
+                console.log(node.body.body);
+                throw new Error(`Unknown node type: ${node.type}`);
+            }
+
             for (let stmt of node.body.body.body) {
               if (this.structMeta[name].fields[stmt.id.name]) {
                 throw new Error(

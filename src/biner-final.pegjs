@@ -267,9 +267,9 @@ Keyword
 
 Statement
   = DirectiveStatement
+  / ConstStatement
   / WhenStatement
-  / DefaultStatement
-  / StructDefinitionStatement
+  / DefaultStatement 
   / ImportStatement
   / PropertyDefinitionStatement
   / PropertyAssignStatement
@@ -280,7 +280,6 @@ Statement
   / Identifier
   / Digit
   / ThrowStatement
-  / ConstStatement
 
 ReturnStatement
  = "=" __ id: Identifier __ body: Block {
@@ -291,8 +290,16 @@ ReturnStatement
    };
  }
 
+TypeStatement
+ = id: Identifier __ generic: Generic? {
+   return {
+     type: "TypeStatement",
+     id, generic
+   };
+ };
+
 TypeList 
-  = head:Identifier tail:(__ Identifier)* {
+  = head:TypeStatement tail:(__ TypeStatement)* {
       return buildList(head, tail, 1);
     }
 
@@ -305,7 +312,7 @@ Generic // TODO Use List
   }
 
 StructureInheritanceStatement
- = ":" __ id: Identifier {
+ = ":" __ id: Identifier generics: Generic* {
    return {
        type: "StructureInheritanceStatement",
        id,
@@ -316,14 +323,14 @@ StructDefinitionStatement
  = isExport: ExportKeyword?
  __ StructKeyword
  __ id: Identifier?
- __ generic: GenericType?
+ __ generics: Generic?
  __ parent: StructureInheritanceStatement?
  __ body: (Block / ReturnStatement) {
    return {
      type: "StructDefinitionStatement",
      id,
      body,
-     generic,
+     generics,
      parent,
      export: !!isExport
    };
@@ -392,28 +399,28 @@ ThrowStatement
    };
  }
 
-GenericType
- = "<" __ name: Identifier __ ">" {
+GenericTypes
+ = "<" __ head:Identifier tail:(__ "," __ Identifier)* __ ">" {
    return {
-     type: "GenericType",
-     name,
+     type: "GenericTypes",
+     generics: buildList(head, tail, 3)
    };
  }
 
 PropertyType
  = structName: Identifier
- / genericType: GenericType {
+ / genericTypes: GenericTypes {
    return {
      type: "PropertyType",
      structName,
-     genericType
+     genericTypes
    };
  }
 
 PropertyDefinitionStatement
  = id: Identifier
   __ ":"
-  __ structName: (Identifier / GenericType)
+  __ structName: PropertyType
   __ generic: (Generic __)? 
   __ body: Block? __ EOS {
    return {
