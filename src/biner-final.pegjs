@@ -247,14 +247,17 @@ DirectiveStatement
     };
   }
 
-ImportKeyword = "import"
-ExportKeyword = "export"
-FromKeyword = "from"
-StructKeyword = "struct"
-WhenKeyword = "when"
+ImportKeyword  = "import"
+ExportKeyword  = "export"
+FromKeyword    = "from"
+StructKeyword  = "struct"
+WhenKeyword    = "when"
 DefaultKeyword = "default"
-ThrowKeyword = "throw"
-ConstKeyword = "const"
+ThrowKeyword   = "throw"
+ConstKeyword   = "const"
+GetKeyword     = "get"
+ThisKeyword    = "@"
+OverrideKeyword= "override"
 
 Keyword
   = ImportKeyword
@@ -264,34 +267,65 @@ Keyword
   / DefaultKeyword
   / ThrowKeyword
   / ConstKeyword
+  / OverrideKeyword
 
 Statement
   = DirectiveStatement
   / ConstStatement
   / WhenStatement
+  / GetterDefinitionStatement
+  / ExpressionStatement
+  / StructDefinitionStatement
   / DefaultStatement 
+  / ReturnStatement 
   / ImportStatement
   / PropertyDefinitionStatement
-  / PropertyAssignStatement
+  / ThisPropertySetStatement
   / StructAccessStatement
   / SystemConstant
   / Block
   / StringLiteral
+  / CharLiteral
   / Identifier
   / Digit
   / ThrowStatement
 
 ReturnStatement
- = "=" __ id: Identifier __ body: Block {
+ = ReturnBlockStatement
+ / ReturnNonBlockStatement
+
+GetterDefinitionStatement
+ = GetKeyword
+  __ id: Identifier 
+  __ "(" ")"
+  __ body: Block {
+
+  }
+
+ReturnBlockStatement
+ = ThisKeyword __ "=" __ id: TypeStatement
+  __ body: (Block / ExpressionStatement) {
    return {
-     type: "ReturnStatement",
+     type: "ReturnBlockStatement",
      id,
      body
    };
  }
 
+ReturnNonBlockStatement
+ = ThisKeyword __ "="
+ __ id:(ThisKeyword / TypeStatement)
+ EOS {
+   return {
+     type: "ReturnNonBlockStatement",
+     id
+   };
+ }
+
 TypeStatement
- = id: Identifier __ generic: Generic? {
+ = id: Identifier 
+  __ generic: Generic?
+  __ array:ArrayDefinition? {
    return {
      type: "TypeStatement",
      id, generic
@@ -350,9 +384,32 @@ Operator
  / "<<"
  / ">>"
  / "&"
- 
+ / "~"
+ / "."
 
-OperatorStatement
+ThisPropertyAccess
+ = thisAccess: ThisKeyword? "." id: (Identifier / Generic)? {
+   return {
+     type: "ThisPropertyAccess",
+     id,
+     thisAccess: !!thisAccess
+   };
+ }
+
+ ThisPropertySetStatement
+  = ThisPropertyAccess
+  __ "="
+  __ expr:Statement
+  __
+  EOS
+  {
+    return {
+      type: "ThisPropertySetStatement",
+      expr,
+    };
+  }
+
+OperatorStatement "operator"
  = operator: Operator {
    return {
      type: "OperatorStatement",
@@ -368,17 +425,81 @@ PropertyAccessStatement
    };
  }
 
+RegularExpressionLiteral "regular expression"
+  = "/" pattern:$RegularExpressionBody "/" flags:$RegularExpressionFlags {
+      var value;
+
+      try {
+        value = new RegExp(pattern, flags);
+      } catch (e) {
+        error(e.message);
+      }
+
+      return { type: "Literal", value: value };
+    }
+
+RegularExpressionBody
+  = RegularExpressionFirstChar RegularExpressionChar*
+
+RegularExpressionFirstChar
+  = ![*\\/[] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+  / RegularExpressionClass
+
+RegularExpressionChar
+  = ![\\/[] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+  / RegularExpressionClass
+
+RegularExpressionBackslashSequence
+  = "\\" RegularExpressionNonTerminator
+
+RegularExpressionNonTerminator
+  = !LineTerminator SourceCharacter
+
+RegularExpressionClass
+  = "[" RegularExpressionClassChar* "]"
+
+RegularExpressionClassChar
+  = ![\]\\] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+
+RegularExpressionFlags
+  = IdentifierPart*
+
+
+
+Expression
+ = "(" __ ExpressionStatement __ ")"
+ / RegularExpressionLiteral
+ / SystemConstant
+ / ThisPropertyAccess
+ / ArrayExpression
+ / Identifier
+ / ThisKeyword
+ / StringLiteral
+ / CharLiteral
+ / Digit
+
+ExpressionStatement
+ =   expr1: Expression
+  __ operator: OperatorStatement
+  __ expr2: Expression {
+    return {
+      type: "ExpressionStatement",
+      expr1, operator, expr2
+    };
+  }
+
 WhenStatement
  = WhenKeyword
-  __ property: PropertyAccessStatement?
-  __ operator: OperatorStatement?
-  __ value: (Identifier / Statement)
+  __ "("
+  __ expr: ExpressionStatement
+  __ ")"
   __ body: Block {
    return {
     type: "WhenStatement",
-    property,
-    operator,
-    value,
+    expr,
     body
    }
  }
@@ -392,13 +513,13 @@ DefaultStatement
  }
 
 ThrowStatement
- = ThrowKeyword __ body: Statement __ EOS {
+ = ThrowKeyword _ expr: Expression __ EOS {
    return {
      type: "ThrowStatement",
-     body,
+     expr,
    };
  }
-
+ 
 GenericTypes
  = "<" __ head:Identifier tail:(__ "," __ Identifier)* __ ">" {
    return {
@@ -407,39 +528,58 @@ GenericTypes
    };
  }
 
+ArrayDefinition
+ = "[" __ body:(ThisPropertyAccess / Expression) __ "]" {
+   return {
+     type: "ArrayDefinition",
+     body,
+   };
+ }
+
+ArrayElements
+  = head:ExpressionStatement tail:(__ "," __ ExpressionStatement)* {
+      return buildList(head, tail, 3);
+    }
+
+
+ArrayExpression
+ = "[" __ body:ArrayElements __ "]" {
+   return {
+     type: "ArrayExpression",
+     body,
+   };
+ }
+ 
+
 PropertyType
  = structName: Identifier
- / genericTypes: GenericTypes {
+  __ generic: (Generic __)?
+  __ array:ArrayDefinition?  {
    return {
      type: "PropertyType",
      structName,
-     genericTypes
+     generic,
+     array,
    };
  }
 
+PropertyDefinitionArray
+ = "[" "]"
+
 PropertyDefinitionStatement
- = id: Identifier
+ = override: OverrideKeyword?
+  __ acc: ThisPropertyAccess PropertyDefinitionArray?
   __ ":"
-  __ structName: PropertyType
-  __ generic: (Generic __)? 
+  __ structName: (PropertyType / ThisKeyword)
   __ body: Block? __ EOS {
    return {
      type: "PropertyDefinitionStatement",
-     id, structName, body, generic
+     acc, structName, body
    };
  } 
 
-PropertyAssignStatement
- = property: Identifier __ "=" __ value: Statement __ EOS {
-   return {
-     type: "PropertyAssignStatement",
-     property,
-     value
-   };
- }
-
 StructAccessStatement
-  = id: Identifier __ body: Block __ EOS {
+  =  id: Identifier __ body: Block __ EOS {
     return {
       type: "StructAccessStatement",
       body,
@@ -469,6 +609,7 @@ SystemConstant
 
 ConstStatement
   = ConstKeyword
+   __ type: TypeStatement
    __ id: Identifier
    __ "="
    __ value: Value __ EOS {
@@ -506,8 +647,10 @@ StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
       return { type: "Literal", value: chars.join("") };
     }
-  / "'" chars:SingleStringCharacter* "'" {
-      return { type: "Literal", value: chars.join("") };
+
+CharLiteral "char"
+  = "'" char:SingleStringCharacter "'" {
+      return { type: "Literal", value: char };
     }
 
 DoubleStringCharacter
