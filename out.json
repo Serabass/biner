@@ -1,227 +1,1660 @@
 {
-    "type": "Program",
-    "body": [
-        {
-            "type": "DirectiveStatement",
-            "id": {
-                "type": "Identifier",
-                "name": "endianness"
+    "ast": {
+        "type": "Program",
+        "body": [
+            {
+                "type": "ConstStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "PNG_SIGNATURE"
+                },
+                "value": {
+                    "type": "HexDigit",
+                    "value": "0x89"
+                }
             },
-            "value": {
-                "type": "Identifier",
-                "name": "BE"
-            }
-        },
-        {
-            "type": "StructDefinitionStatement",
-            "id": {
-                "type": "Identifier",
-                "name": "rgb"
+            {
+                "type": "ConstStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "DOS_EOF"
+                },
+                "value": {
+                    "type": "HexDigit",
+                    "value": "0x1A"
+                }
             },
-            "body": {
-                "type": "BlockStatement",
+            {
+                "type": "ConstStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "CR"
+                },
+                "value": {
+                    "type": "HexDigit",
+                    "value": "0x0A"
+                }
+            },
+            {
+                "type": "ConstStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "LF"
+                },
+                "value": {
+                    "type": "HexDigit",
+                    "value": "0x0D"
+                }
+            },
+            {
+                "type": "ConstStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "CRLF"
+                },
+                "value": {
+                    "type": "HexDigit",
+                    "value": "0x0A0D"
+                }
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "ChunkChar"
+                },
                 "body": {
-                    "type": "StatementList",
-                    "body": [
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "ReturnBlockStatement",
+                                "id": {
+                                    "type": "TypeStatement",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "char"
+                                    },
+                                    "generic": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "ThisPropertySetStatement",
+                                                "expr": "@"
+                                            },
+                                            {
+                                                "type": "Identifier",
+                                                "name": "when"
+                                            },
+                                            {
+                                                "type": "ExpressionStatement",
+                                                "expr1": "@",
+                                                "operator": {
+                                                    "type": "OperatorStatement",
+                                                    "operator": {
+                                                        "type": "Operator",
+                                                        "name": "TRGX"
+                                                    }
+                                                },
+                                                "expr2": {
+                                                    "type": "Literal",
+                                                    "value": {}
+                                                }
+                                            },
+                                            {
+                                                "type": "BlockStatement",
+                                                "body": {
+                                                    "type": "StatementList",
+                                                    "body": [
+                                                        {
+                                                            "type": "ThisPropertySetStatement",
+                                                            "expr": {
+                                                                "type": "TrueValue",
+                                                                "value": true
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            {
+                                                "type": "Identifier",
+                                                "name": "when"
+                                            },
+                                            {
+                                                "type": "ExpressionStatement",
+                                                "expr1": "@",
+                                                "operator": {
+                                                    "type": "OperatorStatement",
+                                                    "operator": {
+                                                        "type": "Operator",
+                                                        "name": "TRGX"
+                                                    }
+                                                },
+                                                "expr2": {
+                                                    "type": "Literal",
+                                                    "value": {}
+                                                }
+                                            },
+                                            {
+                                                "type": "BlockStatement",
+                                                "body": {
+                                                    "type": "StatementList",
+                                                    "body": [
+                                                        {
+                                                            "type": "ThisPropertySetStatement",
+                                                            "expr": {
+                                                                "type": "FalseValue",
+                                                                "value": false
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Generic",
+                                        "id": [
+                                            {
+                                                "type": "TypeStatement",
+                                                "id": {
+                                                    "type": "Identifier",
+                                                    "name": "prop"
+                                                },
+                                                "generic": null
+                                            }
+                                        ]
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            }
+                        ]
+                    }
+                },
+                "generics": {
+                    "type": "Generic",
+                    "id": [
                         {
-                            "type": "PropertyDefinitionStatement",
+                            "type": "TypeStatement",
                             "id": {
                                 "type": "Identifier",
-                                "name": "r"
+                                "name": "prop"
                             },
-                            "structName": {
-                                "type": "Identifier",
-                                "name": "int8"
-                            },
-                            "body": null
-                        },
-                        {
-                            "type": "PropertyDefinitionStatement",
-                            "id": {
-                                "type": "Identifier",
-                                "name": "g"
-                            },
-                            "structName": {
-                                "type": "Identifier",
-                                "name": "int8"
-                            },
-                            "body": null
-                        },
-                        {
-                            "type": "PropertyDefinitionStatement",
-                            "id": {
-                                "type": "Identifier",
-                                "name": "b"
-                            },
-                            "structName": {
-                                "type": "Identifier",
-                                "name": "int8"
-                            },
-                            "body": null
+                            "generic": null
                         }
                     ]
-                }
-            }
-        },
-        {
-            "type": "StructDefinitionStatement",
-            "id": {
-                "type": "Identifier",
-                "name": "main"
+                },
+                "parent": null,
+                "export": false
             },
-            "body": {
-                "type": "BlockStatement",
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "FourthChunkChar"
+                },
                 "body": {
-                    "type": "StatementList",
-                    "body": [
-                        {
-                            "type": "PropertyDefinitionStatement",
-                            "id": {
-                                "type": "Identifier",
-                                "name": "color"
-                            },
-                            "structName": {
-                                "type": "Identifier",
-                                "name": "rgb"
-                            },
-                            "body": {
-                                "type": "BlockStatement",
+                    "type": "BlockStatement",
+                    "body": []
+                },
+                "generics": null,
+                "parent": {
+                    "type": "StructureInheritanceStatement",
+                    "id": {
+                        "type": "Identifier",
+                        "name": "ChunkChar"
+                    }
+                },
+                "export": false
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "PNGChunkType"
+                },
+                "body": {
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "first"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "ChunkChar"
+                                    },
+                                    "generic": [
+                                        {
+                                            "type": "Generic",
+                                            "id": [
+                                                {
+                                                    "type": "TypeStatement",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "critical"
+                                                    },
+                                                    "generic": null
+                                                }
+                                            ]
+                                        },
+                                        [
+                                            " "
+                                        ]
+                                    ],
+                                    "array": null
+                                },
                                 "body": {
-                                    "type": "StatementList",
-                                    "body": [
-                                        {
-                                            "type": "WhenStatement",
-                                            "property": {
-                                                "type": "ProperyAccessStatement",
-                                                "id": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "ThisPropertySetStatement",
+                                                "expr": {
                                                     "type": "Identifier",
-                                                    "name": "r"
-                                                }
-                                            },
-                                            "operator": null,
-                                            "value": {
-                                                "type": "HexDigit",
-                                                "value": [
-                                                    "0x",
-                                                    [
-                                                        "F",
-                                                        "F"
-                                                    ]
-                                                ]
-                                            },
-                                            "body": {
-                                                "type": "BlockStatement",
-                                                "body": {
-                                                    "type": "StatementList",
-                                                    "body": [
-                                                        {
-                                                            "type": "PropertyAssignStatement",
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "red"
-                                                            },
-                                                            "value": {
-                                                                "type": "TrueValue",
-                                                                "value": true
-                                                            }
-                                                        }
-                                                    ]
+                                                    "name": "critical"
                                                 }
                                             }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "second"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "ChunkChar"
+                                    },
+                                    "generic": [
+                                        {
+                                            "type": "Generic",
+                                            "id": [
+                                                {
+                                                    "type": "TypeStatement",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "public"
+                                                    },
+                                                    "generic": null
+                                                }
+                                            ]
                                         },
-                                        {
-                                            "type": "WhenStatement",
-                                            "property": {
-                                                "type": "ProperyAccessStatement",
-                                                "id": {
+                                        [
+                                            " "
+                                        ]
+                                    ],
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "ThisPropertySetStatement",
+                                                "expr": {
                                                     "type": "Identifier",
-                                                    "name": "g"
-                                                }
-                                            },
-                                            "operator": {
-                                                "type": "OperatorStatement",
-                                                "operator": ">="
-                                            },
-                                            "value": {
-                                                "type": "HexDigit",
-                                                "value": [
-                                                    "0x",
-                                                    [
-                                                        "8",
-                                                        "0"
-                                                    ]
-                                                ]
-                                            },
-                                            "body": {
-                                                "type": "BlockStatement",
-                                                "body": {
-                                                    "type": "StatementList",
-                                                    "body": [
-                                                        {
-                                                            "type": "PropertyAssignStatement",
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "green"
-                                                            },
-                                                            "value": {
-                                                                "type": "TrueValue",
-                                                                "value": true
-                                                            }
-                                                        }
-                                                    ]
+                                                    "name": "public"
                                                 }
                                             }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "third"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "ChunkChar"
+                                    },
+                                    "generic": [
+                                        {
+                                            "type": "Generic",
+                                            "id": [
+                                                {
+                                                    "type": "TypeStatement",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "diff"
+                                                    },
+                                                    "generic": null
+                                                }
+                                            ]
                                         },
-                                        {
-                                            "type": "WhenStatement",
-                                            "property": {
-                                                "type": "ProperyAccessStatement",
-                                                "id": {
+                                        [
+                                            " "
+                                        ]
+                                    ],
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "ThisPropertySetStatement",
+                                                "expr": {
                                                     "type": "Identifier",
-                                                    "name": "b"
-                                                }
-                                            },
-                                            "operator": {
-                                                "type": "OperatorStatement",
-                                                "operator": "=="
-                                            },
-                                            "value": {
-                                                "type": "HexDigit",
-                                                "value": [
-                                                    "0x",
-                                                    [
-                                                        "F",
-                                                        "F"
-                                                    ]
-                                                ]
-                                            },
-                                            "body": {
-                                                "type": "BlockStatement",
-                                                "body": {
-                                                    "type": "StatementList",
-                                                    "body": [
-                                                        {
-                                                            "type": "PropertyAssignStatement",
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "blue"
-                                                            },
-                                                            "value": {
-                                                                "type": "TrueValue",
-                                                                "value": true
-                                                            }
-                                                        }
-                                                    ]
+                                                    "name": "diff"
                                                 }
                                             }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "fourth"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "FourthChunkChar"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "ThisPropertySetStatement",
+                                                "expr": {
+                                                    "type": "Identifier",
+                                                    "name": "copyable"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "critical"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "public"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "copyable"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "diff"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            }
+                        ]
+                    }
+                },
+                "generics": null,
+                "parent": null,
+                "export": false
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "PNGChunk"
+                },
+                "body": {
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "length"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "int32"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "type"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "PNGChunkType"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "WhenStatement",
+                                                "expr": {
+                                                    "type": "ExpressionStatement",
+                                                    "expr1": {
+                                                        "type": "ThisPropertyAccess",
+                                                        "id": {
+                                                            "type": "Identifier",
+                                                            "name": "name"
+                                                        },
+                                                        "thisAccess": true
+                                                    },
+                                                    "operator": {
+                                                        "type": "OperatorStatement",
+                                                        "operator": {
+                                                            "type": "Operator",
+                                                            "name": "EQ"
+                                                        }
+                                                    },
+                                                    "expr2": {
+                                                        "type": "Literal",
+                                                        "value": "ihdr"
+                                                    }
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThrowStatement",
+                                                                "expr": {
+                                                                    "type": "Literal",
+                                                                    "value": "ihdr"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "WhenStatement",
+                                                "expr": {
+                                                    "type": "ExpressionStatement",
+                                                    "expr1": {
+                                                        "type": "ThisPropertyAccess",
+                                                        "id": {
+                                                            "type": "Identifier",
+                                                            "name": "name"
+                                                        },
+                                                        "thisAccess": true
+                                                    },
+                                                    "operator": {
+                                                        "type": "OperatorStatement",
+                                                        "operator": {
+                                                            "type": "Operator",
+                                                            "name": "EQ"
+                                                        }
+                                                    },
+                                                    "expr2": {
+                                                        "type": "Literal",
+                                                        "value": "iend"
+                                                    }
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThrowStatement",
+                                                                "expr": {
+                                                                    "type": "Literal",
+                                                                    "value": "iend"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "content"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "int8"
+                                    },
+                                    "generic": null,
+                                    "array": {
+                                        "type": "ArrayDefinition",
+                                        "body": {
+                                            "type": "ThisPropertyAccess",
+                                            "id": {
+                                                "type": "Identifier",
+                                                "name": "length"
+                                            },
+                                            "thisAccess": true
                                         }
-                                    ]
+                                    }
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "crc"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "int32"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            }
+                        ]
+                    }
+                },
+                "generics": null,
+                "parent": null,
+                "export": false
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "IHDRChunk"
+                },
+                "body": {
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "type"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "PNGChunkType"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "WhenStatement",
+                                                "expr": {
+                                                    "type": "ExpressionStatement",
+                                                    "expr1": {
+                                                        "type": "ThisPropertyAccess",
+                                                        "id": {
+                                                            "type": "Identifier",
+                                                            "name": "name"
+                                                        },
+                                                        "thisAccess": true
+                                                    },
+                                                    "operator": {
+                                                        "type": "OperatorStatement",
+                                                        "operator": {
+                                                            "type": "Operator",
+                                                            "name": "NEQ"
+                                                        }
+                                                    },
+                                                    "expr2": {
+                                                        "type": "Literal",
+                                                        "value": "ihdr"
+                                                    }
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThrowStatement",
+                                                                "expr": {
+                                                                    "type": "Literal",
+                                                                    "value": "It's not an IHDR chunk: "
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "content"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "int8"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "width"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": "@",
+                                                "body": null
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "height"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "int32"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": null
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "bitDepth"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "int8"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": null
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "colorType"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "int8"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThisPropertySetStatement",
+                                                                "expr": {
+                                                                    "type": "FalseValue",
+                                                                    "value": false
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "WhenStatement",
+                                                                "expr": {
+                                                                    "type": "ExpressionStatement",
+                                                                    "expr1": "@",
+                                                                    "operator": {
+                                                                        "type": "OperatorStatement",
+                                                                        "operator": {
+                                                                            "type": "Operator",
+                                                                            "name": "GBIT"
+                                                                        }
+                                                                    },
+                                                                    "expr2": {
+                                                                        "type": "DecimalDigit",
+                                                                        "value": "1"
+                                                                    }
+                                                                },
+                                                                "body": {
+                                                                    "type": "BlockStatement",
+                                                                    "body": {
+                                                                        "type": "StatementList",
+                                                                        "body": [
+                                                                            {
+                                                                                "type": "ThisPropertySetStatement",
+                                                                                "expr": {
+                                                                                    "type": "TrueValue",
+                                                                                    "value": true
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "ThisPropertySetStatement",
+                                                                "expr": [
+                                                                    "(",
+                                                                    [],
+                                                                    {
+                                                                        "type": "ExpressionStatement",
+                                                                        "expr1": "@",
+                                                                        "operator": {
+                                                                            "type": "OperatorStatement",
+                                                                            "operator": {
+                                                                                "type": "Operator",
+                                                                                "name": "GBIT"
+                                                                            }
+                                                                        },
+                                                                        "expr2": {
+                                                                            "type": "DecimalDigit",
+                                                                            "value": "2"
+                                                                        }
+                                                                    },
+                                                                    [],
+                                                                    ")"
+                                                                ]
+                                                            },
+                                                            {
+                                                                "type": "ThisPropertySetStatement",
+                                                                "expr": [
+                                                                    "(",
+                                                                    [],
+                                                                    {
+                                                                        "type": "ExpressionStatement",
+                                                                        "expr1": "@",
+                                                                        "operator": {
+                                                                            "type": "OperatorStatement",
+                                                                            "operator": {
+                                                                                "type": "Operator",
+                                                                                "name": "GBIT"
+                                                                            }
+                                                                        },
+                                                                        "expr2": {
+                                                                            "type": "DecimalDigit",
+                                                                            "value": "4"
+                                                                        }
+                                                                    },
+                                                                    [],
+                                                                    ")"
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "compressionMethod"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "int8"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": null
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "filterMethod"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "int8"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": null
+                                            },
+                                            {
+                                                "type": "PropertyDefinitionStatement",
+                                                "acc": {
+                                                    "type": "ThisPropertyAccess",
+                                                    "id": {
+                                                        "type": "Identifier",
+                                                        "name": "interlace"
+                                                    },
+                                                    "thisAccess": false
+                                                },
+                                                "structName": {
+                                                    "type": "PropertyType",
+                                                    "structName": {
+                                                        "type": "Identifier",
+                                                        "name": "bool"
+                                                    },
+                                                    "generic": null,
+                                                    "array": null
+                                                },
+                                                "body": null
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "usePalette"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "useColor"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            },
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "hasAlpha"
+                                    },
+                                    "thisAccess": true
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "bool"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": null
+                            }
+                        ]
+                    }
+                },
+                "generics": null,
+                "parent": {
+                    "type": "StructureInheritanceStatement",
+                    "id": {
+                        "type": "Identifier",
+                        "name": "PNGChunk"
+                    }
+                },
+                "export": false
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "IENDChunk"
+                },
+                "body": {
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "PropertyDefinitionStatement",
+                                "acc": {
+                                    "type": "ThisPropertyAccess",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "type"
+                                    },
+                                    "thisAccess": false
+                                },
+                                "structName": {
+                                    "type": "PropertyType",
+                                    "structName": {
+                                        "type": "Identifier",
+                                        "name": "PNGChunkType"
+                                    },
+                                    "generic": null,
+                                    "array": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "WhenStatement",
+                                                "expr": {
+                                                    "type": "ExpressionStatement",
+                                                    "expr1": {
+                                                        "type": "ThisPropertyAccess",
+                                                        "id": {
+                                                            "type": "Identifier",
+                                                            "name": "name"
+                                                        },
+                                                        "thisAccess": true
+                                                    },
+                                                    "operator": {
+                                                        "type": "OperatorStatement",
+                                                        "operator": {
+                                                            "type": "Operator",
+                                                            "name": "NEQ"
+                                                        }
+                                                    },
+                                                    "expr2": {
+                                                        "type": "Literal",
+                                                        "value": "ihdr"
+                                                    }
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThrowStatement",
+                                                                "expr": {
+                                                                    "type": "Literal",
+                                                                    "value": "It's not an IEND chunk"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
                                 }
                             }
-                        }
-                    ]
-                }
+                        ]
+                    }
+                },
+                "generics": null,
+                "parent": {
+                    "type": "StructureInheritanceStatement",
+                    "id": {
+                        "type": "Identifier",
+                        "name": "PNGChunk"
+                    }
+                },
+                "export": false
+            },
+            {
+                "type": "StructDefinitionStatement",
+                "id": {
+                    "type": "Identifier",
+                    "name": "V1"
+                },
+                "body": {
+                    "type": "BlockStatement",
+                    "body": {
+                        "type": "StatementList",
+                        "body": [
+                            {
+                                "type": "ReturnBlockStatement",
+                                "id": {
+                                    "type": "TypeStatement",
+                                    "id": {
+                                        "type": "Identifier",
+                                        "name": "int8"
+                                    },
+                                    "generic": null
+                                },
+                                "body": {
+                                    "type": "BlockStatement",
+                                    "body": {
+                                        "type": "StatementList",
+                                        "body": [
+                                            {
+                                                "type": "WhenStatement",
+                                                "expr": {
+                                                    "type": "ExpressionStatement",
+                                                    "expr1": "@",
+                                                    "operator": {
+                                                        "type": "OperatorStatement",
+                                                        "operator": {
+                                                            "type": "Operator",
+                                                            "name": "EQ"
+                                                        }
+                                                    },
+                                                    "expr2": {
+                                                        "type": "Identifier",
+                                                        "name": "PNG_SIGNATURE"
+                                                    }
+                                                },
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ReturnBlockStatement",
+                                                                "id": {
+                                                                    "type": "TypeStatement",
+                                                                    "id": {
+                                                                        "type": "Identifier",
+                                                                        "name": "int8"
+                                                                    },
+                                                                    "generic": null
+                                                                },
+                                                                "body": {
+                                                                    "type": "BlockStatement",
+                                                                    "body": {
+                                                                        "type": "StatementList",
+                                                                        "body": [
+                                                                            {
+                                                                                "type": "WhenStatement",
+                                                                                "expr": {
+                                                                                    "type": "ExpressionStatement",
+                                                                                    "expr1": "@",
+                                                                                    "operator": {
+                                                                                        "type": "OperatorStatement",
+                                                                                        "operator": {
+                                                                                            "type": "Operator",
+                                                                                            "name": "EQ"
+                                                                                        }
+                                                                                    },
+                                                                                    "expr2": {
+                                                                                        "type": "Literal",
+                                                                                        "value": "PNG"
+                                                                                    }
+                                                                                },
+                                                                                "body": {
+                                                                                    "type": "BlockStatement",
+                                                                                    "body": {
+                                                                                        "type": "StatementList",
+                                                                                        "body": [
+                                                                                            {
+                                                                                                "type": "ReturnBlockStatement",
+                                                                                                "id": {
+                                                                                                    "type": "TypeStatement",
+                                                                                                    "id": {
+                                                                                                        "type": "Identifier",
+                                                                                                        "name": "int16"
+                                                                                                    },
+                                                                                                    "generic": null
+                                                                                                },
+                                                                                                "body": {
+                                                                                                    "type": "BlockStatement",
+                                                                                                    "body": {
+                                                                                                        "type": "StatementList",
+                                                                                                        "body": [
+                                                                                                            {
+                                                                                                                "type": "Identifier",
+                                                                                                                "name": "when"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type": "ReturnBlockStatement",
+                                                                                                                "id": {
+                                                                                                                    "type": "TypeStatement",
+                                                                                                                    "id": {
+                                                                                                                        "type": "Identifier",
+                                                                                                                        "name": "CRLF"
+                                                                                                                    },
+                                                                                                                    "generic": null
+                                                                                                                },
+                                                                                                                "body": {
+                                                                                                                    "type": "BlockStatement",
+                                                                                                                    "body": {
+                                                                                                                        "type": "StatementList",
+                                                                                                                        "body": [
+                                                                                                                            {
+                                                                                                                                "type": "ReturnBlockStatement",
+                                                                                                                                "id": {
+                                                                                                                                    "type": "TypeStatement",
+                                                                                                                                    "id": {
+                                                                                                                                        "type": "Identifier",
+                                                                                                                                        "name": "int8"
+                                                                                                                                    },
+                                                                                                                                    "generic": null
+                                                                                                                                },
+                                                                                                                                "body": {
+                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                    "body": {
+                                                                                                                                        "type": "StatementList",
+                                                                                                                                        "body": [
+                                                                                                                                            {
+                                                                                                                                                "type": "Identifier",
+                                                                                                                                                "name": "when"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "ReturnBlockStatement",
+                                                                                                                                                "id": {
+                                                                                                                                                    "type": "TypeStatement",
+                                                                                                                                                    "id": {
+                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                        "name": "DOS_EOF"
+                                                                                                                                                    },
+                                                                                                                                                    "generic": null
+                                                                                                                                                },
+                                                                                                                                                "body": {
+                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                    "body": {
+                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                        "body": [
+                                                                                                                                                            {
+                                                                                                                                                                "type": "ReturnBlockStatement",
+                                                                                                                                                                "id": {
+                                                                                                                                                                    "type": "TypeStatement",
+                                                                                                                                                                    "id": {
+                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                        "name": "int8"
+                                                                                                                                                                    },
+                                                                                                                                                                    "generic": null
+                                                                                                                                                                },
+                                                                                                                                                                "body": {
+                                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                                    "body": {
+                                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                                        "body": [
+                                                                                                                                                                            {
+                                                                                                                                                                                "type": "Identifier",
+                                                                                                                                                                                "name": "when"
+                                                                                                                                                                            },
+                                                                                                                                                                            {
+                                                                                                                                                                                "type": "ReturnBlockStatement",
+                                                                                                                                                                                "id": {
+                                                                                                                                                                                    "type": "TypeStatement",
+                                                                                                                                                                                    "id": {
+                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                        "name": "LF"
+                                                                                                                                                                                    },
+                                                                                                                                                                                    "generic": null
+                                                                                                                                                                                },
+                                                                                                                                                                                "body": {
+                                                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                                                    "body": {
+                                                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                                                        "body": [
+                                                                                                                                                                                            {
+                                                                                                                                                                                                "type": "PropertyDefinitionStatement",
+                                                                                                                                                                                                "acc": {
+                                                                                                                                                                                                    "type": "ThisPropertyAccess",
+                                                                                                                                                                                                    "id": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "header"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "thisAccess": false
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "structName": {
+                                                                                                                                                                                                    "type": "PropertyType",
+                                                                                                                                                                                                    "structName": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "IHDRChunk"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "generic": null,
+                                                                                                                                                                                                    "array": null
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "body": null
+                                                                                                                                                                                            },
+                                                                                                                                                                                            {
+                                                                                                                                                                                                "type": "PropertyDefinitionStatement",
+                                                                                                                                                                                                "acc": {
+                                                                                                                                                                                                    "type": "ThisPropertyAccess",
+                                                                                                                                                                                                    "id": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "chunks"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "thisAccess": false
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "structName": {
+                                                                                                                                                                                                    "type": "PropertyType",
+                                                                                                                                                                                                    "structName": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "PNGChunk"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "generic": null,
+                                                                                                                                                                                                    "array": null
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "body": {
+                                                                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                                                                    "body": {
+                                                                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                                                                        "body": [
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "Identifier",
+                                                                                                                                                                                                                "name": "catch"
+                                                                                                                                                                                                            },
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "Literal",
+                                                                                                                                                                                                                "value": "ihdr"
+                                                                                                                                                                                                            },
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "BlockStatement",
+                                                                                                                                                                                                                "body": []
+                                                                                                                                                                                                            },
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "Identifier",
+                                                                                                                                                                                                                "name": "catch"
+                                                                                                                                                                                                            },
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "Literal",
+                                                                                                                                                                                                                "value": "iend"
+                                                                                                                                                                                                            },
+                                                                                                                                                                                                            {
+                                                                                                                                                                                                                "type": "BlockStatement",
+                                                                                                                                                                                                                "body": []
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                        ]
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                }
+                                                                                                                                                                                            },
+                                                                                                                                                                                            {
+                                                                                                                                                                                                "type": "PropertyDefinitionStatement",
+                                                                                                                                                                                                "acc": {
+                                                                                                                                                                                                    "type": "ThisPropertyAccess",
+                                                                                                                                                                                                    "id": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "end"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "thisAccess": false
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "structName": {
+                                                                                                                                                                                                    "type": "PropertyType",
+                                                                                                                                                                                                    "structName": {
+                                                                                                                                                                                                        "type": "Identifier",
+                                                                                                                                                                                                        "name": "IENDChunk"
+                                                                                                                                                                                                    },
+                                                                                                                                                                                                    "generic": null,
+                                                                                                                                                                                                    "array": null
+                                                                                                                                                                                                },
+                                                                                                                                                                                                "body": null
+                                                                                                                                                                                            }
+                                                                                                                                                                                        ]
+                                                                                                                                                                                    }
+                                                                                                                                                                                }
+                                                                                                                                                                            },
+                                                                                                                                                                            {
+                                                                                                                                                                                "type": "DefaultStatement",
+                                                                                                                                                                                "body": {
+                                                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                                                    "body": {
+                                                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                                                        "body": [
+                                                                                                                                                                                            {
+                                                                                                                                                                                                "type": "ThrowStatement",
+                                                                                                                                                                                                "expr": {
+                                                                                                                                                                                                    "type": "Literal",
+                                                                                                                                                                                                    "value": "Wrong PNG signature"
+                                                                                                                                                                                                }
+                                                                                                                                                                                            }
+                                                                                                                                                                                        ]
+                                                                                                                                                                                    }
+                                                                                                                                                                                }
+                                                                                                                                                                            }
+                                                                                                                                                                        ]
+                                                                                                                                                                    }
+                                                                                                                                                                }
+                                                                                                                                                            }
+                                                                                                                                                        ]
+                                                                                                                                                    }
+                                                                                                                                                }
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "type": "DefaultStatement",
+                                                                                                                                                "body": {
+                                                                                                                                                    "type": "BlockStatement",
+                                                                                                                                                    "body": {
+                                                                                                                                                        "type": "StatementList",
+                                                                                                                                                        "body": [
+                                                                                                                                                            {
+                                                                                                                                                                "type": "ThrowStatement",
+                                                                                                                                                                "expr": {
+                                                                                                                                                                    "type": "Literal",
+                                                                                                                                                                    "value": "Wrong PNG signature"
+                                                                                                                                                                }
+                                                                                                                                                            }
+                                                                                                                                                        ]
+                                                                                                                                                    }
+                                                                                                                                                }
+                                                                                                                                            }
+                                                                                                                                        ]
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type": "DefaultStatement",
+                                                                                                                "body": {
+                                                                                                                    "type": "BlockStatement",
+                                                                                                                    "body": {
+                                                                                                                        "type": "StatementList",
+                                                                                                                        "body": [
+                                                                                                                            {
+                                                                                                                                "type": "ThrowStatement",
+                                                                                                                                "expr": {
+                                                                                                                                    "type": "Literal",
+                                                                                                                                    "value": "Wrong PNG signature"
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "type": "DefaultStatement",
+                                                                                "body": {
+                                                                                    "type": "BlockStatement",
+                                                                                    "body": {
+                                                                                        "type": "StatementList",
+                                                                                        "body": [
+                                                                                            {
+                                                                                                "type": "ThrowStatement",
+                                                                                                "expr": {
+                                                                                                    "type": "Literal",
+                                                                                                    "value": "Wrong PNG signature"
+                                                                                                }
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "DefaultStatement",
+                                                "body": {
+                                                    "type": "BlockStatement",
+                                                    "body": {
+                                                        "type": "StatementList",
+                                                        "body": [
+                                                            {
+                                                                "type": "ThrowStatement",
+                                                                "expr": {
+                                                                    "type": "Literal",
+                                                                    "value": "Wrong PNG signature"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "generics": null,
+                "parent": null,
+                "export": false
             }
-        }
-    ]
+        ]
+    },
+    "buffer": {
+        "type": "Buffer",
+        "data": [
+            137
+        ]
+    },
+    "path": "examples\\png-struct.go",
+    "structs": {}
 }

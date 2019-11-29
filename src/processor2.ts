@@ -7,11 +7,13 @@ import { BinaryReader } from "./binary-reader";
 import { StatementHandler } from "./StatementHandler";
 
 export class Proc2 {
-  public static readFile(path: string, buffer: Buffer) {
+  public static readFile(
+    path: string,
+    buffer: Buffer,
+    src = "./src/biner-final.pegjs"
+  ): any {
     let contents = fs.readFileSync(path).toString("utf-8");
-    let parserContents = fs
-      .readFileSync("./src/biner-final.pegjs")
-      .toString("utf-8");
+    let parserContents = fs.readFileSync(src).toString("utf-8");
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {
@@ -39,6 +41,8 @@ export class Proc2 {
   ) {}
 
   public run() {
-    console.log(this.ast);
+    console.log(
+      this.ast.body[3].body[0][3].body.body.body.body[0].consequent.body[0].body
+    );
   }
 }

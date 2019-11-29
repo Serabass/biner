@@ -15,6 +15,10 @@
   function extractList(list, index) {
     return list.map(function(element) { return element[index]; });
   }
+
+  function operator(name) {
+    return { type: "Operator", name }
+  }
 }
 
 Start
@@ -254,6 +258,7 @@ StructKeyword  = "struct"
 WhenKeyword    = "when"
 DefaultKeyword = "default"
 ThrowKeyword   = "throw"
+CatchKeyword   = "catch"
 ConstKeyword   = "const"
 GetKeyword     = "get"
 ThisKeyword    = "@"
@@ -273,6 +278,8 @@ Statement
   = DirectiveStatement
   / ConstStatement
   / WhenStatement
+  / ThrowStatement
+  / CatchStatement
   / GetterDefinitionStatement
   / ExpressionStatement
   / StructDefinitionStatement
@@ -288,7 +295,6 @@ Statement
   / CharLiteral
   / Identifier
   / Digit
-  / ThrowStatement
 
 ReturnStatement
  = ReturnBlockStatement
@@ -371,22 +377,22 @@ StructDefinitionStatement
  }
 
 Operator
- = "=="
- / ">="
- / "<="
- / "<"
- / ">"
- / "!="
+ = "==" { return operator("EQ"); }
+ / ">=" { return operator("GEQ"); }
+ / "<=" { return operator("LEQ"); }
+ / "<"  { return operator("LT"); }
+ / ">"  { return operator("GT"); }
+ / "!=" { return operator("NEQ"); }
 
- / "&&"
- / "||"
- / "^"
- / "<<"
- / ">>"
- / "&"
- / "~~"
- / "~"
- / "."
+ / "&&" { return operator("AND"); }
+ / "||" { return operator("OR"); }
+ / "^"  { return operator("XOR"); }
+ / "<<" { return operator("SHL"); }
+ / ">>" { return operator("SHR"); }
+ / "&" { return operator("BAND"); }
+ / "~~" { return operator("GBIT"); }
+ / "~" { return operator("TRGX"); }
+ / "." { return operator("DOTs"); }
 
 ThisPropertyAccess
  = thisAccess: ThisKeyword? "." id: (Identifier / Generic)? {
@@ -517,6 +523,18 @@ ThrowStatement
    return {
      type: "ThrowStatement",
      expr,
+   };
+ }
+ 
+CatchStatement
+ = CatchKeyword 
+ _ expr: (StringLiteral ? RegularExpressionLiteral) 
+ __ body: Block
+ __ EOS {
+   return {
+     type: "CatchStatement",
+     expr,
+     body,
    };
  }
  

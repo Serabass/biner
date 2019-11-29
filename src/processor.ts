@@ -21,11 +21,13 @@ export class Processor {
   public cursor: number = 0;
   public reader: BinaryReader;
 
-  public static readFile(specFileName: string, buffer: Buffer): Processor {
+  public static readFile(
+    specFileName: string,
+    buffer: Buffer,
+    src: string = "./src/biner-final.pegjs"
+  ): Processor {
     let contents = fs.readFileSync(specFileName).toString("utf-8");
-    let parserContents = fs
-      .readFileSync("./src/biner-final.pegjs")
-      .toString("utf-8");
+    let parserContents = fs.readFileSync(src).toString("utf-8");
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {

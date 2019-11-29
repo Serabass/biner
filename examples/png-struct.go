@@ -10,7 +10,7 @@ const int16 CRLF = 0x0A0D;
 
 struct ChunkChar<prop> {
 	@ = char {
-		@ = @;
+		@.value = @;
 		when @ ~ /[A-Z]/ {
 			@.<prop> = true;
 		}
@@ -59,7 +59,14 @@ struct PNGChunkType {
 
 struct PNGChunk {
 	.length: int32;
-	.type: PNGChunkType;
+	.type: PNGChunkType {
+		when (@.name == "ihdr") {
+			throw "ihdr";
+		}
+		when (@.name == "iend") {
+			throw "iend";
+		}
+	};
 	.content: int8[@.length];
 	.crc: int32;
 }
@@ -71,22 +78,24 @@ struct IHDRChunk : PNGChunk {
 		}
 	};
 	
-	.width: int32;
-	.height: int32;
-	.bitDepth: int8;
-	.colorType: int8 {
-		.usePalette = false;
-		when (@ ~~ 1) { // Прочитать первый бит
-			@.usePalette = true;
-		}
+	override .content: int8 {
+		.width: @;
+		.height: int32;
+		.bitDepth: int8;
+		.colorType: int8 {
+			.usePalette = false;
+			when (@ ~~ 1) { // Прочитать первый бит
+				@.usePalette = true;
+			}
 
-		// Либо так
-		@.useColor = (@ ~~ 1);
-		@.hasAlpha = (@ ~~ 1);
+			// Либо так
+			@.useColor = (@ ~~ 2);
+			@.hasAlpha = (@ ~~ 4);
+		};
+		.compressionMethod: int8;
+		.filterMethod: int8;
+		.interlace: bool;
 	};
-	.compressionMethod: int8;
-	.filterMethod: int8;
-	.interlace: bool;
 
 	@.usePalette: bool;
 	@.useColor: bool;
@@ -112,11 +121,16 @@ struct V1 {
 								when @ = DOS_EOF {
 									@ = int8 {
 										when @ = LF {
-											@ = IHDRChunk {
-												.header: @;
-												.chunks[]: PNGChunk {};
-												.end: IENDChunk;
-											}
+											.header: IHDRChunk;
+											.chunks[]: PNGChunk {
+												catch "ihdr" {
+													
+												}
+												catch "iend" {
+													
+												}
+											};
+											.end: IENDChunk;
 										}
 										default { // Not LF
 											throw "Wrong PNG signature";
