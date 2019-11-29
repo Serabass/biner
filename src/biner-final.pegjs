@@ -384,6 +384,7 @@ Operator
  / "<<"
  / ">>"
  / "&"
+ / "~~"
  / "~"
  / "."
 
@@ -399,9 +400,8 @@ ThisPropertyAccess
  ThisPropertySetStatement
   = ThisPropertyAccess
   __ "="
-  __ expr:Statement
-  __
-  EOS
+  __ expr:Expression
+  __ EOS
   {
     return {
       type: "ThisPropertySetStatement",

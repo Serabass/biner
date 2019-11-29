@@ -10,13 +10,13 @@ const int16 CRLF = 0x0A0D;
 
 struct ChunkChar<prop> {
 	@ = char {
+		@ = @;
 		when @ ~ /[A-Z]/ {
 			@.<prop> = true;
 		}
 		when @ ~ /[a-z]/ {
 			@.<prop> = false;
 		}
-		@ = @;
 	}
 
 	@.<prop>: bool;
@@ -56,6 +56,7 @@ struct PNGChunkType {
 	@.diff: bool;
 }
 
+
 struct PNGChunk {
 	.length: int32;
 	.type: PNGChunkType;
@@ -74,13 +75,14 @@ struct IHDRChunk : PNGChunk {
 	.height: int32;
 	.bitDepth: int8;
 	.colorType: int8 {
-		when (@ & 1) != 0 { // Ну или как там читается бит из байта. В данном случае нам надо прочитать первый бит
+		.usePalette = false;
+		when (@ ~~ 1) { // Прочитать первый бит
 			@.usePalette = true;
 		}
 
 		// Либо так
-		@.useColor = (@ & 1) != 0;
-		@.hasAlpha = (@ & 1) != 0;
+		@.useColor = (@ ~~ 1);
+		@.hasAlpha = (@ ~~ 1);
 	};
 	.compressionMethod: int8;
 	.filterMethod: int8;
