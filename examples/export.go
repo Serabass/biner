@@ -1,12 +1,14 @@
+#endianness BE;
+
 struct rgb {
-	r: int8;
-	g: int8;
-	b: int8;
+	r: uint8;
+	g: uint8;
+	b: uint8;
 }
 
 export struct vars8 {
-	var1: int8;
-	var2: int8;
+	var1: uint8;
+	var2: uint8;
 }
 
 export struct varsRGB {

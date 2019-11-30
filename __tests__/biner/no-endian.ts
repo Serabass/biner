@@ -1,12 +1,9 @@
-import { Processor } from "../../src/processor";
-import { endianness } from "os";
-import { pathFix } from "../../util";
+import { load } from "../../util";
 
 describe("No endian", () => {
   it("Scripts with no endian defined must define default BE", () => {
-    let b = new Buffer([1, 2, 5]);
-    let pr = Processor.readFile(pathFix("no-endian"), b);
-    expect(pr.directives.endian).toBe("BE");
+    let pr = load("no-endian", "0x01 0x02 0x05");
+    expect(pr.directives.endianness).toBe("BE");
     pr.run();
   });
 });

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as ASTY from "asty";
 import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
+import * as path from "path";
 import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
@@ -9,7 +10,7 @@ export class Proc2 {
     path: string,
     buffer: Buffer,
     src = "./src/biner-final.pegjs"
-  ): any {
+  ): Proc2 {
     let contents = fs.readFileSync(path).toString("utf-8");
     let parserContents = fs.readFileSync(src).toString("utf-8");
     let asty = new ASTY();
@@ -32,9 +33,12 @@ export class Proc2 {
   public structs: any = {};
   public exports: any = {};
   public consts: any = {};
-  public directives: any = {};
+  public imports: any = {};
+  public directives: any = {
+    endianness: "BE"
+  };
 
-  private get mainStruct() {
+  public get mainStruct() {
     return this.structs[""];
   }
 
@@ -75,6 +79,9 @@ export class Proc2 {
       case "StructDefinitionStatement":
         this.defineStruct(node);
         break;
+      case "ImportStatement":
+        this.defineImport(node);
+        break;
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
@@ -82,6 +89,24 @@ export class Proc2 {
 
   private defineDirective(node) {
     this.directives[node.id.name] = node.expr.name;
+  }
+
+  private defineImport(node) {
+    let importPath =
+      path.join(path.dirname(this.path), node.moduleName.value) + ".go";
+    let pr = Proc2.readFile(
+      importPath,
+      Buffer.from([]),
+      "src/javascript.pegjs"
+    );
+    pr.run();
+    for (let n of node.names) {
+      let name = n.name;
+      if (this.structs[name]) {
+        throw new Error(`Struct ${name} already defined`);
+      }
+      this.structs[name] = pr.exports[name];
+    }
   }
 
   private defineConst(node) {
@@ -122,12 +147,21 @@ export class Proc2 {
             ? this.buffer.readInt32BE(offset)
             : this.buffer.readInt32LE(offset);
         default:
-          throw new Error(`unrecognized type: ${typeName}`);
+          if (!this.structs[typeName]) {
+            throw new Error(`unrecognized type: ${typeName}`);
+          }
+
+          return this.readStruct(typeName, offset);
       }
     };
   }
 
-  private getStructSize(typeName: string) {
+  private readStruct(typeName: string, offset: number) {
+    let struct = this.structs[typeName];
+    return this.processStruct(struct, offset);
+  }
+
+  public getStructSize(typeName: string) {
     switch (typeName) {
       case "int8":
       case "uint8":
@@ -142,13 +176,21 @@ export class Proc2 {
         if (!this.structs[typeName]) {
           throw new Error(`unrecognized type: ${typeName}`);
         }
-        return this.getStructSize(typeName);
+
+        let result = 0;
+        for (let field of this.structs[typeName].body) {
+          if (field.type === "ReadableFieldStatement") {
+            let multiplier = field.body.array ? field.body.array.size.value : 1;
+            const typeName2 = field.body.typeName.name;
+            result += this.getStructSize(typeName2) * multiplier;
+          }
+        }
+        return result;
     }
   }
 
-  private processStruct(struct) {
+  private processStruct(struct, offset = 0) {
     let result: any = {};
-    let offset = 0;
 
     for (let child of struct.body) {
       switch (child.type) {

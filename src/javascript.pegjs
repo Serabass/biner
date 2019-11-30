@@ -105,12 +105,22 @@ ReadableFieldBody
 
 ReadFieldStatement
  = typeName: Identifier
+ __ array: FieldArrayStatement?
  __ body: ReadableFieldBody? {
      return {
        type: "ReadFieldStatement",
        typeName,
-       body
+       body,
+       array
      };
+ }
+
+FieldArrayStatement
+ = "[" __ size: NumericLiteral __ "]" {
+   return {
+     type: "FieldArrayStatement",
+     size,
+   };
  }
 
 ReadableFieldStatement
@@ -180,8 +190,32 @@ FunctionFieldDefinition
       };
     }
 
+ImportName
+ = name: Identifier __ (AsToken __ alias: Identifier) {
+   return {
+     type: "ImportName".
+     name, alias
+   };
+ }
+
+ImportNamesList
+  = head:Identifier tail:(__ "," __ PropertyAssignment)* {
+      return buildList(head, tail, 3);
+    }
+
+ImportStatement
+ = ImportToken 
+ __ names: ImportNamesList 
+ __ FromToken 
+ __ moduleName: StringLiteral __ EOS {
+   return {
+     type: "ImportStatement",
+     names, moduleName
+   };
+ }
+
 StructDefinitionStatement
- = __ StructToken
+ = isExported: ExportToken? __ StructToken
  __ id: Identifier?
  __  "{" __ body: StructBody __ "}"
   {
@@ -189,6 +223,7 @@ StructDefinitionStatement
      type: "StructDefinitionStatement",
      id,
      body,
+     export: !!isExported,
    }
  }
  / ExportToken __ StructToken
@@ -236,6 +271,7 @@ BinerStatement
  = DirectiveStatement
  / ConstStatement
  / StructDefinitionStatement
+ / ImportStatement
  
 Program
   = body:BinerSourceElements? {
@@ -640,6 +676,8 @@ VoidToken       = "void"       !IdentifierPart
 WhileToken      = "while"      !IdentifierPart
 WithToken       = "with"       !IdentifierPart
 StructToken     = "struct"     !IdentifierPart
+AsToken         = "as"         !IdentifierPart
+FromToken       = "from"       !IdentifierPart
 
 // Skipped
 

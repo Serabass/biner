@@ -1659,5 +1659,8 @@
     "structs": {},
     "exports": {},
     "consts": {},
-    "directives": {}
+    "imports": {},
+    "directives": {
+        "endianness": "BE"
+    }
 }

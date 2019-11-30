@@ -10,7 +10,7 @@ struct rgb {
 
 struct {
 	val: rgb {
-		if ($$.r > HALF && ($$.g > HALF ($$.b > HALF) {
+		if (r > HALF && (g > HALF (b > HALF))) {
 			this.bright = true;
 		}
 	}
