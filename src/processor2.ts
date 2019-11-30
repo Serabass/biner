@@ -175,7 +175,7 @@ export class Proc2 {
     return this.processStruct(struct, offset);
   }
 
-  public getStructSize(typeName: string, arrayData = null) {
+  public getStructSize(typeName: string = "", arrayData = null) {
     if (arrayData) {
       let arraySize = arrayData.size.value;
       let structSize = this.getStructSize(typeName);

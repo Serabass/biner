@@ -4,22 +4,22 @@ const PURGE = 0x44;
 const DISPENSE = 0x45;
 
 struct {
-	start: int8 {
+	start: uint8 {
 		if ($$ !== 0x01) {
 			throw "unknown start byte; Must be SOH";
 		}
 
 		this.startOK = true;
 	};
-	id: int8;
-	stx: int8 {
+	id: uint8;
+	stx: uint8 {
 		if ($$ != 0x02) {
 			throw "unknown byte; Must be STX";
 		}
 		
 		this.stxOK = true;
 	};
-	cmd: int8 {
+	cmd: uint8 {
 		if ($$ == PURGE) { // PURGE
 			errCause: int8;
 		}
@@ -64,17 +64,18 @@ struct {
 			checksum: int8[4];
 		}
 	};
-	etx: int8 {
+	etx: uint8 {
 		if ($$ != 0x03) {
 			throw "Unknown end byte; Must be ETX";
 		}
 	};
-	bcc: int8 {
+	bcc: uint8 {
 		if (!checkBCC(this)) {
 			throw "Wrong BCC";
 		}
 	};
 
-	@startOK: bool;
+	// @startOK: bool;
+	// @stxOK: bool;
 }
 
