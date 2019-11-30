@@ -102,8 +102,6 @@ struct B {
 
 // Указание типа с вложенными дженериками
 
-struct 
-
 struct CountedList<T> {
 	count: int32;
 	data: T[];
@@ -122,28 +120,28 @@ struct B {
 // Условия при чтении + использование констант
 
 struct decimalValue {
-  when TYPE_INT {
-    type = "int";
-    val: int8;
-  }
-
-  when TYPE_VAR {
-    type = "var";
-    val: int16;
-  }
-
-  when TYPE_FLOAT32 {
-    type = "float32";
-    val: float32;
+	if ($$ === TYPE_INT) {
+		this.type = "int";
+		val: int8;
 	}
 	
-	when TYPE_RGB {
-		type = "rgb";
+	if ($$ === TYPE_VAR) {
+		this.type = "var";
+		val: int16;
+	}
+
+	if ($$ === TYPE_FLOAT32) {
+		this.type = "float32";
+		val: float32;
+	}
+
+	if ($$ === TYPE_RGB) {
+		this.type = "rgb";
 		val: rgb;
 	}
 
-	when TYPE_RGBA {
-		type = "rgba";
+	if ($$ === TYPE_RGBA) {
+		this.type = "rgba";
 		val: rgba;
 	}
 }
@@ -151,28 +149,27 @@ struct decimalValue {
 
 struct fstring1b {
 	= int8 {
-		= char[=];
+		=: char[=];
 	}
 }
 
-
 struct opcode {
   = int16 {
-		when 0x0005 {
+		if ($$ === 0x0005)  {
 			pointer: {
-				when 0x04 {
-					type = "int";
+				switch ($$) {
+				case 0x04:
+					this.type = "int";
 					val: int8;
-				}
-			
-				when 0x02 {
-					type = "var";
+					break;
+				case 0x02:
+					this.type = "var";
 					val: int16;
-				}
-			
-				when 0x06 {
-					type = "float32";
+					break;
+				case 0x06:
+					this.type = "float32";
 					val: float32;
+					break;
 				}
 			} {
 				= val;
@@ -181,8 +178,7 @@ struct opcode {
 			val2: decimalValue {
 				= [type, val];
 			}
-		}
-		default {
+		} else {
 			throw "Unhandled opcode: " + $;
 		}
 	}
@@ -194,17 +190,6 @@ struct S {
 	= int8 {
 		
 	};
-}
-
-struct A {
-	bool {
-		when true {
-			
-		}
-		when false {
-			
-		}
-	}
 }
 
 // Массивы

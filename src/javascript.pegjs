@@ -84,20 +84,16 @@ Start
   = __ program:Program __ { return program; }
 
 StructBody
-  = head:StructElements
-    tail:(__ StructElements)* {
-    return buildList(head, tail, 1);
- }
-
-StructElements
   = head:StructFieldDefinitionStatement
     tail:(__ StructFieldDefinitionStatement)* {
     return buildList(head, tail, 1);
-}
+ }
 
 StructFieldDefinitionStatement
   = ReadableFieldStatement
   / SystemFieldDefinition
+  / FunctionFieldDefinition
+  / SystemPropertyDefinition
 
 ReadableFieldBody
 = "{" __ body: JSProgram __ "}" {
@@ -137,15 +133,74 @@ __ typeName: Identifier __ EOS {
   };
 } 
 
+SystemPropertyDefinition
+ = GetToken __ "@" key:PropertyName __
+    "(" __ ")" __
+    "{" __ body:FunctionBody __ "}"
+    {
+      return {
+        type: "Property",
+        key: key,
+        value: {
+          type: "FunctionExpression",
+          id: null,
+          params: [],
+          body: body
+        },
+        kind: "get"
+      };
+    }
+  / SetToken __ "@" key:PropertyName __
+    "(" __ params:PropertySetParameterList __ ")" __
+    "{" __ body:FunctionBody __ "}"
+    {
+      return {
+        type: "Property",
+        key: key,
+        value: {
+          type: "FunctionExpression",
+          id: null,
+          params: params,
+          body: body
+        },
+        kind: "set"
+      };
+    }
+
+FunctionFieldDefinition
+  = __ id:Identifier __
+    "(" __ params:(FormalParameterList __)? ")" __
+    "{" __ body:FunctionBody __ "}"
+    {
+      return {
+        type: "FunctionFieldDefinition",
+        id: id,
+        params: optionalList(extractOptional(params, 0)),
+        body: body
+      };
+    }
+
 StructDefinitionStatement
- = StructToken
+ = __ StructToken
+ __ id: Identifier?
+ __  "{" __ body: StructBody __ "}"
+  {
+   return {
+     type: "StructDefinitionStatement",
+     id,
+     body,
+     export: !!isExport
+   }
+ }
+ / ExportToken __ StructToken
  __ id: Identifier
  __  "{" __ body: StructBody __ "}"
   {
    return {
      type: "StructDefinitionStatement",
      id,
-     body
+     body,
+     export: true
    }
  }
 
@@ -164,7 +219,7 @@ DirectiveStatement
    return {
      type: "DirectiveStatement",
      id,
-     expr
+     expr,
    };
  }
 
@@ -386,10 +441,12 @@ HexDigit
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
-      return { type: "Literal", value: chars.join("") };
+      return { type: "StringLiteral", value: chars.join("") };
     }
-  / "'" chars:SingleStringCharacter* "'" {
-      return { type: "Literal", value: chars.join("") };
+
+CharLiteral "char"
+  = "'" char:SingleStringCharacter "'" {
+      return { type: "CharLiteral", value: char };
     }
 
 DoubleStringCharacter
@@ -1425,7 +1482,8 @@ JSProgram
   = body:SourceElements? {
       return {
         type: "JSProgram",
-        body: optionalList(body)
+        body: optionalList(body),
+        location: location(),
       };
     }
 

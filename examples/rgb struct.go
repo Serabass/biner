@@ -16,14 +16,14 @@ struct rgb {
 
 struct {
 	color: rgb {
-		when r == 0xFF {
-			red = true;
+		if (r == 0xFF) {
+			this.red = true;
 		}
-		when g >= 0x80 {
-			green = true;
+		if (g >= 0x80) {
+			this.green = true;
 		}
-		when b == 0xFF {
-			blue = true;
+		if (b == 0xFF) {
+			this.blue = true;
 		}
 	}
 }

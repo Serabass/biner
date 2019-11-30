@@ -14,9 +14,8 @@ export class Proc2 {
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {
-      makeAST: function(line, column, offset, args) {
-        return asty.create.apply(asty, args).pos(line, column, offset);
-      }
+      makeAST: (line, column, offset, args) =>
+        asty.create.apply(asty, args).pos(line, column, offset)
     });
 
     if (actual.error) {
@@ -30,6 +29,8 @@ export class Proc2 {
   }
 
   public structs: any = {};
+  public consts: any = {};
+  public directives: any = {};
 
   public constructor(
     public ast: any,
@@ -38,8 +39,44 @@ export class Proc2 {
   ) {}
 
   public run() {
-    console.log(
-      this.ast.body[3].body[0][3].body.body.body.body[0].consequent.body[0].body
-    );
+    this.processBody();
+  }
+
+  private processBody() {
+    console.log(this.ast.body);
+    let nodes = this.ast.body;
+    for (let node of nodes) {
+      this.processNode(node);
+    }
+  }
+
+  private processNode(node) {
+    switch (node.type) {
+      case "DirectiveStatement":
+        this.processDirective(node);
+        break;
+      case "ConstStatement":
+        this.processConst(node);
+        break;
+      case "StructDefinitionStatement":
+        this.processStruct(node);
+        break;
+      default:
+        throw new Error(`Unknown type: ${node.type}`);
+    }
+  }
+
+  private processDirective(node) {
+    this.directives[node.id.name] = node.expr;
+  }
+
+  private processConst(node) {
+    let name = node.id.name;
+    this.consts[name] = node.expr.expression.value;
+  }
+
+  private processStruct(node) {
+    let name = node.id ? node.id.name : "";
+    this.structs[name] = node;
   }
 }

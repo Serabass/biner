@@ -34,19 +34,19 @@ struct vector3i8 {
 struct myObject {
   id: int8;
   age: int8 {
-    when 0x15 {
+    if ($$ === 0x15) {
       job: int8;
     }
-    when 0x20 {
+    if ($$ === 0x20) {
       edu: int8;
     }
-    when 0x3F {
+    if ($$ === 0x3F) {
       p: int8;
     }
-    when 0x2F {
+    if ($$ === 0x2F) {
       // Do nothing
     }
-    when 0x21 {
+    if ($$ === 0x21) {
       float1: float;
       float2: float;
     }

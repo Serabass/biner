@@ -10,8 +10,8 @@ struct rgb {
 
 struct {
 	val: rgb {
-		when r > HALF {
-			bright = true;
+		if ($$.r > HALF && ($$.g > HALF ($$.b > HALF) {
+			this.bright = true;
 		}
 	}
 }

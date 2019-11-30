@@ -3,7 +3,7 @@
 const PURGE = 0x44;
 const DISPENSE = 0x45;
 
-struct Response {
+export struct R {
 	start: int8 {
 		if ($$ !== 0x01) {
 			throw "unknown start byte; Must be SOH";
@@ -69,7 +69,12 @@ struct Response {
 			throw "Unknown end byte; Must be ETX";
 		}
 	};
-	bcc: int8;
+	bcc: int8 {
+		if (!checkBCC(this)) {
+			throw "Wrong BCC";
+		}
+	};
 
-	startOK: bool;
+	@startOK: bool;
 }
+

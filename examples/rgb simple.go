@@ -12,4 +12,12 @@ struct {
 	r: int8;
 	g: int8;
 	b: int8;
+
+  get @hex() {
+		return [this.r, this.g, this.b];
+	}
+
+	hex(a, b, c) {
+		return [this.r, this.g, this.b];
+	}
 }

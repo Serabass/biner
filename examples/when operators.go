@@ -8,22 +8,22 @@ struct rgb {
 
 struct {
 	color: rgb {
-		when r >= 0x80 {
+		if (r >= 0x80) {
 			redBright = true;
 		}
-		when g >= 0x80 {
+		if (g >= 0x80) {
 			greenBright = true;
 		}
-		when b >= 0x80 {
+		if (b >= 0x80) {
 			blueBright = true;
 		}
-		when r < 0x80 {
+		if (r < 0x80) {
 			redBright = false;
 		}
-		when g < 0x80 {
+		if (g < 0x80) {
 			greenBright = false;
 		}
-		when b < 0x80 {
+		if (b < 0x80) {
 			blueBright = false;
 		}
 	}
