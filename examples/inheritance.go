@@ -1,19 +1,19 @@
-#endian BE;
+#endianness BE;
 
 struct rgb {
-	r: int8;
-	g: int8;
-	b: int8;
+	r: uint8;
+	g: uint8;
+	b: uint8;
 }
 
 struct rgba : rgb {
-	a: int8;
+	a: uint8;
 }
 
 struct rgbax : rgba {
-	x: int16;
+	x: uint16;
 }
 
 struct {
-	val: rgba;
+	val: rgbax;
 }

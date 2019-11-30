@@ -214,27 +214,34 @@ ImportStatement
    };
  }
 
+TypeAccessStatement
+ = id: Identifier {
+   return {
+     type: "TypeAccessStatement",
+     id,
+   };
+ }
+
+InheritanceStatement
+ = ":" __ parent: TypeAccessStatement {
+   return {
+     type: "InheritanceStatement",
+     parent
+   };
+ }
+
 StructDefinitionStatement
  = isExported: ExportToken? __ StructToken
  __ id: Identifier?
+ __ parent: InheritanceStatement?
  __  "{" __ body: StructBody __ "}"
   {
    return {
      type: "StructDefinitionStatement",
      id,
      body,
+     parent,
      export: !!isExported,
-   }
- }
- / ExportToken __ StructToken
- __ id: Identifier
- __  "{" __ body: StructBody __ "}"
-  {
-   return {
-     type: "StructDefinitionStatement",
-     id,
-     body,
-     export: true
    }
  }
 

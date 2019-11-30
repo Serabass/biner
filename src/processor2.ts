@@ -4,6 +4,7 @@ import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
 import * as path from "path";
 import { JSInterpreter } from "./js-interpreter";
+import { resolveSoa } from "dns";
 
 export class Proc2 {
   public static readFile(
@@ -42,7 +43,7 @@ export class Proc2 {
     return this.structs[""];
   }
 
-  private get endianness() {
+  public get endianness() {
     return this.directives.endianness || "BE";
   }
 
@@ -177,7 +178,14 @@ export class Proc2 {
           throw new Error(`unrecognized type: ${typeName}`);
         }
 
+        let struct = this.structs[typeName];
         let result = 0;
+
+        if (struct.parent) {
+          let name = struct.parent.parent.id.name;
+          result = this.getStructSize(name);
+        }
+
         for (let field of this.structs[typeName].body) {
           if (field.type === "ReadableFieldStatement") {
             let multiplier = field.body.array ? field.body.array.size.value : 1;
@@ -189,8 +197,12 @@ export class Proc2 {
     }
   }
 
-  private processStruct(struct, offset = 0) {
-    let result: any = {};
+  private processStruct(struct, offset = 0, result = {}): any {
+    if (struct.parent) {
+      let parentStruct = this.structs[struct.parent.parent.id.name];
+      this.processStruct(parentStruct, offset, result);
+      offset += this.getStructSize(struct.parent.parent.id.name);
+    }
 
     for (let child of struct.body) {
       switch (child.type) {
@@ -237,6 +249,7 @@ export class Proc2 {
           throw new Error(`Unknown type: ${child.type}`);
       }
     }
+
     return result;
   }
 }
