@@ -189,7 +189,6 @@ StructDefinitionStatement
      type: "StructDefinitionStatement",
      id,
      body,
-     export: !!isExport
    }
  }
  / ExportToken __ StructToken

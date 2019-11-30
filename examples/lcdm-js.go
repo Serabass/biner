@@ -3,7 +3,7 @@
 const PURGE = 0x44;
 const DISPENSE = 0x45;
 
-export struct R {
+struct {
 	start: int8 {
 		if ($$ !== 0x01) {
 			throw "unknown start byte; Must be SOH";

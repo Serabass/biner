@@ -1657,6 +1657,7 @@
     },
     "path": "examples\\png-struct.go",
     "structs": {},
+    "exports": {},
     "consts": {},
     "directives": {}
 }

@@ -7,11 +7,11 @@ describe("Biner simple tests using pegjs", () => {
     let pr = Proc2.readFile(pathFix("rgb simple"), b, "src/javascript.pegjs");
     let result = pr.run();
     expect(result).toBeDefined();
-    expect(result).toBe({
-      b: 0x00,
-      g: 0x00,
-      r: 0xff
-    });
+    expect(result.r).toBe(0xff);
+    expect(result.g).toBe(0x00);
+    expect(result.b).toBe(0x00);
+    // expect(result.add(1, 2)).toBe(3);
+    // expect(result.hex).toBe([0xff, 0x00, 0x00]);
   });
 
   xit("rgb struct red", () => {

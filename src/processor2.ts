@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as ASTY from "asty";
 import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
+import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
   public static readFile(
@@ -29,8 +30,17 @@ export class Proc2 {
   }
 
   public structs: any = {};
+  public exports: any = {};
   public consts: any = {};
   public directives: any = {};
+
+  private get mainStruct() {
+    return this.structs[""];
+  }
+
+  private get endianness() {
+    return this.directives.endianness || "BE";
+  }
 
   public constructor(
     public ast: any,
@@ -40,43 +50,151 @@ export class Proc2 {
 
   public run() {
     this.processBody();
-  }
 
-  private processBody() {
-    console.log(this.ast.body);
-    let nodes = this.ast.body;
-    for (let node of nodes) {
-      this.processNode(node);
+    if (this.mainStruct) {
+      var a = this.processStruct(this.mainStruct);
+      return a;
     }
   }
 
-  private processNode(node) {
+  private processBody() {
+    let nodes = this.ast.body;
+    for (let node of nodes) {
+      this.registerNode(node);
+    }
+  }
+
+  private registerNode(node) {
     switch (node.type) {
       case "DirectiveStatement":
-        this.processDirective(node);
+        this.defineDirective(node);
         break;
       case "ConstStatement":
-        this.processConst(node);
+        this.defineConst(node);
         break;
       case "StructDefinitionStatement":
-        this.processStruct(node);
+        this.defineStruct(node);
         break;
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
   }
 
-  private processDirective(node) {
-    this.directives[node.id.name] = node.expr;
+  private defineDirective(node) {
+    this.directives[node.id.name] = node.expr.name;
   }
 
-  private processConst(node) {
+  private defineConst(node) {
     let name = node.id.name;
     this.consts[name] = node.expr.expression.value;
   }
 
-  private processStruct(node) {
+  private defineStruct(node) {
     let name = node.id ? node.id.name : "";
     this.structs[name] = node;
+
+    if (node.export) {
+      this.exports[name] = node;
+    }
+  }
+
+  private defineGetter(typeName, offset): Function {
+    return () => {
+      switch (typeName) {
+        case "int8":
+          return this.buffer.readInt8(offset);
+        case "uint8":
+          return this.buffer.readUInt8(offset);
+        case "uint16":
+          return this.endianness == "BE"
+            ? this.buffer.readUInt16BE(offset)
+            : this.buffer.readUInt16LE(offset);
+        case "int16":
+          return this.endianness == "BE"
+            ? this.buffer.readInt16BE(offset)
+            : this.buffer.readInt16LE(offset);
+        case "uint32":
+          return this.endianness == "BE"
+            ? this.buffer.readUInt32BE(offset)
+            : this.buffer.readUInt32LE(offset);
+        case "int32":
+          return this.endianness == "BE"
+            ? this.buffer.readInt32BE(offset)
+            : this.buffer.readInt32LE(offset);
+        default:
+          throw new Error(`unrecognized type: ${typeName}`);
+      }
+    };
+  }
+
+  private getStructSize(typeName: string) {
+    switch (typeName) {
+      case "int8":
+      case "uint8":
+        return 1;
+      case "int16":
+      case "uint16":
+        return 2;
+      case "int32":
+      case "uint32":
+        return 4;
+      default:
+        if (!this.structs[typeName]) {
+          throw new Error(`unrecognized type: ${typeName}`);
+        }
+        return this.getStructSize(typeName);
+    }
+  }
+
+  private processStruct(struct) {
+    let result: any = {};
+    let offset = 0;
+
+    for (let child of struct.body) {
+      switch (child.type) {
+        case "ReadableFieldStatement":
+          let field = child.field.name;
+
+          Object.defineProperty(result, field, {
+            enumerable: true,
+            get: this.defineGetter(child.body.typeName.name, offset) as any
+          });
+
+          const structSize = this.getStructSize(child.body.typeName.name);
+          offset += structSize;
+
+          break;
+
+        case "Property":
+          let key = child.key.name;
+          switch (child.kind) {
+            case "get":
+              Object.defineProperty(result, key, {
+                enumerable: true,
+                get: () => JSInterpreter.callFunction(child.value, result)
+              });
+              break;
+            case "set":
+              Object.defineProperty(result, key, {
+                enumerable: true,
+                set: value =>
+                  JSInterpreter.callFunction(child.value, result, value)
+              });
+              break;
+          }
+          break;
+        case "FunctionFieldDefinition":
+          let functionName = child.id.name;
+          Object.defineProperty(result, functionName, {
+            enumerable: true,
+            value: (...args) =>
+              JSInterpreter.callFunction(functionName, result, ...args)
+          });
+          break;
+        default:
+          throw new Error(`Unknown type: ${child.type}`);
+      }
+    }
+    return result;
   }
 }

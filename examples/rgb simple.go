@@ -2,22 +2,27 @@
 
 /*
 | r  g  b  |
-| FF 00 00 | => red: true
+| FF 00 00 |
 
 | r  g  b  |
-| 00 00 FF | => blue: true
+| 00 00 FF |
 */
 
-struct {
-	r: int8;
-	g: int8;
-	b: int8;
+struct rgb {
+	r: uint8;
+	g: uint8;
+	b: uint8;
 
   get @hex() {
 		return [this.r, this.g, this.b];
 	}
 
-	hex(a, b, c) {
-		return [this.r, this.g, this.b];
+	add(a, b) {
+		return a + b;
 	}
+}
+
+struct {
+	rgb: rgb;
+	a: uint8;
 }
