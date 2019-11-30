@@ -20,17 +20,17 @@
 */
 
 struct decimalValue {
-  when 0x04 {
+  if ($$ === 0x04) {
     type = "int";
     val: int8;
   }
 
-  when 0x02 {
+  if ($$ === 0x02) {
     type = "var";
     val: int16;
   }
 
-  when 0x06 {
+  if ($$ === 0x06) {
     type = "float32";
     val: float32;
   }
@@ -48,22 +48,22 @@ struct wstring32b = int8 {
 
 struct main {
   opcode: int16 {
-    when 0x0005 {
+    if ($$ === 0x0005) {
       type = "opcode0005";
       val1: decimalValue;
       val2: decimalValue;
     }
 
-    when 0x034A {
+    if  ($$ === 0x034A) {
       type = "opcode034A";
       name: string8;
     }
 
-    when == 0x0009 {
+    if ($$ == 0x0009) {
       type = "opcode0009";
     }
 
-    when 0x0019 {
+    if ($$ === 0x0019) {
       type = "opcode0019";
       val1: decimalValue;
       val2: decimalValue;

@@ -4,7 +4,6 @@ import * as PEGUtil from "pegjs-util";
 import * as peg from "pegjs";
 import * as path from "path";
 import { JSInterpreter } from "./js-interpreter";
-import { resolveSoa } from "dns";
 
 export class Proc2 {
   public static readFile(
@@ -124,8 +123,22 @@ export class Proc2 {
     }
   }
 
-  private defineGetter(typeName, offset): Function {
-    return () => {
+  private defineGetter(typeName, arrayData): Function {
+    return (offset: number) => {
+      if (arrayData) {
+        let result = [];
+        let arraySize = arrayData.size.value;
+
+        for (let i = 0; i < arraySize; i++) {
+          let fn = this.defineGetter(typeName, null);
+          const l = fn(offset);
+          result.push(l);
+          offset += this.getStructSize(typeName);
+        }
+
+        return result;
+      }
+
       switch (typeName) {
         case "int8":
           return this.buffer.readInt8(offset);
@@ -162,7 +175,14 @@ export class Proc2 {
     return this.processStruct(struct, offset);
   }
 
-  public getStructSize(typeName: string) {
+  public getStructSize(typeName: string, arrayData = null) {
+    if (arrayData) {
+      let arraySize = arrayData.size.value;
+      let structSize = this.getStructSize(typeName);
+
+      return structSize * arraySize;
+    }
+
     switch (typeName) {
       case "int8":
       case "uint8":
@@ -199,9 +219,10 @@ export class Proc2 {
 
   private processStruct(struct, offset = 0, result = {}): any {
     if (struct.parent) {
-      let parentStruct = this.structs[struct.parent.parent.id.name];
+      const parentStructName = struct.parent.parent.id.name;
+      let parentStruct = this.structs[parentStructName];
       this.processStruct(parentStruct, offset, result);
-      offset += this.getStructSize(struct.parent.parent.id.name);
+      offset += this.getStructSize(parentStructName);
     }
 
     for (let child of struct.body) {
@@ -209,12 +230,22 @@ export class Proc2 {
         case "ReadableFieldStatement":
           let field = child.field.name;
 
-          Object.defineProperty(result, field, {
-            enumerable: true,
-            get: this.defineGetter(child.body.typeName.name, offset) as any
-          });
+          (offset => {
+            Object.defineProperty(result, field, {
+              enumerable: true,
+              get: () => {
+                return this.defineGetter(
+                  child.body.typeName.name,
+                  child.body.array
+                )(offset) as any;
+              }
+            });
+          })(offset);
 
-          const structSize = this.getStructSize(child.body.typeName.name);
+          const structSize = this.getStructSize(
+            child.body.typeName.name,
+            child.body.array
+          );
           offset += structSize;
 
           break;
