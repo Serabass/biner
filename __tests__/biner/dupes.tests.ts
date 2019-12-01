@@ -13,6 +13,6 @@ describe("Dupes", () => {
       let pr = load("dupe-fields", "01 | 02 | 05");
       let result = pr.run();
       console.log(result);
-    }).toThrowError("Cannot redefine field: val");
+    }).toThrowError("Cannot redefine property: val");
   });
 });

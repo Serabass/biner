@@ -190,16 +190,25 @@ FunctionFieldDefinition
       };
     }
 
-ImportName
- = name: Identifier __ (AsToken __ alias: Identifier) {
+ImportAlias
+ = AsToken __ aliasName: Identifier {
    return {
-     type: "ImportName".
-     name, alias
+     type: "ImportAlias",
+     aliasName,
+   };
+ }
+
+ImportName
+ = name: Identifier __ alias: ImportAlias? {
+   return {
+     type: "ImportName",
+     name,
+     alias
    };
  }
 
 ImportNamesList
-  = head:Identifier tail:(__ "," __ PropertyAssignment)* {
+  = head:ImportName tail:(__ "," __ ImportName)* {
       return buildList(head, tail, 3);
     }
 

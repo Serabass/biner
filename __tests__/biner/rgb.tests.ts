@@ -30,14 +30,12 @@ describe("Biner simple tests using pegjs", () => {
   it("rgb struct red", () => {
     let pr = load("rgb struct", "FF | 00 | 00");
     let result = pr.run();
-    expect(result).toBe({
-      color: {
-        r: 0xff,
-        g: 0x00,
-        b: 0x00,
-        red: true
-      }
-    });
+    expect(result).toBeDefined();
+    expect(result.color).toBeDefined();
+    expect(result.color.r).toBe(0xff);
+    expect(result.color.g).toBe(0x00);
+    expect(result.color.b).toBe(0x00);
+    expect(result.color.red).toBe(true);
   });
 
   it("rgb struct green", () => {
@@ -51,7 +49,7 @@ describe("Biner simple tests using pegjs", () => {
   });
 
   it("rgb struct blue", () => {
-    let pr = load("rgb str", "00 | 00 | FF");
+    let pr = load("rgb struct", "00 | 00 | FF");
     let x = pr.run();
     expect(x.color.r).toBe(0x00);
     expect(x.color.g).toBe(0x00);

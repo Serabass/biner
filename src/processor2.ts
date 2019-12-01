@@ -99,13 +99,23 @@ export class Proc2 {
       Buffer.from([]),
       "src/javascript.pegjs"
     );
+
+    this.imports[importPath] = pr;
+
     pr.run();
     for (let n of node.names) {
-      let name = n.name;
-      if (this.structs[name]) {
-        throw new Error(`Struct ${name} already defined`);
+      let exportName = n.name.name;
+      let importName = n.name.name;
+
+      if (n.alias) {
+        importName = n.alias.aliasName.name;
       }
-      this.structs[name] = pr.exports[name];
+
+      if (this.structs[importName]) {
+        throw new Error(`Struct ${importName} already defined`);
+      }
+
+      this.structs[importName] = pr.exports[exportName];
     }
   }
 
@@ -116,6 +126,11 @@ export class Proc2 {
 
   private defineStruct(node) {
     let name = node.id ? node.id.name : "";
+
+    if (this.structs[name]) {
+      throw new Error(`Struct '${name}' already defined`);
+    }
+
     this.structs[name] = node;
 
     if (node.export) {
@@ -160,6 +175,21 @@ export class Proc2 {
           return this.endianness == "BE"
             ? this.buffer.readInt32BE(offset)
             : this.buffer.readInt32LE(offset);
+        case "fstring":
+          let s = [];
+          let len = this.buffer.readUInt8(offset);
+          offset++;
+
+          for (let i = 0; i < len; i++) {
+            let charCode = this.buffer.readUInt8(offset);
+            offset++;
+            let char = String.fromCharCode(charCode);
+            s.push(char);
+          }
+
+          return s.join("");
+
+          break;
         default:
           if (!this.structs[typeName]) {
             throw new Error(`unrecognized type: ${typeName}`);
@@ -193,7 +223,10 @@ export class Proc2 {
       case "int32":
       case "uint32":
         return 4;
+      case "fstring":
+        return 0;
       default:
+        console.log(this.structs);
         if (!this.structs[typeName]) {
           throw new Error(`unrecognized type: ${typeName}`);
         }

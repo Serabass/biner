@@ -1,5 +1,5 @@
 struct {
-	i8: int8;
-	i81: int8;
+	i8: uint8;
+	i81: uint8;
 	str: fstring;
 }

@@ -1,10 +1,9 @@
-import { buf, pathFix } from "../../util";
+import { buf, pathFix, load } from "../../util";
 import { Processor } from "../../src/processor";
 
 describe("Fixed string tests", () => {
   it("Simple", () => {
-    let b = buf(" FF | 22 | 03 | 30 | 31 | 32 ");
-    let pr = Processor.readFile(pathFix("fixed string1"), b);
+    let pr = load("fixed string1", " FF | 22 | 03 | 30 31 32 ");
     let result = pr.run();
 
     expect(result).toBeDefined();
