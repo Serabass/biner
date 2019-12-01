@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Serabass/biner.svg?branch=master)](https://travis-ci.org/Serabass/biner)
+
 # Biner
 
 **Biner** - это моя первая попытка разработать язык.

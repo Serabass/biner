@@ -285,7 +285,6 @@ export class Proc2 {
                   child.body.body &&
                   child.body.body.body
                 ) {
-                  console.log(child.body.body.body);
                   let js = child!.body!.body!.body;
                   if (js!.type === "JSProgram") {
                     let script =
@@ -295,7 +294,6 @@ export class Proc2 {
                         js.location.end.offset
                       );
                     vm.runInNewContext(script, newLocal);
-                    console.log(newLocal);
                   }
                 }
 
