@@ -103,9 +103,10 @@ ReadableFieldBody
    }
  }
 
+
+
 ReadFieldStatement
- = typeName: Identifier
- __ array: FieldArrayStatement?
+ = typeName: TypeAccessStatement
  __ body: ReadableFieldBody? {
      return {
        type: "ReadFieldStatement",
@@ -223,11 +224,23 @@ ImportStatement
    };
  }
 
+TypeAccessList
+ = head: TypeAccessStatement tail: (__ "," __ TypeAccessStatement)* {
+     return buildList(head, tail, 3);
+ }
+
+GenericStatement
+ = "<" __ TypeAccessList __ ">"
+
 TypeAccessStatement
- = id: Identifier {
+ = id: Identifier 
+ __ generic: GenericStatement?
+ __ array: FieldArrayStatement? {
    return {
      type: "TypeAccessStatement",
      id,
+     generic,
+     array
    };
  }
 
@@ -237,6 +250,29 @@ InheritanceStatement
      type: "InheritanceStatement",
      parent
    };
+ }
+
+TypeGenericStatement
+ = id: Identifier,
+ __ defaultType: ("=" __ Identifier)? {
+     return {
+         type: "TypeGenericStatement",
+         id,
+         defaultType
+     };
+ }
+
+GenericTypeList
+ = head: TypeGenericStatement tail: ("," __ TypeGenericStatement)* {
+     return buildList(head, tail, 3);
+ }
+
+GenericDefinitionStatement
+ = "<" __ list: GenericTypeList __ ">" {
+     return {
+        type: "GenericDefinitionStatement",
+        list,
+     }
  }
 
 StructDefinitionStatement

@@ -273,7 +273,7 @@ export class Proc2 {
           ((offsetValue: number, child2) => {
             Object.defineProperty(result, field, {
               enumerable: true,
-              get: () => {
+              value: (() => {
                 const newLocal = this.defineGetter(
                   child.body.typeName.name,
                   child.body.array
@@ -298,7 +298,7 @@ export class Proc2 {
                 }
 
                 return newLocal;
-              }
+              })()
             });
           })(offset, child);
 
