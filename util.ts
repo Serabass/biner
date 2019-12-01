@@ -2,7 +2,7 @@ import * as path from "path";
 import { Proc2 } from "./src/processor2";
 
 export function buf(data: string | Buffer) {
-  if (typeof data == "string") {
+  if (typeof data === "string") {
     data = Buffer.from(data.replace(/[\s|]+/g, ""), "hex");
   }
 

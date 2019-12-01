@@ -12,7 +12,6 @@ describe("Dupes", () => {
     expect(() => {
       let pr = load("dupe-fields", "01 | 02 | 05");
       let result = pr.run();
-      console.log(result);
     }).toThrowError("Cannot redefine property: val");
   });
 });

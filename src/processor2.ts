@@ -1,17 +1,25 @@
-import * as fs from "fs";
 import * as ASTY from "asty";
-import * as PEGUtil from "pegjs-util";
-import * as peg from "pegjs";
+import * as fs from "fs";
 import * as path from "path";
+import * as peg from "pegjs";
+import * as PEGUtil from "pegjs-util";
+import * as vm from "vm";
 import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
+  public get mainStruct() {
+    return this.structs[""];
+  }
+
+  public get endianness() {
+    return this.directives.endianness || "BE";
+  }
   public static readFile(
-    path: string,
+    scriptPath: string,
     buffer: Buffer,
     src = "./src/biner-final.pegjs"
   ): Proc2 {
-    let contents = fs.readFileSync(path).toString("utf-8");
+    let contents = fs.readFileSync(scriptPath).toString("utf-8");
     let parserContents = fs.readFileSync(src).toString("utf-8");
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
@@ -22,11 +30,11 @@ export class Proc2 {
 
     if (actual.error) {
       delete actual.error.expected;
-      actual.error.sourceFile = path;
+      actual.error.sourceFile = scriptPath;
       throw new Error(JSON.stringify(actual.error, null, 4));
     }
 
-    const res = new Proc2(actual.ast, buffer, path);
+    const res = new Proc2(actual.ast, buffer, scriptPath, contents);
     return res;
   }
 
@@ -38,26 +46,63 @@ export class Proc2 {
     endianness: "BE"
   };
 
-  public get mainStruct() {
-    return this.structs[""];
-  }
-
-  public get endianness() {
-    return this.directives.endianness || "BE";
-  }
-
   public constructor(
     public ast: any,
     public buffer: Buffer,
-    public path: string
+    public scriptPath: string,
+    public contents: string
   ) {}
 
   public run() {
     this.processBody();
 
     if (this.mainStruct) {
-      var a = this.processStruct(this.mainStruct);
+      let a = this.processStruct(this.mainStruct);
       return a;
+    }
+  }
+
+  public getStructSize(typeName: string = "", arrayData = null) {
+    if (arrayData) {
+      let arraySize = arrayData.size.value;
+      let structSize = this.getStructSize(typeName);
+
+      return structSize * arraySize;
+    }
+
+    switch (typeName) {
+      case "int8":
+      case "uint8":
+        return 1;
+      case "int16":
+      case "uint16":
+        return 2;
+      case "int32":
+      case "uint32":
+        return 4;
+      case "fstring":
+        return 0;
+      default:
+        if (!this.structs[typeName]) {
+          throw new Error(`unrecognized type: ${typeName}`);
+        }
+
+        let struct = this.structs[typeName];
+        let result = 0;
+
+        if (struct.parent) {
+          let name = struct.parent.parent.id.name;
+          result = this.getStructSize(name);
+        }
+
+        for (let field of this.structs[typeName].body) {
+          if (field.type === "ReadableFieldStatement") {
+            let multiplier = field.body.array ? field.body.array.size.value : 1;
+            const typeName2 = field.body.typeName.name;
+            result += this.getStructSize(typeName2) * multiplier;
+          }
+        }
+        return result;
     }
   }
 
@@ -93,7 +138,7 @@ export class Proc2 {
 
   private defineImport(node) {
     let importPath =
-      path.join(path.dirname(this.path), node.moduleName.value) + ".go";
+      path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
     let pr = Proc2.readFile(
       importPath,
       Buffer.from([]),
@@ -138,15 +183,18 @@ export class Proc2 {
     }
   }
 
-  private defineGetter(typeName, arrayData): Function {
-    return (offset: number) => {
+  private defineGetter(
+    typeName,
+    arrayData
+  ): (offset: number, node: any) => any {
+    return (offset: number, node: any) => {
       if (arrayData) {
         let result = [];
         let arraySize = arrayData.size.value;
 
         for (let i = 0; i < arraySize; i++) {
           let fn = this.defineGetter(typeName, null);
-          const l = fn(offset);
+          const l = fn(offset, node);
           result.push(l);
           offset += this.getStructSize(typeName);
         }
@@ -157,24 +205,30 @@ export class Proc2 {
       switch (typeName) {
         case "int8":
           return this.buffer.readInt8(offset);
+
         case "uint8":
           return this.buffer.readUInt8(offset);
+
         case "uint16":
-          return this.endianness == "BE"
+          return this.endianness === "BE"
             ? this.buffer.readUInt16BE(offset)
             : this.buffer.readUInt16LE(offset);
+
         case "int16":
-          return this.endianness == "BE"
+          return this.endianness === "BE"
             ? this.buffer.readInt16BE(offset)
             : this.buffer.readInt16LE(offset);
+
         case "uint32":
-          return this.endianness == "BE"
+          return this.endianness === "BE"
             ? this.buffer.readUInt32BE(offset)
             : this.buffer.readUInt32LE(offset);
+
         case "int32":
-          return this.endianness == "BE"
+          return this.endianness === "BE"
             ? this.buffer.readInt32BE(offset)
             : this.buffer.readInt32LE(offset);
+
         case "fstring":
           let s = [];
           let len = this.buffer.readUInt8(offset);
@@ -188,8 +242,6 @@ export class Proc2 {
           }
 
           return s.join("");
-
-          break;
         default:
           if (!this.structs[typeName]) {
             throw new Error(`unrecognized type: ${typeName}`);
@@ -205,51 +257,6 @@ export class Proc2 {
     return this.processStruct(struct, offset);
   }
 
-  public getStructSize(typeName: string = "", arrayData = null) {
-    if (arrayData) {
-      let arraySize = arrayData.size.value;
-      let structSize = this.getStructSize(typeName);
-
-      return structSize * arraySize;
-    }
-
-    switch (typeName) {
-      case "int8":
-      case "uint8":
-        return 1;
-      case "int16":
-      case "uint16":
-        return 2;
-      case "int32":
-      case "uint32":
-        return 4;
-      case "fstring":
-        return 0;
-      default:
-        console.log(this.structs);
-        if (!this.structs[typeName]) {
-          throw new Error(`unrecognized type: ${typeName}`);
-        }
-
-        let struct = this.structs[typeName];
-        let result = 0;
-
-        if (struct.parent) {
-          let name = struct.parent.parent.id.name;
-          result = this.getStructSize(name);
-        }
-
-        for (let field of this.structs[typeName].body) {
-          if (field.type === "ReadableFieldStatement") {
-            let multiplier = field.body.array ? field.body.array.size.value : 1;
-            const typeName2 = field.body.typeName.name;
-            result += this.getStructSize(typeName2) * multiplier;
-          }
-        }
-        return result;
-    }
-  }
-
   private processStruct(struct, offset = 0, result = {}): any {
     if (struct.parent) {
       const parentStructName = struct.parent.parent.id.name;
@@ -263,17 +270,39 @@ export class Proc2 {
         case "ReadableFieldStatement":
           let field = child.field.name;
 
-          (offset => {
+          ((offsetValue: number, child2) => {
             Object.defineProperty(result, field, {
               enumerable: true,
               get: () => {
-                return this.defineGetter(
+                const newLocal = this.defineGetter(
                   child.body.typeName.name,
                   child.body.array
-                )(offset) as any;
+                )(offsetValue, child2) as any;
+
+                if (
+                  child &&
+                  child.body &&
+                  child.body.body &&
+                  child.body.body.body
+                ) {
+                  console.log(child.body.body.body);
+                  let js = child!.body!.body!.body;
+                  if (js!.type === "JSProgram") {
+                    let script =
+                      "{{" +
+                      this.contents.substr(
+                        js.location.start.offset,
+                        js.location.end.offset
+                      );
+                    vm.runInNewContext(script, newLocal);
+                    console.log(newLocal);
+                  }
+                }
+
+                return newLocal;
               }
             });
-          })(offset);
+          })(offset, child);
 
           const structSize = this.getStructSize(
             child.body.typeName.name,

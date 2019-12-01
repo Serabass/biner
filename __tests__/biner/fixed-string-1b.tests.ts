@@ -1,5 +1,4 @@
-import { buf, pathFix, load } from "../../util";
-import { Processor } from "../../src/processor";
+import { load } from "../../util";
 
 describe("Fixed string tests", () => {
   it("Simple", () => {

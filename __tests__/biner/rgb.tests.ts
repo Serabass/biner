@@ -4,7 +4,6 @@ describe("Biner simple tests using pegjs", () => {
   it("rgb simple", () => {
     let pr = load("rgb simple", "FF | 00 | 00 | 80");
     let result = pr.run();
-    console.log(result);
     expect(result).toBeDefined();
     expect(result.rgb).toBeDefined();
     expect(result.rgb.r).toBe(0xff);
@@ -22,7 +21,7 @@ describe("Biner simple tests using pegjs", () => {
     expect(pr.getStructSize("sandbox")).toBe(7);
     expect(pr.getStructSize("arrayStruct")).toBe(4);
     expect(pr.getStructSize("arrayStruct2")).toBe(
-      4 * 2 + 4 * 20 + 4 * 40 + 2 * 2
+      4 * 2 + 4 * 20 + 4 * 40 + 2 * 2,
     );
     expect(pr.getStructSize("")).toBe(4);
   });

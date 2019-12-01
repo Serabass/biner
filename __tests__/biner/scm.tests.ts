@@ -7,11 +7,11 @@ xdescribe("Biner simple tests using pegjs", () => {
     expect(x.opcode.type).toBe("opcode0005");
     expect(x.opcode.val1).toBe({
       type: "int",
-      val: 1
+      val: 1,
     });
     expect(x.opcode.val2).toBe({
       type: "float",
-      val: 0
+      val: 0,
     });
   });
 
@@ -23,11 +23,11 @@ xdescribe("Biner simple tests using pegjs", () => {
     expect(first.type).toBe("opcode0005");
     expect(first.val1).toBe({
       type: "var",
-      val: 0x0201
+      val: 0x0201,
     });
     expect(first.val2).toBe({
       type: "float",
-      val: 0
+      val: 0,
     });
   });
 
@@ -39,7 +39,7 @@ xdescribe("Biner simple tests using pegjs", () => {
     expect(first.type).toBe("opcode034A");
     expect(first.val1).toBe({
       type: "var",
-      name: "1111"
+      name: "1111",
     });
   });
 

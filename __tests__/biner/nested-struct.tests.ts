@@ -21,9 +21,9 @@ describe("Nested structs", () => {
         nested: {
           r: 0xff,
           g: 0xff,
-          b: 0xff
-        }
-      }
+          b: 0xff,
+        },
+      },
     });
   });
 });

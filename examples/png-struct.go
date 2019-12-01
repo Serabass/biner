@@ -2,11 +2,11 @@
 
 // Option 1
 
-const int8 PNG_SIGNATURE = 0x89;
-const int8 DOS_EOF = 0x1A;
-const int CR = 0x0A;
-const int LF = 0x0D;
-const int16 CRLF = 0x0A0D;
+const PNG_SIGNATURE = 0x89;
+const DOS_EOF = 0x1A;
+const CR = 0x0A;
+const LF = 0x0D;
+const CRLF = 0x0A0D;
 
 struct ChunkChar<prop> {
 	@ = char {

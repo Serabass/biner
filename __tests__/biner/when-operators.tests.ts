@@ -9,8 +9,8 @@ describe("Biner simple tests using pegjs", () => {
     expect(Object.keys(x).length).toBe(1);
     expect(Object.keys(x)).toEqual(["color"]);
     expect(x.color.r).toBe(0x00);
-    expect(x.color.redBright).toBe(false);
     expect(x.color.g).toBe(0x81);
+    expect(x.color.redBright).toBe(false);
     expect(x.color.greenBright).toBe(true);
   });
 });

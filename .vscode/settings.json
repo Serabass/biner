@@ -13,5 +13,5 @@
     "wstring",
     "zerox"
   ],
-  "editor.formatOnSave": true
+  "editor.defaultFormatter": "eg2.tslint"
 }
