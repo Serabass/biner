@@ -10,7 +10,7 @@ struct vector<T, TT = T> {
 }
 
 struct A<T> : vector<vector<T>> {
-	b: T:
+	b: T;
 }
 
 struct {
