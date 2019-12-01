@@ -322,7 +322,7 @@ export class Proc2 {
             case "set":
               Object.defineProperty(result, key, {
                 enumerable: true,
-                set: value =>
+                set: (value) =>
                   JSInterpreter.callFunction(child.value, result, value)
               });
               break;

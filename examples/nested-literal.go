@@ -4,7 +4,7 @@ struct Parent {
 	data: struct {
 		title: char[10];
 		meta: struct Meta {
-			sandbox: uint[255];
+			sandbox: uint8[255];
 		}
 	}
 

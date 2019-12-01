@@ -9,7 +9,7 @@ struct {
 			throw "unknown start byte; Must be SOH";
 		}
 
-		this.startOK = true;
+		startOK = true;
 	};
 	id: uint8;
 	stx: uint8 {
@@ -17,7 +17,7 @@ struct {
 			throw "unknown byte; Must be STX";
 		}
 		
-		this.stxOK = true;
+		stxOK = true;
 	};
 	cmd: uint8 {
 		if ($$ == PURGE) { // PURGE
@@ -25,7 +25,7 @@ struct {
 		}
 
 		if ($$ == DISPENSE) { // Dispense
-			this.type = "Dispense";
+			type = "Dispense";
 
 			reqBills: char[2];
 			reqBills2: char[2];
@@ -35,7 +35,7 @@ struct {
 		}
 
 		if ($$ == 0x76) { // Test dispense
-			this.type = "Test dispense";
+			type = "Test dispense";
 
 			reqBills: char[2];
 		  reqBills2: char[2];
@@ -46,7 +46,7 @@ struct {
 		}
 
 		if ($$ == 0x46) { // Status
-			this.type = "Status";
+			type = "Status";
 
 			unk: int8;
 			errCause: int8;
@@ -55,7 +55,7 @@ struct {
 		}
 
 		if ($$ == 0x47) { // RomVersion
-			this.type = "RomVersion";
+			type = "RomVersion";
 
 			unk: char;
 			ver1: char;
@@ -69,13 +69,9 @@ struct {
 			throw "Unknown end byte; Must be ETX";
 		}
 	};
-	bcc: uint8 {
-		if (!checkBCC(this)) {
-			throw "Wrong BCC";
-		}
-	};
+	bcc: uint8;
 
-	// @startOK: bool;
-	// @stxOK: bool;
+	@startOK: bool;
+	@stxOK: bool;
 }
 

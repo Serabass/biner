@@ -112,7 +112,6 @@ ReadFieldStatement
        type: "ReadFieldStatement",
        typeName,
        body,
-       array
      };
  }
 
@@ -151,12 +150,12 @@ SystemPropertyDefinition
     {
       return {
         type: "Property",
-        key: key,
+        key,
         value: {
           type: "FunctionExpression",
           id: null,
           params: [],
-          body: body
+          body
         },
         kind: "get"
       };
@@ -167,12 +166,12 @@ SystemPropertyDefinition
     {
       return {
         type: "Property",
-        key: key,
+        key,
         value: {
           type: "FunctionExpression",
           id: null,
-          params: params,
-          body: body
+          params,
+          body
         },
         kind: "set"
       };
@@ -230,7 +229,12 @@ TypeAccessList
  }
 
 GenericStatement
- = "<" __ TypeAccessList __ ">"
+ = "<" __ typeNames: TypeAccessList __ ">" {
+   return {
+      type: "GenericStatement",
+      typeNames
+   }
+ }
 
 TypeAccessStatement
  = id: Identifier 
@@ -253,7 +257,7 @@ InheritanceStatement
  }
 
 TypeGenericStatement
- = id: Identifier,
+ = id: Identifier
  __ defaultType: ("=" __ Identifier)? {
      return {
          type: "TypeGenericStatement",

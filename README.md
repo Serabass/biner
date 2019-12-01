@@ -148,3 +148,13 @@ _пока не ясно_
 ### Плагины для IDE
 
 ### Линтеры
+
+### Варианты названия
+
+* BiSt = от Binary Structurization (созвучно с Beast)
+
+
+https://www.opennet.ru/opennews/art.shtml?num=46244
+
+Можно добавить системную директиву #docRef как в описании по ссылке.
+

@@ -19,58 +19,50 @@
 
 */
 
-struct decimalValue {
+scalar decimalValue {
   if ($$ === 0x04) {
-    type = "int";
-    val: int8;
+    = int8;
   }
 
   if ($$ === 0x02) {
-    type = "var";
-    val: int16;
+    = int16;
   }
 
   if ($$ === 0x06) {
-    type = "float32";
-    val: float32;
+    = float32;
   }
 }
 
-// struct string8 = fstring(8);
-
-// struct wstring8b = int8 {
-//   = fstring(@);
-// }
-
-struct wstring32b = int8 {
-  a: float32;
+struct opcode0005 {
+  val1: decimalValue;
+  val2: decimalValue;
 }
 
-struct main {
-  opcode: int16 {
-    if ($$ === 0x0005) {
-      type = "opcode0005";
-      val1: decimalValue;
-      val2: decimalValue;
+struct opcode034A {
+  name: string8;
+}
+
+struct opcode0019 {
+  val1: decimalValue;
+  val2: decimalValue;
+}
+
+struct {
+  opcode: int16 { opc ->
+    if (opc === 0x0005) {
+      = opcode0005;
     }
 
-    if  ($$ === 0x034A) {
-      type = "opcode034A";
-      name: string8;
+    if (opc === 0x034A) {
+      = opcode034A;
     }
 
-    if ($$ == 0x0009) {
+    if (opc == 0x0009) {
       type = "opcode0009";
     }
 
-    if ($$ === 0x0019) {
-      type = "opcode0019";
-      val1: decimalValue;
-      val2: decimalValue;
+    if (opc === 0x0019) {
+      = opcode0019;
     }
-
-    // default {
-    //   throw "Unknown opcode: ${@}";
-    // }
   }
 }

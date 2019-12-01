@@ -26,6 +26,9 @@ struct {
 			this.blue = true;
 		}
 	}
+	@red: bool;
+	@green: bool;
+	@blue: bool;
 }
 
 // FF 00 00 => Must return {

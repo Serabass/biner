@@ -29,14 +29,6 @@ struct rgb {
 	r: uint8;
 	g: uint8;
 	b: uint8;
-
-  get @hex() {
-		return [this.r, this.g, this.b];
-	}
-
-	add(a, b) {
-		return a + b;
-	}
 }
 
 struct {
