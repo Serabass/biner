@@ -1,3 +1,12 @@
+
+const INT = 100001;
+const HEX = 0x01;
+const OCT = 0o05;
+const BIN1 = 0b0000001;
+const BIN2 = 0b0000_1111_01010;
+const FLOAT = 178.01;
+/*
+
 struct A
 	<
 		 TT1,
@@ -13,7 +22,6 @@ struct A
 	c: T2;
 }
 
-/*
 struct B : A<float32> {
 	b: uint8;
 	vector: vector<

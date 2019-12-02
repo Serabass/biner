@@ -176,7 +176,8 @@ ConstStatement
  = ConstToken
    __ id: Identifier
    __ "="
-   __ expr: Expression {
+   __ expr: Expression
+   __ EOS {
    return {
      type: "ConstStatement",
      id, expr,
@@ -303,7 +304,7 @@ TypeAccessGenericStatement
  }
 
 TypeAccessArrayExpressionStatement
- = "[" __ size: (HexDigitLiteral / Digit / Expression)? __ "]" {
+ = "[" __ size: Expression? __ "]" {
    return {
      type: "TypeAccessArrayExpressionStatement",
      size,
@@ -555,8 +556,7 @@ OperatorExpression
 Expression
  = FieldAccessExpression
  / StringLiteral
- / Digit
- / HexDigitLiteral
+ / NumericLiteral
  / EnumFieldAccess
  / Identifier
 
@@ -720,25 +720,76 @@ BooleanLiteral
   = TrueToken  { return { type: "Literal", value: true  }; }
   / FalseToken { return { type: "Literal", value: false }; }
 
+
+
+DecimalDigitLiteral
+ = value: DecimalDigit+ {
+   return {
+     type: "DecimalDigitLiteral",
+     value: value.join(''),
+   };
+ }
 HexDigitLiteral
- = "0x" HexDigit+
+ = "0x" value: HexDigit+ {
+   return {
+     type: "HexDigitLiteral",
+     value: "0x" + value.join('')
+   };
+ }
+
+OctDigitLiteral
+ = "0o" value: OctDigit+ {
+   return {
+     type: "OctDigitLiteral",
+     value: "0o" + value.join('')
+   };
+ }
+
+BinDigitLiteral
+ = "0b" value: BinDigit+ {
+   return {
+     type: "BinDigitLiteral",
+     value: "0b" + value.join('')
+   };
+ }
 
 HexDigit
   = [0-9a-f]i
 
-Digit
-  = [0-9]+ "." [0-9]+
-  / [0-9]+
+OctDigit
+  = [0-7]i
+
+BinDigit
+  = [01_]i
+
+IntDigitLiteral
+  = value: DecimalDigit+ {
+    return {
+      type: "Digit",
+      value,
+    };
+  }
+
+FloatDigitLiteral
+  = p1: DecimalDigit+ "." p2: DecimalDigit+ {
+    p1 = p1.join('');
+    p2 = p2.join('');
+    return {
+      type: "FloatDigit",
+      value: [p1, p2].join('.'),
+    };
+  }
 
 DecimalDigit
   = [0-9]
 
-NonZeroDigit
-  = [1-9]
-
 NumericLiteral
- = HexDigitLiteral
- / Digit
+ = FloatDigitLiteral
+ / HexDigitLiteral
+ / OctDigitLiteral
+ / BinDigitLiteral
+ / DecimalDigitLiteral
+ / IntDigitLiteral
 
 
 
