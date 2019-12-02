@@ -1,4 +1,4 @@
-decorator structDecorator() {
+/*decorator structDecorator() {
 	// js
 }
 
@@ -9,7 +9,7 @@ decorator pass(...vals) {
 decorator nopass(...vals) {
 	// js
 }
-
+*/
 @structDecorator
 struct A {
 	x: uint8;
@@ -21,9 +21,9 @@ struct A {
 }
 
 struct RealStruct {
-	@pass(0x90)
+	@pass(90)
 	header: uint8;
 
-	@nopass(0x80)
+	@nopass(80)
 	footer: uint8;
 }

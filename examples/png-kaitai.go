@@ -2,11 +2,11 @@
 // https://github.com/kaitai-io/kaitai_struct
 // https://www.opennet.ru/opennews/art.shtml?num=46244
 
-#endianness BE
-#extension png
-#id png
+#endianness BE;
+#extension png;
+#id png;
 
-enum color_type {
+enum color_type : uint8 {
 	greyscale = 0,
 	truecolor = 2,
 	indexed = 3,
@@ -19,52 +19,39 @@ enum phys_unit : uint8 {
 	meter = 1
 }
 
+struct rgb<R = uint8<A, B, C<A>>, G = R, B = G> {
+	r: R;
+	g: G;
+	b: B;
+}
+
+struct rgbfloat : rgb<float32> {}
+
+struct rgba<R = uint8, G = R, B = G, A = B>
+     : rgb<R, G, B> {
+	a: A;
+}
+
+struct sandbox {
+	rgb: rgb<float32>;
+}
+
 struct chunk {
 	len: uint8;
-	type: wstring<4>;
-	body: chunk_body[len] [] {
-		// Critical chunks
-		// '"IHDR"': ihdr_chunk
-		when (_.type == "PLTE") {
-			= plte_chunk;
-		}
-		// IDAT = raw
-		// IEND = empty, thus raw
-
-		// Ancillary chunks
-		when (_.type == "cHRM") {
-			= chrm_chunk;
-		}
-		when (_.type == "gAMA") {
-			= gama_chunk;
-		}
-		// iCCP
-		// sBIT
-		when (_.type == "sRGB") {
-			= srgb_chunk;
-		}
-		when (_.type == "bKGD") {
-			= bkgd_chunk;
-		}
-		// hIST
-		// tRNS
-		when (_.type == "pHYs") {
-			= phys_chunk;
-		}
-		// sPLT
-		when (_.type == "tIME") {
-			= time_chunk;
-		}
-		when (_.type == "iTXt") {
-			= international_text_chunk;
-		}
-		when (_.type == "tEXt") {
-			= text_chunk;
-		}
-		when (_.type == "zTXt") {
-			= compressed_text_chunk;
-		}
-	};
+	type: char[4];
+	body: chunk_body[len] /*[] switch (_.type) {
+		case "PLTE": = plte_chunk;
+		case "cHRM": = chrm_chunk;
+		case "gAMA": = gama_chunk;
+		case "sRGB": = srgb_chunk;
+		case "sRGB": = srgb_chunk;
+		case "bKGD": = bkgd_chunk;
+		case "pHYs": = phys_chunk;
+		case "tIME": = time_chunk;
+		case "iTXt": = international_text_chunk;
+		case "tEXt": = text_chunk;
+		case "zTXt": = compressed_text_chunk;
+		}*/;
 	crc: uint8[4];
 }
 
@@ -79,7 +66,7 @@ struct ihdr_chunk {
 }
 
 struct plte_chunk {
-	entries: rgb[] []{
+	entries: rgb[] [] {
 		until { _io.eof }
 	};
 }
@@ -89,11 +76,11 @@ struct point {
 	y_int: uint32;
 
 	get @x {
-		return x_int / 100000.0;
+		x_int / 100000.0
 	}
 
 	get @y {
-		return y_int / 100000.0;
+		y_int / 100000.0
 	}
 }
 
@@ -101,7 +88,7 @@ struct gama_chunk {
 	gamma_int: uint32;
 
 	get @gamma_ratio {
-		return 100000.0 / gamma_int;
+		// return 100000.0 / gamma_int;
 	}
 }
 
@@ -110,20 +97,20 @@ struct srgb_chunk {
 		perceptual = 0,
     relative_colorimetric = 1,
     saturation = 2,
-    absolute_colorimetric = 3,
+    absolute_colorimetric = 3
 	}
 
 	render_intent: intent;
 }
 
 struct bkgd_chunk {
-	bkgd: switch (_root.ihdr.color_type) {
-		case color_type::greyscale = bkgd_greyscale;
-		case color_type::greyscale_alpha = bkgd_greyscale;
-		case color_type::truecolor = bkgd_truecolor;
-		case color_type::truecolor_alpha = bkgd_truecolor;
-		case color_type::indexed = bkgd_indexed;
-	}
+  bkgd: switch ($color_type) {
+  	case color_type::greyscale = bkgd_greyscale;
+  	case color_type::greyscale_alpha = bkgd_greyscale;
+  	case color_type::truecolor = bkgd_truecolor;
+  	case color_type::truecolor_alpha = bkgd_truecolor;
+  	case color_type::indexed = bkgd_indexed;
+  }
 }
 
 struct bkgd_greyscale {
@@ -155,21 +142,21 @@ struct time_chunk {
 }
 
 struct international_text_chunk {
-	@encoding(utf8)
+	@encoding("utf8")
 	keyword: strz;
 
 	compression_flag: uint8;
 	compression_method: uint8;
 
-	@encoding(ASCII)
+	@encoding("ASCII")
 	language_tag: strz;
 
-	@encoding(utf8)
+	@encoding("utf8")
 	translated_keyword: strz;
 
 	translated_keyword: uint8;
 
-	@encoding(utf8)
+	@encoding("utf8")
 	@sizeEOS
 	text: str;
 }
@@ -184,14 +171,14 @@ struct text_chunk {
 }
 
 struct compressed_text_chunk {
-	@encoding(utf8)
+	@encoding("utf8")
 	keyword: strz;
 
 	compression_method: uint8;
 
-	@process(zlib)
+	@process("zlib")
 	@sizeEOS
-	text_datastream: unknown??????;
+	text_datastream: unknown;
 }
 
 struct chrm_chunk {
@@ -208,11 +195,11 @@ struct rgb {
 }
 
 struct {
-	@doc-ref("https://www.w3.org/TR/PNG/#5PNG-file-signature")
-	@pass([137, 80, 78, 71, 13, 10, 26, 10])
+	@docref("https://www.w3.org/TR/PNG/#5PNG-file-signature")
+	@pass(137, 80, 78, 71, 13, 10, 26, 10)
 	magic: char[8];
 
-	@pass([0, 0, 0, 13])
+	@pass(0, 0, 0, 13)
 	ihdr_len: char[4];
 
 	ihdr: ihdr_chunk;
@@ -220,6 +207,41 @@ struct {
 
 	// The rest of the chunks
 	chunks: chunk[] []{
-		until { _.type == "IEND" || _io.eof }
+		// until { _.type == "IEND" || _io.eof }
 	};
+}
+
+scalar byte {
+	= uint8 as byte;
+}
+
+scalar fstring8 {
+	len: uint8;
+	= char[len] as string;
+}
+
+scalar fstring32 {
+	len: uint32;
+	= char[len] as string;
+}
+
+scalar nstring {
+	= char[]/* []{
+		until { _ == 0x00 }
+	} as string*/;
+}
+
+scalar bool {
+	value: uint8;
+
+	= value as bool;
+}
+
+scalar SCMValue {
+	type: uint8;
+	
+	= switch (type) {
+		case 04 = uint32;
+		case 06 = float32;
+	}
 }

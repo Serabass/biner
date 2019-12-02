@@ -1,5 +1,5 @@
-#endianness BE
-#myCustomDirective value
+#endianness BE;
+#myCustomDirective value;
 
 struct mystruct {
 	a: int8;

@@ -108,6 +108,7 @@ export class Proc2 {
 
   private processBody() {
     let nodes = this.ast.body;
+    console.log(this.ast);
     for (let node of nodes) {
       this.registerNode(node);
     }
@@ -116,17 +117,16 @@ export class Proc2 {
   private registerNode(node) {
     switch (node.type) {
       case "DirectiveStatement":
-        this.defineDirective(node);
-        break;
+        return this.defineDirective(node);
+
       case "ConstStatement":
-        this.defineConst(node);
-        break;
+        return this.defineConst(node);
+
       case "StructDefinitionStatement":
-        this.defineStruct(node);
-        break;
+        return this.defineStruct(node);
+
       case "ImportStatement":
-        this.defineImport(node);
-        break;
+        return this.defineImport(node);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
@@ -322,7 +322,7 @@ export class Proc2 {
             case "set":
               Object.defineProperty(result, key, {
                 enumerable: true,
-                set: (value) =>
+                set: value =>
                   JSInterpreter.callFunction(child.value, result, value)
               });
               break;

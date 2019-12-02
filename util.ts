@@ -14,7 +14,7 @@ export function pathFix(specFileName: string) {
   return path.join(".", "examples", specFileName + ".go");
 }
 
-export function load(scriptPath: string, buffer: string | Buffer) {
+export function load(scriptPath: string, buffer: string | Buffer, src: string = "src/biner-work.pegjs") {
   let b = buf(buffer);
-  return Proc2.readFile(pathFix(scriptPath), b, "src/javascript.pegjs");
+  return Proc2.readFile(pathFix(scriptPath), b, src);
 }

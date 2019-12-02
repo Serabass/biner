@@ -1,6 +1,6 @@
-#endianness LE
-# ext exe ovl
-#title DOS MZ executable
+#endianness LE;
+#ext exe ovl;
+#title DOS MZ executable;
 
 struct mz_header {
 	@pass("MZ")
@@ -28,10 +28,11 @@ struct relocation {
 
 struct {
 	hdr: mz_header;
-	mz_header2: uint8[hdr.relocations_ofs - 0x1c];
+	mz_header2: uint8[hdr$relocations_ofs/* - 0x1c*/];
 	relocations: relocation[] []{
-		expr { hdr.qty_relocations }
-	}
-	@size-eos
+		// expr { hdr$qty_relocations }
+	};
+
+	@sizeeos
 	body: uint8;
 }

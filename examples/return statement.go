@@ -1,17 +1,9 @@
 scalar val {
-	= int8 {
-		if ($$ === 0x01) {
-			 = int8;
-		}
-	
-		if ($$ === 0x02) {
-			= int16;
-		}
-	
-		if ($$ === 0x04) {
-			= int32;
-		}
-	}
+	= int8 /*switch (_) {
+		case 01 = int8;
+		case 02 = int16;
+		case 04 = int32;
+	}*/;
 }
 
 struct {

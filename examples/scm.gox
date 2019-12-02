@@ -20,6 +20,7 @@
 */
 
 scalar decimalValue {
+  value: uint8 switch () {}
   if ($$ === 0x04) {
     = int8;
   }

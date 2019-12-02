@@ -4,11 +4,19 @@
 
 // Source avi.yml
 
-#endianness LE
-#title Microsoft AVI file format
-#ext avi
-#license CC0-1.0
-#doc-ref https://msdn.microsoft.com/en-us/library/ms779636.aspx
+#endianness LE;
+#title Microsoft AVI file format;
+#ext avi;
+// #license CC0-1.0;
+// #docref "https://msdn.microsoft.com/en-us/library/ms779636.aspx" ;
+
+enum color_type : uint8 {
+	greyscale = 0,
+	truecolor = 2,
+	indexed = 3,
+	greyscale_alpha = 4,
+	truecolor_alpha = 6
+}
 
 enum chunk_type : uint32 {
 	idx1 = 0x31786469,
@@ -28,7 +36,7 @@ enum stream_type : uint32 {
 	mids = 0x7364696d, // MIDI stream
 	vids = 0x73646976, // Video stream
 	auds = 0x73647561, // Audio stream
-	txts = 0x73747874, // Text stream
+	txts = 0x73747874  // Text stream
 }
 
 enum handler_type : uint32 {
@@ -36,7 +44,7 @@ enum handler_type : uint32 {
 	ac3 = 0x00002000, 
 	dts = 0x00002001, 
 	cvid = 0x64697663, 
-	xvid = 0x64697678, 
+	xvid = 0x64697678 
 }
 
 struct list_body {
@@ -52,7 +60,7 @@ struct Rect {
 }
 
 @doc("Main header of an AVI file, defined as AVIMAINHEADER structure")
-@doc-ref("https://msdn.microsoft.com/en-us/library/ms779632.aspx")
+@docref("https://msdn.microsoft.com/en-us/library/ms779632.aspx")
 struct avih_body {
 	micro_sec_per_frame: uint32;
 	max_bytes_per_sec: uint32;
@@ -68,7 +76,7 @@ struct avih_body {
 }
 
 @docStream("header (one header per stream), defined as AVISTREAMHEADER structure")
-@doc-ref("https://msdn.microsoft.com/en-us/library/ms779638.aspx")
+@docref("https://msdn.microsoft.com/en-us/library/ms779638.aspx")
 struct strh_body {
 
 	@doc("Type of the data contained in the stream")
@@ -94,17 +102,11 @@ struct strh_body {
 struct Block {
 	four_cc: chunk_type;
 	block_size: uint32;
-	data: chunk_type[block_size] {
-		when four_cc == chunk_type.list {
-			= list_body;
-		}
-		when four_cc == chunk_type.avih {
-			= avih_body;
-		}
-		when four_cc == chunk_type.strh {
-			= strh_body;
-		}
-	}
+	data: chunk_type[block_size]; /*switch (four_cc) {
+	case chunk_type::list = list_body;
+	case chunk_type::avih = avih_body;
+	case chunk_type::strh = strh_body;
+	}*/
 }
 
 struct {
@@ -116,5 +118,5 @@ struct {
 	@pass("AVI ")
 	magic2: char[4];
 	
-	data: Block[file_size - 4];
+	data: Block[file_size/* - 4*/];
 }

@@ -16,7 +16,7 @@ struct rgb {
 
 struct {
 	color: rgb {
-		if (r == 0xFF) {
+		/*if (r == 0xFF) {
 			this.red = true;
 		}
 		if (g >= 0x80) {
@@ -24,11 +24,11 @@ struct {
 		}
 		if (b == 0xFF) {
 			this.blue = true;
-		}
+		}*/
 	}
-	@red: bool;
-	@green: bool;
-	@blue: bool;
+	// @red: bool;
+	// @green: bool;
+	// @blue: bool;
 }
 
 // FF 00 00 => Must return {

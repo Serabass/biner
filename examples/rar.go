@@ -9,7 +9,7 @@ enum block_types {
 	old_style_recovery_record = 0x78,
 	old_style_authenticity_info_79 = 0x79,
 	subblock = 0x7a,
-	terminator = 0x7b,
+	terminator = 0x7b
 }
 
 enum oses {
@@ -18,7 +18,7 @@ enum oses {
 	windows = 2,
 	unix = 3,
 	mac_os = 4,
-	beos = 5,
+	beos = 5
 }
 
 enum methods {
@@ -27,23 +27,23 @@ enum methods {
 	fast = 0x32,
 	normal = 0x33,
 	good = 0x34,
-	best = 0x35,
+	best = 0x35
 }
 
 
 struct magic_signature {
 	@doc("Fixed part of file's magic signature that doesn't change with RAR version")
-	magic1: {
+	magic1: uint8/*{
 		// ... Не знаю
-	};
+	}*/;
 	@doc("")
 	version: uint8;
 	
-	@if(version == 1)
+	@if("version == 1")
 	magic3: uint8;
 }
 
-@doc("...");
+@doc("...")
 struct block {
 	crc16: uint16;
 
@@ -56,27 +56,27 @@ struct block {
 	@if(has_add)
 	add_size: uint16;
 	
-	body_size: {
+	body_size: uint8 /*{
 		when (block_type == block_types.file_header) {
 			block_file_header
 		}
-	}
+	}*/;
 	
 	@doc("Additional content in this block")
 	@if(has_add)
 	add_body: uint8[add_size];
 
 	@doc("True if block has additional content attached to it")
-	get has_add {
-		return flags & 0x8000 != 0;
+	get @has_add {
+		/*return flags & 0x8000 != 0;*/
 	}
 
-	get header_size {
-		return has_add ? 11 : 7;
+	get @header_size {
+		/*return has_add ? 11 : 7;*/
 	}
 
-	get body_size {
-		return block_size - header_size;
+	get @body_size {
+		/*return block_size - header_size;*/
 	}
 }
 struct block_file_header {
@@ -94,12 +94,12 @@ struct block_file_header {
 
 	attr: uint32;
 
-	@if(_parent.flags & 0x100 != 0)
+	@if("_parent.flags & 0x100 != 0")
 	high_pack_size: uint32;
 
 	file_name: char[name_size];
 
-	@if(_parent.flags & 0x400 != 0)
+	@if("_parent.flags & 0x400 != 0")
 	salt: uint64;
 }
 
@@ -109,28 +109,28 @@ struct dos_time {
 	time: uint16;
 	date: uint16;
 
-	get year {
-		return ((date & 0b1111_1110_0000_0000) >> 9) + 1980
+	get @year {
+		/*return ((date & 0b1111_1110_0000_0000) >> 9) + 1980*/
 	}
 
-	get month {
-		return (date & 0b0000_0001_1110_0000) >> 5
+	get @month {
+		/*return (date & 0b0000_0001_1110_0000) >> 5*/
 	}
 
-	get day {
-		return date & 0b0000_0000_0001_1111
+	get @day {
+		/* return date & 0b0000_0000_0001_1111 */
 	}
 
-	get hours {
-		return (time & 0b1111_1000_0000_0000) >> 11
+	get @hours {
+		/* return (time & 0b1111_1000_0000_0000) >> 11 */
 	}
 
-	get minutes {
-		return (time & 0b0000_0111_1110_0000) >> 5
+	get @minutes {
+		/* return (time & 0b0000_0111_1110_0000) >> 5 */
 	}
 
-	get seconds {
-		return (time & 0b0000_0000_0001_1111) * 2
+	get @seconds {
+		/* return (time & 0b0000_0000_0001_1111) * 2 */
 	}
 }
 
@@ -139,7 +139,7 @@ struct {
 	magic: magic_signature;
 
 	@doc("Sequence of blocks that constitute the RAR file")
-	blocks: []{
+	blocks: uint8[]/*{
 		// Не уверен
 		(@magic.version) {
 			when (_ == 0x00) {
@@ -150,6 +150,6 @@ struct {
 				= block_v5;
 			}
 		}
-	}
+	}*/
 }
 

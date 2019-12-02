@@ -20,11 +20,19 @@ from "./export";
 
 // Constants definition
 
-const TYPE_VAR = 0x02;
-const TYPE_INT = 0x04;
-const TYPE_FLOAT32 = 0x06;
-const TYPE_RGB = 0x08;
-const TYPE_RGBA = 0xA;
+enum DecimalValueType : uint8 {
+	VAR = 0x02,
+	INT = 0x04,
+	FLOAT32 = 0x06,
+	RGB = 0x08,
+	RGBa = 0x0a
+}
+
+// const TYPE_VAR = 0x02;
+// const TYPE_INT = 0x04;
+// const TYPE_FLOAT32 = 0x06;
+// const TYPE_RGB = 0x08;
+// const TYPE_RGBA = 0xA;
 
 // All internal types
 
@@ -72,7 +80,7 @@ struct B : A {
 }
 
 struct C {
-	parent: C:
+	parent: C;
 	children: A[];
 }
 
@@ -119,76 +127,33 @@ struct B {
 
 // Условия при чтении + использование констант
 
-struct decimalValue {
-	if ($$ === TYPE_INT) {
-		this.type = "int";
-		val: int8;
-	}
-	
-	if ($$ === TYPE_VAR) {
-		this.type = "var";
-		val: int16;
-	}
-
-	if ($$ === TYPE_FLOAT32) {
-		this.type = "float32";
-		val: float32;
-	}
-
-	if ($$ === TYPE_RGB) {
-		this.type = "rgb";
-		val: rgb;
-	}
-
-	if ($$ === TYPE_RGBA) {
-		this.type = "rgba";
-		val: rgba;
+scalar decimalValue {
+	= switch (_) {
+	case DecimalValueType::INT = int8;
+	case DecimalValueType::VAR = int16;
+	case DecimalValueType::FLOAT32 = float32;
+	case DecimalValueType::RGB = rgb;
+	case DecimalValueType::RGBA = rgba;
 	}
 }
 
-
-struct fstring1b {
-	= int8 {
-		=: char[=];
-	}
+struct opcode00005 {
+	val1: decimalValue;
 }
 
 struct opcode {
-  = int16 {
-		if ($$ === 0x0005)  {
-			pointer: {
-				switch ($$) {
-				case 0x04:
-					this.type = "int";
-					val: int8;
-					break;
-				case 0x02:
-					this.type = "var";
-					val: int16;
-					break;
-				case 0x06:
-					this.type = "float32";
-					val: float32;
-					break;
-				}
-			} {
-				= val;
-			}
+	opcode: uint16;
 
-			val2: decimalValue {
-				= [type, val];
-			}
-		} else {
-			throw "Unhandled opcode: " + $;
-		}
-	}
+	data: switch (opcode) {
+		case 5 = opcode00005;
+	};
 }
 
 // Условия при чтении с операторами
 
-struct S {
-	= int8 {
-		
+struct SCM {
+	opcodes: opcode[] []{
+		until { eos }
 	};
 }
 

@@ -1,9 +1,7 @@
+#id id3v1_1;
+#license CC0-1.0;
 
-#id id3v1_1
-#license CC0-1.0
-#doc-ref http://id3.org/ID3v1
-      
-enum Genre {
+enum Genre : uint8 {
 	blues = 0,
 	classic_rock = 1,
 	country = 2,
@@ -129,10 +127,10 @@ enum Genre {
 	drum_solo = 122,
 	a_capella = 123,
 	euro_house = 124,
-	dance_hall = 125,
+	dance_hall = 125
 }
 
-@doc(...)
+@doc("...")
 struct ID3_v1_1_tag {
 	@pass("TAG")
 	magic: char[3];

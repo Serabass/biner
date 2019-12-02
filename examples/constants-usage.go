@@ -1,6 +1,6 @@
 #endian BE;
 
-const HALF = 0x80;
+// const HALF = 0x80;
 
 struct rgb {
 	r: int8;
@@ -10,8 +10,8 @@ struct rgb {
 
 struct {
 	val: rgb {
-		if (r > HALF && (g > HALF (b > HALF))) {
+		/*if (r > HALF && (g > HALF (b > HALF))) {
 			this.bright = true;
-		}
+		}*/
 	}
 }

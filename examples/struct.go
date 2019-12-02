@@ -33,14 +33,10 @@ struct myObject {
   hired: bool;
 
   rgb: vector3i8 {
-    r: $$.x;
-    g: $$.y;
-    b: $$.z;
-
-    delete $$.x;
-    delete $$.y;
-    delete $$.z;
-  }
+    r: x;
+    g: y;
+    b: z;
+  };
   
   vecPointer: pointer<vector3i8>;
 }

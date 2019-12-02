@@ -1,7 +1,7 @@
-#id 					ftl_dat
-#endian  			le
-#application 	Faster Than Light (FTL)
-#ext 					dat
+#id 					ftl_dat;
+#endian  			le;
+#application 	Faster Than Light (FTL);
+#ext 					dat;
 
 struct file {
 	meta_ofs: uint32;

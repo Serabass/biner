@@ -1,4 +1,4 @@
-#endian BE
+#endian BE;
 
 scalar opcodes {
 	= scmOpcode[];
@@ -20,11 +20,11 @@ scalar fstring32 {
 }
 
 scalar nstring {
-	= char[] {
+	= char[]/* []{
 		when $$ == 0x00 {
 			break;
 		}
-	}
+	}*/;
 }
 
 scalar wnstring {

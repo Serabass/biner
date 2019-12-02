@@ -6,7 +6,8 @@ struct rgb {
 }
 
 struct {
-	vals: uint8[2];
+	t: uint8;
+	vals: uint8[t];
 	val: uint8;
 	val2: uint16;
 	rgb: rgb;
