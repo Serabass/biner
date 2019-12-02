@@ -28,11 +28,11 @@ enum DecimalValueType : uint8 {
 	RGBa = 0x0a
 }
 
-// const TYPE_VAR = 0x02;
-// const TYPE_INT = 0x04;
-// const TYPE_FLOAT32 = 0x06;
-// const TYPE_RGB = 0x08;
-// const TYPE_RGBA = 0xA;
+const TYPE_VAR = 0x02;
+const TYPE_INT = 0x04;
+const TYPE_FLOAT32 = 0x06;
+const TYPE_RGB = 0x08;
+const TYPE_RGBA = 0xA;
 
 // All internal types
 
@@ -145,7 +145,7 @@ struct opcode {
 	opcode: uint16;
 
 	data: switch (opcode) {
-		case 5 = opcode00005;
+		case 0x05: = opcode00005;
 	};
 }
 

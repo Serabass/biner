@@ -1,8 +1,8 @@
-#id zip
-#ext zip
-#endianness le
-#license CC0-1.0
-#docref https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+#id zip;
+#ext zip;
+#endianness le;
+#license CC0-1.0;
+// #docref "https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT";
 
 struct {
 	sections: pk_section[] []{
@@ -17,14 +17,14 @@ struct pk_section {
 	section_type: uint16;
 
 	body: switch (section_type) {
-		case 0x0201: = central_dir_entry
-		case 0x0403: = local_file
-		case 0x0605: = end_of_central_dir
+		case 0x0201: = central_dir_entry;
+		case 0x0403: = local_file;
+		case 0x0605: = end_of_central_dir;
 	}
 }
 
 struct local_file {
-	header: local_file_header
+	header: local_file_header;
 	body: uint8[header.compressed_size];
 }
 
@@ -72,7 +72,9 @@ struct central_dir_entry {
 	@encoding("UTF-8")
 	comment: char[comment_len];
 
-	#local_header: pk_section[@local_header_offset];
+	// get @local_header {
+	// 	= pk_section[local_header_offset]
+	// };
 }
 
 struct end_of_central_dir {
@@ -90,7 +92,7 @@ struct end_of_central_dir {
 
 struct extras {
 	entries: extra_field[] []{
-		until { eos };
+		until { eos }
 	};
 }
 
@@ -101,7 +103,7 @@ struct extra_field {
 		reserved: uint32;
 		attributes: attribute[] [] {
 			until { eos }
-		}
+		};
 
 		struct attribute {
 			tag: uint16;

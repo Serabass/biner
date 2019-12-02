@@ -33,14 +33,14 @@ struct mdl_header {
 	size: float32;
 
 	get @version { return 6 }
-	get @skin_size { return skin_width /** skin_height;*/ }
+	get @skin_size { return skin_width * skin_height; }
 }
 
 struct mdl_skin {
 	group: int32;
 
 	@if("group == 0")
-	single_texture_data: uint8[/*_root.header.skin_size*/];
+	single_texture_data: uint8[_root.header.skin_size];
 
 	@if("group != 0")
 	num_frames: uint32;
@@ -49,7 +49,7 @@ struct mdl_skin {
 	frame_times: float32[num_frames];
 
 	@if("group != 0")
-	group_texture_data: uint8[/*_root.header.skin_size*/];
+	group_texture_data: uint8[_root.header.skin_size];
 }
 
 struct mdl_texcoord {
@@ -77,7 +77,7 @@ struct mdl_simple_frame {
 	@padRight(00)
 	name: char[16];
 
-	vertices: mdl_vertex[/*_root.header.num_verts*/];
+	vertices: mdl_vertex[_root.header.num_verts];
 }
 
 struct mdl_frame {
@@ -95,14 +95,14 @@ struct mdl_frame {
 	frames: mdl_simple_frame[num_simple_frames];
 
 	get @num_simple_frames {
-		/*(type == 0 ? 1 : type)*/
+		(type == 0 ? 1 : type)
 	}
 }
 
 struct {
 	header: mdl_header;
-	skins: mdl_skin[/*header.num_skins*/];
-	texture_coordinates: mdl_texcoord[/*header.num_verts*/];
-	triangles: mdl_triangle[/*header.num_tris*/];
-	frames: mdl_frame[/*header.num_frames*/];
+	skins: mdl_skin[header.num_skins];
+	texture_coordinates: mdl_texcoord[header.num_verts];
+	triangles: mdl_triangle[header.num_tris];
+	frames: mdl_frame[header.num_frames];
 }

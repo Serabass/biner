@@ -4,6 +4,7 @@ import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import * as vm from "vm";
+import { json } from "../util";
 import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
@@ -108,7 +109,7 @@ export class Proc2 {
 
   private processBody() {
     let nodes = this.ast.body;
-    console.log(this.ast);
+    json(this.ast.body);
     for (let node of nodes) {
       this.registerNode(node);
     }
@@ -322,7 +323,7 @@ export class Proc2 {
             case "set":
               Object.defineProperty(result, key, {
                 enumerable: true,
-                set: value =>
+                set: (value) =>
                   JSInterpreter.callFunction(child.value, result, value)
               });
               break;
@@ -335,6 +336,8 @@ export class Proc2 {
             value: (...args) =>
               JSInterpreter.callFunction(functionName, result, ...args)
           });
+          break;
+        case "StructReadableField":
           break;
         default:
           throw new Error(`Unknown type: ${child.type}`);

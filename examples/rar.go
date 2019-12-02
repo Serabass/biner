@@ -56,11 +56,9 @@ struct block {
 	@if(has_add)
 	add_size: uint16;
 	
-	body_size: uint8 /*{
-		when (block_type == block_types.file_header) {
-			block_file_header
-		}
-	}*/;
+	body_size: uint8 switch (block_type) {
+		case block_types::file_header: = block_file_header;
+	};
 	
 	@doc("Additional content in this block")
 	@if(has_add)
@@ -68,15 +66,15 @@ struct block {
 
 	@doc("True if block has additional content attached to it")
 	get @has_add {
-		/*return flags & 0x8000 != 0;*/
+		return flags & 0x8000 != 0;
 	}
 
 	get @header_size {
-		/*return has_add ? 11 : 7;*/
+		return has_add ? 11 : 7;
 	}
 
 	get @body_size {
-		/*return block_size - header_size;*/
+		return block_size - header_size;
 	}
 }
 struct block_file_header {
@@ -110,27 +108,27 @@ struct dos_time {
 	date: uint16;
 
 	get @year {
-		/*return ((date & 0b1111_1110_0000_0000) >> 9) + 1980*/
+		return ((date & 0b1111_1110_0000_0000) >> 9) + 1980
 	}
 
 	get @month {
-		/*return (date & 0b0000_0001_1110_0000) >> 5*/
+		return (date & 0b0000_0001_1110_0000) >> 5
 	}
 
 	get @day {
-		/* return date & 0b0000_0000_0001_1111 */
+		 return date & 0b0000_0000_0001_1111 
 	}
 
 	get @hours {
-		/* return (time & 0b1111_1000_0000_0000) >> 11 */
+		 return (time & 0b1111_1000_0000_0000) >> 11 
 	}
 
 	get @minutes {
-		/* return (time & 0b0000_0111_1110_0000) >> 5 */
+		 return (time & 0b0000_0111_1110_0000) >> 5 
 	}
 
 	get @seconds {
-		/* return (time & 0b0000_0000_0001_1111) * 2 */
+		 return (time & 0b0000_0000_0001_1111) * 2 
 	}
 }
 
@@ -139,17 +137,9 @@ struct {
 	magic: magic_signature;
 
 	@doc("Sequence of blocks that constitute the RAR file")
-	blocks: uint8[]/*{
-		// Не уверен
-		(@magic.version) {
-			when (_ == 0x00) {
-				= block;
-			}
-	
-			when (_ == 0x01) {
-				= block_v5;
-			}
-		}
-	}*/
+	blocks: uint8[] []switch (magic.version) {
+	case 0x00: = block;
+	case 0x01: = block_v5;
+	}
 }
 

@@ -39,7 +39,7 @@ struct sandbox {
 struct chunk {
 	len: uint8;
 	type: char[4];
-	body: chunk_body[len] /*[] switch (_.type) {
+	body: chunk_body[len] [] switch (_.type) {
 		case "PLTE": = plte_chunk;
 		case "cHRM": = chrm_chunk;
 		case "gAMA": = gama_chunk;
@@ -51,7 +51,7 @@ struct chunk {
 		case "iTXt": = international_text_chunk;
 		case "tEXt": = text_chunk;
 		case "zTXt": = compressed_text_chunk;
-		}*/;
+		};
 	crc: uint8[4];
 }
 
@@ -226,9 +226,9 @@ scalar fstring32 {
 }
 
 scalar nstring {
-	= char[]/* []{
+	= char[] []{
 		until { _ == 0x00 }
-	} as string*/;
+	} as string;
 }
 
 scalar bool {

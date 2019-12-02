@@ -28,9 +28,9 @@ struct relocation {
 
 struct {
 	hdr: mz_header;
-	mz_header2: uint8[hdr$relocations_ofs/* - 0x1c*/];
+	mz_header2: uint8[hdr$relocations_ofs - 0x1c];
 	relocations: relocation[] []{
-		// expr { hdr$qty_relocations }
+		expr { hdr$qty_relocations }
 	};
 
 	@sizeeos

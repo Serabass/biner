@@ -227,123 +227,115 @@ EnumFieldAccess
    };
  }
 
-StructDefinitionStatement
- = decorators: DecoratorList?  __ 
-   isExport: ExportToken?
-  __ StructToken
-  __ id: Identifier?
-  __ body: StructBlock {
+StructInheritStatement
+ = ":" __ typeName: TypeAccess {
    return {
-     type: "StructDefinitionStatement",
-     id, body,
-     isExport,
+     type: "StructInheritStatement",
+     typeName
    };
  }
- / 
-   isExport: ExportToken?
-   __ StructToken __ id: Identifier
-   __ ":" __ inherit: TypeAccess
-   __ body: StructBlock {
-   return {
-     type: "StructDefinitionStatement",
-     withInerit: true,
-     id, body, inherit,
-     isExport,
-   };
+
+ StructGenericStatement
+  = "<" __ types: GenericTypeList __ ">" {
+    return {
+      type: "StructGenericStatement",
+      types,
+    };
   }
- / isExport: ExportToken? __ 
-   StructToken __ id: Identifier
-   __ "<" __ generics: GenericTypeList __ ">"
+
+StructDefinitionStatement
+ = decorators: DecoratorList? 
+   __ isExport: ExportToken?
+   __ StructToken
+   __ id: Identifier?
+   __ generics: StructGenericStatement?
+   __ inherit: StructInheritStatement?
    __ body: StructBlock {
    return {
      type: "StructDefinitionStatement",
-     withGenerics: true, 
-     id, body, generics,
-     isExport,
-   };
-  }
- / isExport: ExportToken? __ 
-   StructToken __ id: Identifier
-   __ "<" __ generics: GenericTypeList __ ">"
-   __ ":" __ inherit: TypeAccess
-   __ body: StructBlock {
-   return {
-     type: "StructDefinitionStatement",
-     withGenerics: true, 
-     withInerit: true,
-     id, body, generics, inherit,
-     isExport,
+     decorators,
+     id,
+     body,
+     inherit,
+     generics,
+     export: !!isExport,
    };
   }
 
 GenericTypeList
- = head: GenericType tail: (__ "," __ GenericType)* {
-   return buildList(head, tail, 1);
+ = head: GenericType
+   tail: (__ "," __ GenericType)* {
+   return buildList(head, tail, 3);
+ }
+
+GenericTypeDefaultStatement
+ = "=" __ typeName: TypeAccess {
+   return {
+     type: "GenericTypeDefaultStatement",
+     typeName
+   };
  }
 
 GenericType
  = id: Identifier
-  __ defaultType: ("=" __ TypeAccess)? {
+  __ defaultType: (GenericTypeDefaultStatement)? {
     return {
       type: "GenericType",
-      id, defaultType
+      id,
+      defaultType
     };
   }
 
+// =============== Type Access ==============
+
 TypeAccessList 
- = head: TypeAccess tail: ("," __ TypeAccess)* {
-   return buildList(head, tail, 1);
+ = head: TypeAccess
+   tail: ("," __ TypeAccess)* {
+   return buildList(head, tail, 2);
  }
 
-TypeAccess
- = 
-  StrictFieldSwitchStatement
- / id: Identifier
- __ "<" __ generics: TypeAccessList __ ">"
- __ "[" __ size: (Digit / Identifier)? __ "]" 
- {
+TypeAccessGenericStatement
+ = "<" __ typeNames: TypeAccessList __ ">" {
    return {
-     type: "TypeAccess",
-     id,
-     withGenerics: true,
-     generics
+     type: "TypeAccessGenericStatement",
+     typeNames
    };
  }
- / id: Identifier
- __ "<" __ generics: TypeAccessList __ ">"
- {
+
+TypeAccessArrayExpressionStatement
+ = "[" __ size: (HexDigitLiteral / Digit / Expression)? __ "]" {
    return {
-     type: "TypeAccess",
-     id,
-     withGenerics: true,
-     generics
-   };
- }
- / id: Identifier
- __ "[" __ size: (Digit / Identifier)? __ "]" 
- {
-   return {
-     type: "TypeAccess",
-     id,
-     array: true,
+     type: "TypeAccessArrayExpressionStatement",
      size,
    };
  }
- / id: Identifier {
+
+TypeAccess
+ = StructFieldSwitchStatement
+ / id: Identifier
+ __ generics: TypeAccessGenericStatement?
+ __ array: TypeAccessArrayExpressionStatement?
+ {
    return {
      type: "TypeAccess",
-     id
+     id,
+     generics,
+     array
    };
  }
+
+// =============== /Type Access ==============
 
 StructField
  = StructReadableField
  / StructGetterField
  / EnumStatement
 
+// =============== Decorators ==============
+
 DecoratorList
  = head: DecoratorStatement
- __ tail: (__ DecoratorStatement*) {
+ tail: (__ DecoratorStatement)* {
    return buildList(head, tail, 1);
  }
 
@@ -356,12 +348,14 @@ DecoratorStatement
  }
 
 DecoratorBody
-  = "(" __ body: ExpressionList __ ")" {
+  = "(" __ body: ExpressionList? __ ")" {
     return {
       type: "DecoratorBody",
       body,
     };
   }
+
+// =============== /Decoratos ==============
 
 StructReadableField
  =  decorators: DecoratorList?
@@ -408,6 +402,7 @@ StructGetterField
 SwitchCaseStatement
   = CaseToken
   __ expr: Expression
+  __ ":"
   __ result: ReturnStatement {
     return {
       type: "SwitchCaseStatement",
@@ -422,29 +417,29 @@ SwitchCaseStatementList
    return buildList(head, tail, 1);
  }
 
-StrictFieldSwitchBody
+StructFieldSwitchBody
  = "{" __ body: SwitchCaseStatementList? __ "}" {
    return {
-     type: "StrictFieldSwitchBody",
+     type: "StructFieldSwitchBody",
      body,
    };
  }
 
-StrictFieldSwitchStatement
+StructFieldSwitchStatement
  = "[]" __ SwitchToken 
  __ "(" __ expr: Expression __ ")" 
- __ body: StrictFieldSwitchBody {
+ __ body: StructFieldSwitchBody {
    return {
-     type: "StrictFieldSwitchStatement",
+     type: "StructFieldSwitchStatement",
      expr, body,
      array: true
    };
  }
  / SwitchToken 
  __ "(" __ expr: Expression __ ")" 
- __ body: StrictFieldSwitchBody {
+ __ body: StructFieldSwitchBody {
    return {
-     type: "StrictFieldSwitchStatement",
+     type: "StructFieldSwitchStatement",
      expr, body,
    };
  }
@@ -474,6 +469,7 @@ StructFieldChildStatement
  / StructField
  / ReturnStatement
  / UntilStatement
+ / StructDefinitionStatement
 
 ReturnStatement
  = "=" __ typeExpr: TypeAccess
@@ -557,12 +553,12 @@ OperatorExpression
  }
 
 Expression
- = StringLiteral
- / EnumFieldAccess
+ = FieldAccessExpression
+ / StringLiteral
  / Digit
- / FieldAccessExpression
- / Identifier
  / HexDigitLiteral
+ / EnumFieldAccess
+ / Identifier
 
 __
   = (WhiteSpace / LineTerminatorSequence / Comment)*

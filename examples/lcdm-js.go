@@ -1,7 +1,7 @@
 #endianness BE;
 
-// const PURGE = 0x44;
-// const DISPENSE = 0x45;
+const PURGE = 0x44;
+const DISPENSE = 0x45;
 
 struct purgeCmd {
 	errCause: int8;
@@ -40,23 +40,23 @@ struct romVerCmd {
 }
 
 struct {
-	@pass(1)
+	@pass(0x01)
 	start: uint8;
 	id: uint8;
-	@pass(2)
+	@pass(0x02)
 	stx: uint8;
-	cmd: uint8 /*switch ($$) {
-		case PURGE = purgeCmd;
-		case DISPENSE = dispenseCmd;
-		case 0x76 = testCmd;
-		case 0x46 = statusCmd;
-		case 0x47 = romVerCmd;
-	}*/;
+	cmd: uint8 switch (_) {
+		case PURGE : = purgeCmd;
+		case DISPENSE : = dispenseCmd;
+		case 0x76 : = testCmd;
+		case 0x46 : = statusCmd;
+		case 0x47 : = romVerCmd;
+	};
 	@pass(3)
 	etx: uint8;
 	bcc: uint8;
 
-	// @startOK: bool;
-	// @stxOK: bool;
+	@startOK: bool;
+	@stxOK: bool;
 }
 

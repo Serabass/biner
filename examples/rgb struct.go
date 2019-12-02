@@ -26,9 +26,15 @@ struct {
 			this.blue = true;
 		}*/
 	}
-	// @red: bool;
-	// @green: bool;
-	// @blue: bool;
+	get @red: bool {
+		js`r == 0xFF`
+	};
+	get @green: bool {
+		js`g == 0xFF`
+	};
+	get @blue: bool {
+		js`b == 0xFF`
+	};
 }
 
 // FF 00 00 => Must return {
