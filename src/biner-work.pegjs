@@ -401,7 +401,7 @@ StructGetterField
  __ body: StructGetterBlock {
    return {
      type: "StructGetterField",
-     id, body
+     id, body, decorators
    };
  }
 
