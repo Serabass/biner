@@ -5,14 +5,31 @@ import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import { json } from "../src/util";
 
+/**
+ * Обработчик исходников
+ */
 export class Processor {
+  /**
+   * Основная структура модуля (та, что без имени)
+   */
   public get mainStruct() {
     return this.structs[""];
   }
 
+  /**
+   * Порядок байт - BE / LE
+   */
   public get endianness() {
     return this.directives.endianness || "BE";
   }
+
+  /**
+   * Читаем файл и возвращаем процессор
+   *
+   * @param scriptPath Путь к файлу исходника
+   * @param buffer Буфер с данными для обработки
+   * @param src Исходник PEG
+   */
   public static readFile(
     scriptPath: string,
     buffer: Buffer,
@@ -37,10 +54,29 @@ export class Processor {
     return res;
   }
 
+  /**
+   * Все объявленные структуры
+   */
   public structs: any = {};
+
+  /**
+   * Все экспортируемые сущности
+   */
   public exports: any = {};
+
+  /**
+   * Константы
+   */
   public consts: any = {};
+
+  /**
+   * Импорты
+   */
   public imports: any = {};
+
+  /**
+   * Директивы (могут быть какими угодно)
+   */
   public directives: any = {
     endianness: "BE"
   };
@@ -52,6 +88,9 @@ export class Processor {
     public contents: string
   ) {}
 
+  /**
+   * Поехали!
+   */
   public run() {
     // console.log(this.ast);
     // this.processBody();
@@ -62,6 +101,12 @@ export class Processor {
     }
   }
 
+  /**
+   * Просчитываем размер структуры
+   *
+   * @param typeName Имя типа
+   * @param arrayData ...
+   */
   public getStructSize(typeName: string = "", arrayData: any = null): number {
     if (arrayData) {
       let arraySize = arrayData.size.value;
@@ -106,6 +151,9 @@ export class Processor {
     }
   }
 
+  /**
+   * Обрабатываем тело документа
+   */
   private processBody() {
     let nodes = this.ast.body;
     json(this.ast.body);
@@ -114,6 +162,10 @@ export class Processor {
     }
   }
 
+  /**
+   * Обрабатываем определённую ноду
+   * @param node Нода
+   */
   private registerNode(node: any) {
     switch (node.type) {
       case "DirectiveStatement":
@@ -132,10 +184,20 @@ export class Processor {
     }
   }
 
+  /**
+   * Объявляем директиву
+   *
+   * @param node Нода
+   */
   private defineDirective(node: any) {
     this.directives[node.id.name] = node.expr.name;
   }
 
+  /**
+   * Объявляем импорты
+   *
+   * @param node Нода
+   */
   private defineImport(node: any) {
     let importPath =
       path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
@@ -164,11 +226,19 @@ export class Processor {
     }
   }
 
+  /**
+   * Объявляем константу
+   * @param node Нода
+   */
   private defineConst(node: any) {
     let name = node.id.name;
     this.consts[name] = node.expr.expression.value;
   }
 
+  /**
+   * Объявляем структуру
+   * @param node Нода
+   */
   private defineStruct(node: any) {
     let name = node.id ? node.id.name : "";
 
@@ -183,6 +253,11 @@ export class Processor {
     }
   }
 
+  /**
+   * Геттер. Скорее всего будет удалён
+   * @param typeName Тип
+   * @param arrayData ...
+   */
   private defineGetter(
     typeName: string,
     arrayData: any
@@ -252,11 +327,23 @@ export class Processor {
     };
   }
 
+  /**
+   * Читаем структуру из памяти
+   * @param typeName Тип
+   * @param offset сдвиг
+   */
   private readStruct(typeName: string, offset: number) {
     let struct = this.structs[typeName];
     return this.processStruct(struct, offset);
   }
 
+  /**
+   * Обрабатываем структуру
+   *
+   * @param struct Структура
+   * @param offset Сдвиг
+   * @param result Первичный результат (нужен для рекурсии)
+   */
   private processStruct(struct: any, offset = 0, result = {}): any {
     if (struct.parent) {
       const parentStructName = struct.parent.parent.id.name;
@@ -269,7 +356,6 @@ export class Processor {
       switch (child.type) {
         case "ReadableFieldStatement":
           break;
-
         case "Property":
           break;
         case "FunctionFieldDefinition":

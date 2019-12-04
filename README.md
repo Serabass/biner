@@ -92,7 +92,7 @@ struct rgb {
 * [Jest](https://jestjs.io/)
 * [PEGjs](https://pegjs.org/) (Его важно изучить. У них в репке есть [несколько замечательных примеров](https://github.com/pegjs/pegjs/tree/master/examples))
 * [Travis CI](https://travis-ci.org/)
-* 
+* [Codecov](https://codecov.io/)
 
 ## Kaitai
 
