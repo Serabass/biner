@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "tw": "jest --watch",
-    "lint": "tslint tslint.json"
+    "lint": "tslint --project tsconfig.json -e src/**/*.spec.*"
   },
   "dependencies": {
     "asty": "^1.8.7",
