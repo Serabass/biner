@@ -225,11 +225,11 @@ scalar fstring32 {
 	= char[len] as string;
 }
 
-scalar nstring { // Null terminated string
-	= char[] [] {
-		until { js`_ != 0x00` }
-	}
-}
+// scalar nstring { // Null terminated string
+// 	= char[] []{
+// 		until { js`_ != 0x00` }
+// 	}
+// }
 
 scalar bool {
 	value: uint8;
@@ -238,10 +238,10 @@ scalar bool {
 }
 
 scalar SCMValue {
-	type: uint8;
+	var type = uint8;
 	
 	= switch (type) {
-		case 04 = uint32;
-		case 06 = float32;
+		case 04: = uint32;
+		case 06: = float32;
 	}
 }

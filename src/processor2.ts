@@ -55,11 +55,12 @@ export class Proc2 {
   ) {}
 
   public run() {
-    this.processBody();
+    // console.log(this.ast);
+    // this.processBody();
 
     if (this.mainStruct) {
-      let a = this.processStruct(this.mainStruct);
-      return a;
+      // let a = this.processStruct(this.mainStruct);
+      // return a;
     }
   }
 

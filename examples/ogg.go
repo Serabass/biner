@@ -1,7 +1,7 @@
 #id ogg;
-#title Ogg media container file;
-#ext	ogg ogv oga spx ogx;
-#license CC0-1.0;
+#title "Ogg media container file";
+#ext	"ogg ogv oga spx ogx";
+#license "CC0-1.0";
 #endianness le;
 
 struct page {

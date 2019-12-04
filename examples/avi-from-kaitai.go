@@ -5,7 +5,7 @@
 // Source avi.yml
 
 #endianness LE;
-#title Microsoft AVI file format;
+#title "Microsoft AVI file format";
 #ext avi;
 // #license CC0-1.0;
 // #docref "https://msdn.microsoft.com/en-us/library/ms779636.aspx" ;

@@ -1,6 +1,6 @@
 #id 					ftl_dat;
 #endian  			le;
-#application 	Faster Than Light (FTL);
+#application 	"Faster Than Light (FTL)";
 #ext 					dat;
 
 struct file {

@@ -1,7 +1,7 @@
 #id doom_wad;
-#application Tech 1;
-#file-ext wad;
-#license CC0-1.0;
+#application "Tech 1";
+#ext wad;
+#license "CC0-1.0";
 #endian le;
 
 struct {

@@ -735,7 +735,8 @@ OperatorExpression
 
 
 Expression
- = FieldAccessExpression
+ = JSExpression
+ / FieldAccessExpression
  / StringLiteral
  / NumericLiteral
  / EnumFieldAccess
@@ -985,7 +986,7 @@ NumericLiteral
  / IntDigitLiteral
 
 JSExpression
- = "js" body: CodeStringLiteral  {
+ = "js" body: CodeStringLiteral {
    return {
      type: "JSExpression",
      body,

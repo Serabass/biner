@@ -1,4 +1,4 @@
-#endianness BE
+#endianness BE;
 
 struct Opcode0005 {
 	b1: uint8;
@@ -15,10 +15,7 @@ struct Opcode0006 {
 struct OpcodeMeta {
 	opcode: uint8;
 	...switch (opcode) {
-		case 0x0005: = struct Opcode0006 {
-			b1: uint8;
-			b2: uint8;
-		};
+		case 0x0005: = Opcode0006;
 		case 0x0006: = Opcode0006;
 	};
 }

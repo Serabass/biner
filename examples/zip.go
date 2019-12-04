@@ -1,7 +1,7 @@
 #id zip;
 #ext zip;
 #endianness le;
-#license CC0-1.0;
+#license "CC0-1.0";
 // #docref "https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT";
 
 struct {
@@ -109,8 +109,8 @@ struct extra_field {
 			tag: uint16;
 			size: uint16;
 			body: switch (tag) {
-				case 1: = attribute_1;
-			}[size];
+				case 1: = attribute_1[size];
+			};
 		}
 
 		struct attribute_1 {
@@ -124,11 +124,11 @@ struct extra_field {
 	struct extended_timestamp {
 		flags: uint8;
 		mod_time: uint32;
-
-		@if (!eof)
+ 
+		@if(js`!eof`)
 		access_time: uint32;
 
-		@if (!eof)
+		@if(js`!eof`)
 		create_time: uint32;
 	}
 
@@ -153,10 +153,10 @@ struct extra_field {
 	code: extra_codes;
 	size: uint16;
 	body: switch (code) {
-		case extra_codes::ntfs = ntfs;
-		case extra_codes::extended_timestamp = extended_timestamp;
-		case extra_codes::infozip_unix_var_size = infozip_unix_var_size;
-	}[size];
+		case extra_codes::ntfs								  : = ntfs[size];
+		case extra_codes::extended_timestamp	  : = extended_timestamp[size];
+		case extra_codes::infozip_unix_var_size : = infozip_unix_var_size[size];
+	};
 }
 
 
@@ -179,7 +179,7 @@ enum compression : uint16 {
 	lzma = 14,
 	ibm_terse = 18,
 	ibm_lz77_z = 19,
-	ppmd = 98,
+	ppmd = 98
 }
 
 enum extra_codes : uint16 {
@@ -203,6 +203,6 @@ enum extra_codes : uint16 {
 	poszip_4690 = 0x4690, 
 	extended_timestamp = 0x5455, 
 	infozip_unix = 0x7855, 
-	infozip_unix_var_size = 0x7875, 
+	infozip_unix_var_size = 0x7875
 }
 

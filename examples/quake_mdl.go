@@ -1,9 +1,9 @@
 #id 					quake_mdl;
 #endian 			le;
-#title 				Quake 1 (idtech2) model format (MDL version 6);
-#application 	Quake 1 (idtech2);
-#ext: 				mdl;
-#license  		CC0-1.0;
+#title 				"Quake 1 (idtech2) model format (MDL version 6)";
+#application 	"Quake 1 (idtech2)";
+#ext  				mdl;
+#license  		"CC0-1.0";
 
 struct vec3 {
 	x: float32;
@@ -32,15 +32,20 @@ struct mdl_header {
 	flags: int32;
 	size: float32;
 
-	get @version { return 6 }
-	get @skin_size { return skin_width * skin_height; }
+	get @version: uint8 {
+		 = 6
+	}
+
+	get @skin_size: uint8 { 
+		= js`skin_width * skin_height`
+	}
 }
 
 struct mdl_skin {
 	group: int32;
 
 	@if("group == 0")
-	single_texture_data: uint8[_root.header.skin_size];
+	single_texture_data: uint8[js`_root.header.skin_size`];
 
 	@if("group != 0")
 	num_frames: uint32;
@@ -49,7 +54,7 @@ struct mdl_skin {
 	frame_times: float32[num_frames];
 
 	@if("group != 0")
-	group_texture_data: uint8[_root.header.skin_size];
+	group_texture_data: uint8[js`_root.header.skin_size`];
 }
 
 struct mdl_texcoord {
@@ -77,7 +82,7 @@ struct mdl_simple_frame {
 	@padRight(00)
 	name: char[16];
 
-	vertices: mdl_vertex[_root.header.num_verts];
+	vertices: mdl_vertex[js`_root.header.num_verts`];
 }
 
 struct mdl_frame {
@@ -94,8 +99,8 @@ struct mdl_frame {
 
 	frames: mdl_simple_frame[num_simple_frames];
 
-	get @num_simple_frames {
-		(type == 0 ? 1 : type)
+	get @num_simple_frames: int32 {
+		js`(type == 0 ? 1 : type)`
 	}
 }
 

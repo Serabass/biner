@@ -16,9 +16,9 @@ struct rgb {
 
 struct {
 	color: rgb;
-	get @red: bool { js`r == 0xFF` };
-	get @green: bool { 	js`g == 0xFF` };
-	get @blue: bool { js`b == 0xFF` };
+	get @red: bool { = js`r == 0xFF` }
+	get @green: bool { = js`g == 0xFF` }
+	get @blue: bool { = js`b == 0xFF` }
 }
 
 // FF 00 00 => Must return {

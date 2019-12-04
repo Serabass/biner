@@ -54,17 +54,17 @@ export scalar wfstring32 { // Fixed string with 32 bit length
 	= wchar[len] as string;
 }
 
-export scalar nstring { // Null terminated string
-	= char[] [] {
-		until { js`_ != 0x00` }
-	}
-}
+// export scalar nstring { // Null terminated string
+// 	= char[] [] {
+// 		until { js`_ != 0x00` }
+// 	}
+// }
 
-export scalar wnstring { // Null terminated wide string (Unicode)
-	= wchar[] [] {
-		until { js`_ != 0x0000` }
-	}
-}
+// export scalar wnstring { // Null terminated wide string (Unicode)
+// 	= wchar[] [] {
+// 		until { js`_ != 0x0000` }
+// 	}
+// }
 
 export struct rgb<T = uint8> {
 	r: T;

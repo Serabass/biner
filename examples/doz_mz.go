@@ -1,6 +1,6 @@
 #endianness LE;
-#ext exe ovl;
-#title DOS MZ executable;
+#ext "exe ovl";
+#title "DOS MZ executable";
 
 struct mz_header {
 	@pass("MZ")
@@ -34,6 +34,6 @@ struct {
 	};
 
 	body: uint8[] []{
-		until { !eos }
+		until { js`!eos` }
 	};
 }

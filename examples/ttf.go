@@ -2,13 +2,13 @@
 #id ttf;
 #ext ttf;
 #license MIT;
-#title TrueType Font File;
+#title "TrueType Font File";
 
 enum platforms {
 	unicode,
 	macintosh,
 	reserved_2,
-	microsoft,
+	microsoft
 }
 
 enum names {
@@ -58,6 +58,6 @@ struct dir_table_entry {
 struct {
 	offset_table: offset_table;
 	directory_table: dir_table_entry {
-		expr { offset_table.num_tables }
+		expr { js`offset_table.num_tables` }
 	};
 }

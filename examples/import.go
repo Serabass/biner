@@ -1,5 +1,6 @@
 
-import vars8, varsRGB as rgb from "./export";
+import struct vars8,
+			 struct varsRGB as rgb from "./export";
 
 struct {
 	val: vars8;

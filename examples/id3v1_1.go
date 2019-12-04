@@ -1,5 +1,5 @@
 #id id3v1_1;
-#license CC0-1.0;
+#license "CC0-1.0";
 
 enum Genre : uint8 {
 	blues = 0,

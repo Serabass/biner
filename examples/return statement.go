@@ -1,8 +1,8 @@
 scalar val {
-	= int8 switch (_) {
-		case 01 = int8;
-		case 02 = int16;
-		case 04 = int32;
+	= switch (int8) {
+		case 1: = int8;
+		case 2: = int16;
+		case 4: = int32;
 	};
 }
 

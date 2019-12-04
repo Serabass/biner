@@ -2,20 +2,20 @@
 
 // Simple import
 
-import vars8 from "./export";
+import struct vars8 from "./export";
 
 // Simple multiple imports 
 
 import 
-	vars8,
-	varsRGB
+	struct vars8,
+	struct varsRGB
 from "./export";
 
 // Simple multiple imports with an alias
 
 import 
-	vars8,
-	varsRGB as myVars
+	struct vars8,
+	struct varsRGB as myVars
 from "./export";
 
 // Constants definition
