@@ -90,6 +90,8 @@ struct rgb {
 
 ## Kaitai
 
+https://www.opennet.ru/opennews/art.shtml?num=46244
+
 Есть аналогичный проект: [Kaitai](http://kaitai.io/), однако там структуры описываются на языке YAML. Этот язык тоже хорош, да и проект довольно объёмный:
  * Множество готовых примеров (некоторые из которых, я, к слову, у них подсмотрел)
  * Онлайн-песочница
@@ -157,5 +159,3 @@ _описать_
 * BiSt = от Binary Structurization (созвучно с Beast)
 * BSLang - Binary Structurization Language
 * ...предлагайте
-
-https://www.opennet.ru/opennews/art.shtml?num=46244
