@@ -1,13 +1,14 @@
 {
-  "name": "jison-reaper-parse",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "biner",
+  "description": "Biner is a binary structurization language",
+  "version": "0.0.1",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "test": "jest",
     "tw": "jest --watch",
     "build": "tsc",
-    "lint": "tslint --project tsconfig.json -e src/**/*.spec.*"
+    "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {
     "@types/pegjs": "^0.10.1",
