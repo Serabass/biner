@@ -6,10 +6,14 @@ node_js:
   - "12"
   - "13"
 
+env:
+  CODECOV_TOKEN = "c7ca8475-a614-42ad-992f-12a46a4ef2ef"
+
 before_script:
   - yarn
 
 script:
   - yarn lint
-  - yarn test
+  - yarn test --coverage
   - yarn build
+  - codecov -f coverage/*.json
