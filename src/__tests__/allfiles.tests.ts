@@ -9,7 +9,7 @@ describe("Try to parse all files", () => {
     let b = Buffer.from([0x00]);
     for (let file of files) {
       let name = file.replace(/\.go$/, "");
-      let pr = load(name, "89", "src/biner-work.pegjs");
+      let pr = load(name, "89");
 
       // let p = path.join("examples", file);
 

@@ -3,10 +3,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
-import * as vm from "vm";
 import { json } from "../src/util";
 
-export class Proc2 {
+export class Processor {
   public get mainStruct() {
     return this.structs[""];
   }
@@ -17,8 +16,8 @@ export class Proc2 {
   public static readFile(
     scriptPath: string,
     buffer: Buffer,
-    src = "./src/biner-final.pegjs"
-  ): Proc2 {
+    src = "./src/biner.pegjs"
+  ): Processor {
     let contents = fs.readFileSync(scriptPath).toString("utf-8");
     let parserContents = fs.readFileSync(src).toString("utf-8");
     let asty = new ASTY();
@@ -34,7 +33,7 @@ export class Proc2 {
       throw new Error(JSON.stringify(actual.error, null, 4));
     }
 
-    const res = new Proc2(actual.ast, buffer, scriptPath, contents);
+    const res = new Processor(actual.ast, buffer, scriptPath, contents);
     return res;
   }
 
@@ -140,7 +139,7 @@ export class Proc2 {
   private defineImport(node: any) {
     let importPath =
       path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
-    let pr = Proc2.readFile(
+    let pr = Processor.readFile(
       importPath,
       Buffer.from([]),
       "src/javascript.pegjs"
@@ -269,73 +268,11 @@ export class Proc2 {
     for (let child of struct.body) {
       switch (child.type) {
         case "ReadableFieldStatement":
-          let field = child.field.name;
-
-          ((offsetValue: number, child2) => {
-            Object.defineProperty(result, field, {
-              enumerable: true,
-              value: (() => {
-                const newLocal = this.defineGetter(
-                  child.body.typeName.name,
-                  child.body.array
-                )(offsetValue, child2) as any;
-
-                if (
-                  child &&
-                  child.body &&
-                  child.body.body &&
-                  child.body.body.body
-                ) {
-                  let js = child!.body!.body!.body;
-                  if (js!.type === "JSProgram") {
-                    let script =
-                      "{{" +
-                      this.contents.substr(
-                        js.location.start.offset,
-                        js.location.end.offset
-                      );
-                    vm.runInNewContext(script, newLocal);
-                  }
-                }
-
-                return newLocal;
-              })()
-            });
-          })(offset, child);
-
-          const structSize = this.getStructSize(
-            child.body.typeName.name,
-            child.body.array
-          );
-          offset += structSize;
-
           break;
 
         case "Property":
-          let key = child.key.name;
-          switch (child.kind) {
-            case "get":
-              Object.defineProperty(result, key, {
-                enumerable: true,
-                get: () => JSInterpreter.callFunction(child.value, result)
-              });
-              break;
-            case "set":
-              Object.defineProperty(result, key, {
-                enumerable: true,
-                set: (value) =>
-                  JSInterpreter.callFunction(child.value, result, value)
-              });
-              break;
-          }
           break;
         case "FunctionFieldDefinition":
-          let functionName = child.id.name;
-          Object.defineProperty(result, functionName, {
-            enumerable: true,
-            value: (...args: any[]) =>
-              JSInterpreter.callFunction(functionName, result, ...args)
-          });
           break;
         case "StructReadableField":
           break;

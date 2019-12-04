@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Proc2 } from "./processor2";
+import { Processor } from "./processor";
 
 export function json(obj: any, indent = 2) {
   // console.log(JSON.stringify(obj, null, indent));
@@ -21,8 +21,8 @@ export function pathFix(specFileName: string) {
 export function load(
   scriptPath: string,
   buffer: string | Buffer,
-  src: string = "src/biner-work.pegjs"
+  src: string = "src/biner.pegjs"
 ) {
   let b = buf(buffer);
-  return Proc2.readFile(pathFix(scriptPath), b, src);
+  return Processor.readFile(pathFix(scriptPath), b, src);
 }
