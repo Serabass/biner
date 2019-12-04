@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/Serabass/biner.svg?branch=master)](https://travis-ci.org/Serabass/biner)
-
 [![codecov](https://codecov.io/gh/Serabass/biner/branch/master/graph/badge.svg)](https://codecov.io/gh/Serabass/biner)
 
 # Biner
