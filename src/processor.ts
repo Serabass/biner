@@ -356,7 +356,6 @@ export class Processor {
       switch (child.type) {
         case "ReadableFieldStatement":
           break;
-
         case "Property":
           break;
         case "FunctionFieldDefinition":
