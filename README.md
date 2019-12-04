@@ -1,10 +1,10 @@
 [![Build Status](https://img.shields.io/travis/com/Serabass/biner?style=for-the-badge)](https://travis-ci.org/Serabass/biner)
 [![codecov](https://img.shields.io/codecov/c/github/Serabass/biner?style=for-the-badge)](https://codecov.io/gh/Serabass/biner)
+![issues](https://img.shields.io/github/languages/top/Serabass/biner?style=for-the-badge)
+![issues](https://img.shields.io/github/repo-size/Serabass/biner?style=for-the-badge)
+
 [![issues](https://img.shields.io/github/issues-raw/Serabass/biner?style=for-the-badge)](https://github.com/Serabass/biner/issues)
 [![issues](https://img.shields.io/github/issues-closed/Serabass/biner?style=for-the-badge)](https://github.com/Serabass/biner/issues)
-[![issues](https://img.shields.io/github/languages/top/Serabass/biner?style=for-the-badge)]
-[![issues](https://img.shields.io/github/repo-size/Serabass/biner?style=for-the-badge)]
-
 
 # Biner
 
