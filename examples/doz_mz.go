@@ -33,6 +33,7 @@ struct {
 		expr { js`hdr.qty_relocations` }
 	};
 
-	@sizeeos
-	body: uint8;
+	body: uint8[] []{
+		until { !eos }
+	};
 }

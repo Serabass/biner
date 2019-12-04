@@ -330,10 +330,22 @@ StructDefinitionStatement
    };
   }
 
+StructParentFieldOverrideStatement
+ = "^" parentFieldName:Identifier
+   __ AsToken
+   __ thisFieldName: Identifier EOS {
+     return {
+       type: "StructParentFieldOverrideStatement",
+       parentFieldName,
+       thisFieldName
+     };
+ }
+
 StructField
  = StructReadableField
  / StructGetterField
  / EnumStatement
+ / StructParentFieldOverrideStatement
 
 // =============== /Struct ==============
 

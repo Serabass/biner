@@ -39,7 +39,7 @@ struct sandbox {
 struct chunk {
 	len: uint8;
 	type: char[4];
-	body: []switch (_.type) {
+	body: []switch (type as string) {
 		case "PLTE": = plte_chunk;
 		case "cHRM": = chrm_chunk;
 		case "gAMA": = gama_chunk;
@@ -225,10 +225,10 @@ scalar fstring32 {
 	= char[len] as string;
 }
 
-scalar nstring {
-	= char[] []{
-		until { _ == 0x00 }
-	} as string;
+scalar nstring { // Null terminated string
+	= char[] [] {
+		until { js`_ != 0x00` }
+	}
 }
 
 scalar bool {

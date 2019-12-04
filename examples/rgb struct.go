@@ -15,26 +15,10 @@ struct rgb {
 }
 
 struct {
-	color: rgb {
-		/*if (r == 0xFF) {
-			this.red = true;
-		}
-		if (g >= 0x80) {
-			this.green = true;
-		}
-		if (b == 0xFF) {
-			this.blue = true;
-		}*/
-	}
-	get @red: bool {
-		js`r == 0xFF`
-	};
-	get @green: bool {
-		js`g == 0xFF`
-	};
-	get @blue: bool {
-		js`b == 0xFF`
-	};
+	color: rgb;
+	get @red: bool { js`r == 0xFF` };
+	get @green: bool { 	js`g == 0xFF` };
+	get @blue: bool { js`b == 0xFF` };
 }
 
 // FF 00 00 => Must return {

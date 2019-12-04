@@ -14,6 +14,13 @@ struct rgbax : rgba {
 	x: uint16;
 }
 
+struct rgb : vector3<uint8> {
+	^x as r;
+	^y as g;
+	^z as b;
+	a: uint8;
+}
+
 struct {
-	val: rgbax;
+	...rgbax;
 }

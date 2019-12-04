@@ -1,15 +1,4 @@
-/*decorator structDecorator() {
-	// js
-}
 
-decorator pass(...vals) {
-	// js
-}
-
-decorator nopass(...vals) {
-	// js
-}
-*/
 @structDecorator
 struct A {
 	x: uint8;

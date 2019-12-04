@@ -2,7 +2,7 @@ import * as path from "path";
 import { Proc2 } from "./src/processor2";
 
 export function json(obj, indent = 2) {
-  console.log(JSON.stringify(obj, null, indent));
+  // console.log(JSON.stringify(obj, null, indent));
 }
 
 export function buf(data: string | Buffer) {
