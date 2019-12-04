@@ -15,7 +15,8 @@ from "./export";
 
 import 
 	struct vars8,
-	struct varsRGB as myVars
+	struct varsRGB as myVars,
+	enum A as MyEnum
 from "./export";
 
 // Constants definition
@@ -185,7 +186,7 @@ struct opcode {
 
 struct SCM {
 	opcodes: opcode[] []{
-		until { eos }
+		until { js`eos` }
 	};
 }
 
