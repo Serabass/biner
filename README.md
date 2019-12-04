@@ -162,6 +162,7 @@ _описать_
 
 Нужно решить, как обозвать проект. Сейчас используется рабочее название Biner, но мне оно не нравится.
 
-* BiSt = от Binary Structurization (созвучно с Beast)
+* BiSt - от Binary Structurization (созвучно с Beast)
 * BiStLang - Binary Structurization Language
+* BinLang
 * ...предлагайте

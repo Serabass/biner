@@ -9,16 +9,16 @@
 */
 
 struct rgb {
-	r: uint8;
-	g: uint8;
-	b: uint8;
+  r: uint8;
+  g: uint8;
+  b: uint8;
 }
 
 struct {
-	color: rgb;
-	get @red: bool { = js`r == 0xFF` }
-	get @green: bool { = js`g == 0xFF` }
-	get @blue: bool { = js`b == 0xFF` }
+  color: rgb;
+  get @red: bool { = js`r == 0xFF` }
+  get @green: bool { = js`g == 0xFF` }
+  get @blue: bool { = js`b == 0xFF` }
 }
 
 // FF 00 00 => Must return {

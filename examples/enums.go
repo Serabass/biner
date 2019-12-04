@@ -1,11 +1,11 @@
 
 export enum A {
-	A = 6,
-	B
+  A = 6,
+  B
 }
 
 enum B : uint32 {
-	A,
-	B,
-	C
+  A,
+  B,
+  C
 }

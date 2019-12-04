@@ -1,3 +1,3 @@
 struct {
-	vals: uint16[];
+  vals: uint16[];
 }
