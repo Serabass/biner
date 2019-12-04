@@ -82,7 +82,7 @@ struct rgb {
 * [Typescript](https://www.typescriptlang.org/)
 * [TSLint](https://palantir.github.io/tslint/)
 * [Jest](https://jestjs.io/)
-* [PEGjs](https://pegjs.org/)
+* [PEGjs](https://pegjs.org/) (Его важно изучить. У них в репке есть [несколько замечательных примеров](https://github.com/pegjs/pegjs/tree/master/examples))
 * [Travis CI](https://travis-ci.org/)
 * 
 
@@ -155,6 +155,6 @@ _описать_
 Нужно решить, как обозвать проект. Сейчас используется рабочее название Biner, но мне оно не нравится.
 
 * BiSt = от Binary Structurization (созвучно с Beast)
-
+* BDSLang - Binary Data Structurization
 
 https://www.opennet.ru/opennews/art.shtml?num=46244
