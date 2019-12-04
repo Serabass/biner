@@ -1,4 +1,4 @@
-import { load } from "../../util";
+import { load } from "../../src/util";
 
 describe("Arrays definition", () => {
   it("Simple", () => {

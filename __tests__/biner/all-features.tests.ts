@@ -1,4 +1,4 @@
-import {load } from "../../util";
+import {load } from "../../src/util";
 
 describe("Constants usage", () => {
   it("Usage of constants", () => {

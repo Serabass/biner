@@ -1,10 +1,10 @@
-import * as ASTY from "asty";
+import ASTY from "asty";
 import * as fs from "fs";
 import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import * as vm from "vm";
-import { json } from "../util";
+import { json } from "../src/util";
 import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
@@ -25,7 +25,7 @@ export class Proc2 {
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {
-      makeAST: (line, column, offset, args) =>
+      makeAST: (line: number, column: number, offset: number, args: any[]) =>
         asty.create.apply(asty, args).pos(line, column, offset)
     });
 
@@ -64,7 +64,7 @@ export class Proc2 {
     }
   }
 
-  public getStructSize(typeName: string = "", arrayData = null) {
+  public getStructSize(typeName: string = "", arrayData: any = null): number {
     if (arrayData) {
       let arraySize = arrayData.size.value;
       let structSize = this.getStructSize(typeName);
@@ -116,7 +116,7 @@ export class Proc2 {
     }
   }
 
-  private registerNode(node) {
+  private registerNode(node: any) {
     switch (node.type) {
       case "DirectiveStatement":
         return this.defineDirective(node);
@@ -134,11 +134,11 @@ export class Proc2 {
     }
   }
 
-  private defineDirective(node) {
+  private defineDirective(node: any) {
     this.directives[node.id.name] = node.expr.name;
   }
 
-  private defineImport(node) {
+  private defineImport(node: any) {
     let importPath =
       path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
     let pr = Proc2.readFile(
@@ -166,12 +166,12 @@ export class Proc2 {
     }
   }
 
-  private defineConst(node) {
+  private defineConst(node: any) {
     let name = node.id.name;
     this.consts[name] = node.expr.expression.value;
   }
 
-  private defineStruct(node) {
+  private defineStruct(node: any) {
     let name = node.id ? node.id.name : "";
 
     if (this.structs[name]) {
@@ -186,8 +186,8 @@ export class Proc2 {
   }
 
   private defineGetter(
-    typeName,
-    arrayData
+    typeName: string,
+    arrayData: any
   ): (offset: number, node: any) => any {
     return (offset: number, node: any) => {
       if (arrayData) {
@@ -259,7 +259,7 @@ export class Proc2 {
     return this.processStruct(struct, offset);
   }
 
-  private processStruct(struct, offset = 0, result = {}): any {
+  private processStruct(struct: any, offset = 0, result = {}): any {
     if (struct.parent) {
       const parentStructName = struct.parent.parent.id.name;
       let parentStruct = this.structs[parentStructName];
@@ -334,7 +334,7 @@ export class Proc2 {
           let functionName = child.id.name;
           Object.defineProperty(result, functionName, {
             enumerable: true,
-            value: (...args) =>
+            value: (...args: any[]) =>
               JSInterpreter.callFunction(functionName, result, ...args)
           });
           break;

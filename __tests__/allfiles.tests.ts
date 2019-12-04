@@ -1,7 +1,5 @@
 import * as fs from "fs";
-import * as path from "path";
-import { Proc2 } from "../src/processor2";
-import { load } from "../util";
+import { load } from "../src/util";
 
 describe("Try to parse all files", () => {
   it("Parse", () => {

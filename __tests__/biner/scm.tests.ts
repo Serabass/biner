@@ -1,4 +1,4 @@
-import { load } from "../../util";
+import { load } from "../../src/util";
 
 xdescribe("Biner simple tests using pegjs", () => {
   it("scm 0005 int + float", () => {

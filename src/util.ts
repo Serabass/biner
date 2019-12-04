@@ -1,7 +1,7 @@
 import * as path from "path";
-import { Proc2 } from "./src/processor2";
+import { Proc2 } from "./processor2";
 
-export function json(obj, indent = 2) {
+export function json(obj: any, indent = 2) {
   // console.log(JSON.stringify(obj, null, indent));
 }
 

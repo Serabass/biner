@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { load } from "../../util";
+import { load } from "../../src/util";
 
 describe("Generic", () => {
   it("Test gp5", () => {

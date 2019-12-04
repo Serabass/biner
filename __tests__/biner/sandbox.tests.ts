@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { json, load } from "../../util";
+import { json, load } from "../../src/util";
 
 describe("Type definitions", () => {
   it("types", () => {

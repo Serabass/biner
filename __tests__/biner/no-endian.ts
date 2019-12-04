@@ -1,4 +1,4 @@
-import { load } from "../../util";
+import { load } from "../../src/util";
 
 describe("No endian", () => {
   it("Scripts with no endian defined must define default BE", () => {
