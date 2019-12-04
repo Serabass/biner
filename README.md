@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/Serabass/biner.svg?branch=master)](https://travis-ci.org/Serabass/biner)
-[![codecov](https://codecov.io/gh/Serabass/biner/branch/master/graph/badge.svg)](https://codecov.io/gh/Serabass/biner)
+[![Build Status](https://img.shields.io/travis/com/Serabass/biner?style=for-the-badge)](https://travis-ci.org/Serabass/biner)
+[![codecov](https://img.shields.io/codecov/c/github/Serabass/biner?style=for-the-badge)](https://codecov.io/gh/Serabass/biner)
+[![issues](https://img.shields.io/bitbucket/issues-raw/Serabass/biner?style=for-the-badge)](https://codecov.io/gh/Serabass/biner/issues)
 
 # Biner
 
