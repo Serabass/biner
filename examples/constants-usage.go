@@ -11,6 +11,6 @@ struct rgb {
 struct {
 	val: rgb;
 	get @bright: bool {
-		js`r > HALF && (g > HALF (b > HALF))`
-	};
+		= js`_.r > HALF && (_.g > HALF (_.b > HALF))`;
+	}
 }

@@ -2,6 +2,9 @@
 
 const PURGE = 0x44;
 const DISPENSE = 0x45;
+const TEST = 0x76;
+const STATUS = 0x46;
+const ROMVER = 0x47;
 
 struct purgeCmd {
 	errCause: int8;
@@ -45,18 +48,15 @@ struct {
 	id: uint8;
 	@pass(0x02)
 	stx: uint8;
-	cmd: uint8 switch (_) {
+	cmd: switch (uint8) {
 		case PURGE : = purgeCmd;
 		case DISPENSE : = dispenseCmd;
-		case 0x76 : = testCmd;
-		case 0x46 : = statusCmd;
-		case 0x47 : = romVerCmd;
+		case TEST : = testCmd;
+		case STATUS : = statusCmd;
+		case ROMVER : = romVerCmd;
 	};
 	@pass(3)
 	etx: uint8;
 	bcc: uint8;
-
-	@startOK: bool;
-	@stxOK: bool;
 }
 

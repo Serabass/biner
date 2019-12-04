@@ -102,10 +102,10 @@ struct strh_body {
 struct Block {
 	four_cc: chunk_type;
 	block_size: uint32;
-	data: chunk_type[block_size]; switch (four_cc) {
-	case chunk_type::list = list_body;
-	case chunk_type::avih = avih_body;
-	case chunk_type::strh = strh_body;
+	data: []switch (four_cc) {
+	case chunk_type::list: = list_body[block_size];
+	case chunk_type::avih: = avih_body[block_size];
+	case chunk_type::strh: = strh_body[block_size];
 	}
 }
 

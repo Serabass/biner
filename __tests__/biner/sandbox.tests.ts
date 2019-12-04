@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { json, load } from "../../util";
 
 describe("Type definitions", () => {

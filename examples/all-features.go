@@ -20,6 +20,38 @@ from "./export";
 
 // Constants definition
 
+const INT = 100001;
+const HEX = 0x01;
+const OCT = 0o05;
+const BIN1 = 0b0000001;
+const BIN2 = 0b0000_1111_01010;
+const FLOAT = 178.01;
+
+struct A
+	<
+		 TT1,
+		 T1 = float64[0xA10],
+		 TTT =
+		 vector<uint8, float64[10]>
+	>
+{
+	a: uint8;
+	b: TT2;
+	c: T2;
+}
+
+struct B : A<float32> {
+	b: uint8;
+	vector: vector<
+		uint8, float64[10], 
+		vector<a, b, c>
+	>
+}
+
+struct size : A<char[2]> {
+	c: uint8;
+}
+
 enum DecimalValueType : uint8 {
 	VAR = 0x02,
 	INT = 0x04,
@@ -129,11 +161,11 @@ struct B {
 
 scalar decimalValue {
 	= switch (_) {
-	case DecimalValueType::INT = int8;
-	case DecimalValueType::VAR = int16;
-	case DecimalValueType::FLOAT32 = float32;
-	case DecimalValueType::RGB = rgb;
-	case DecimalValueType::RGBA = rgba;
+	case DecimalValueType::INT: = int8;
+	case DecimalValueType::VAR: = int16;
+	case DecimalValueType::FLOAT32: = float32;
+	case DecimalValueType::RGB: = rgb;
+	case DecimalValueType::RGBA: = rgba;
 	}
 }
 
@@ -145,7 +177,7 @@ struct opcode {
 	opcode: uint16;
 
 	data: switch (opcode) {
-		case 0x05: = opcode00005;
+		case 0x0005: = opcode00005;
 	};
 }
 

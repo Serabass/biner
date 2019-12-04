@@ -1,8 +1,8 @@
-#id ogg
-#title Ogg media container file
-#ext	ogg ogv oga spx ogx
-#license CC0-1.0
-#endianness le
+#id ogg;
+#title Ogg media container file;
+#ext	ogg ogv oga spx ogx;
+#license CC0-1.0;
+#endianness le;
 
 struct page {
 	@pass("OggS")
@@ -27,6 +27,6 @@ struct page {
 
 struct {
 	pages: page[] []{
-		until { eos };
+		until { eos }
 	};
 }

@@ -39,7 +39,7 @@ struct sandbox {
 struct chunk {
 	len: uint8;
 	type: char[4];
-	body: chunk_body[len] [] switch (_.type) {
+	body: []switch (_.type) {
 		case "PLTE": = plte_chunk;
 		case "cHRM": = chrm_chunk;
 		case "gAMA": = gama_chunk;
@@ -75,11 +75,11 @@ struct point {
 	x_int: uint32;
 	y_int: uint32;
 
-	get @x {
+	get @x: float32 {
 		x_int / 100000.0
 	}
 
-	get @y {
+	get @y: float32 {
 		y_int / 100000.0
 	}
 }
@@ -87,8 +87,8 @@ struct point {
 struct gama_chunk {
 	gamma_int: uint32;
 
-	get @gamma_ratio {
-		// return 100000.0 / gamma_int;
+	get @gamma_ratio: float32 {
+		100000.0 / gamma_int
 	}
 }
 
@@ -105,11 +105,11 @@ struct srgb_chunk {
 
 struct bkgd_chunk {
   bkgd: switch ($color_type) {
-  	case color_type::greyscale = bkgd_greyscale;
-  	case color_type::greyscale_alpha = bkgd_greyscale;
-  	case color_type::truecolor = bkgd_truecolor;
-  	case color_type::truecolor_alpha = bkgd_truecolor;
-  	case color_type::indexed = bkgd_indexed;
+  	case color_type::greyscale: = bkgd_greyscale;
+  	case color_type::greyscale_alpha: = bkgd_greyscale;
+  	case color_type::truecolor: = bkgd_truecolor;
+  	case color_type::truecolor_alpha: = bkgd_truecolor;
+  	case color_type::indexed: = bkgd_indexed;
   }
 }
 

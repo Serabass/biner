@@ -6,7 +6,9 @@
 
   function filledArray(count, value) {
     return Array.apply(null, new Array(count))
-      .map(function() { return value; });
+      .map(function() {
+        return value;
+      });
   }
 
   function extractOptional(optional, index) {
@@ -14,7 +16,9 @@
   }
 
   function extractList(list, index) {
-    return list.map(function(element) { return element[index]; });
+    return list.map(function(element) {
+      return element[index];
+    });
   }
 
   function buildList(head, tail, index) {
@@ -75,47 +79,72 @@ BinerStatement
  / ImportStatement
  / ConstStatement
 
+DirectiveExpression
+ = StringLiteral
+ / NumericLiteral
+ / Identifier
+
 DirectiveStatement
- = "#" id: Identifier __ expr: (!EOS SourceCharacter)* __ EOS {
+ =    "#" id: Identifier
+ __ contents: DirectiveExpression?
+ __ EOS {
    return {
      type: "DirectiveStatement",
-     expr,
+     contents,
      id,
    };
  }
 
+ConstStatementExpression
+ = StringLiteral
+ / NumericLiteral
+ / JSExpression
+ / Identifier
 
+ConstStatement
+ = __ isExport: ExportToken? __ ConstToken
+         __ id: Identifier __ "="
+       __ expr: ConstStatementExpression
+         __ EOS {
+   return {
+     type: "ConstStatement",
+     id, expr,
+     export: !!isExport
+   };
+ }
 
-
-
-
+// =============== Scalars ==============
 
 ScalarDefinitionStatement
- = ScalarToken __ id: Identifier
+ = 
+  isExport: ExportToken? __ ScalarToken
+     __ id: Identifier
    __ body: ScalarBody {
      return {
        type: "ScalarDefinitionStatement",
        id,
        body,
+       export: !!isExport,
      };
    }
 
 ScalarBodyStatement
  = ScalarReturnStatement
  / StructField
+ / StructVarStatement
 
-ScalarConvertStatement
+TypeCastStatement
  = AsToken __ typeName: TypeAccess {
    return {
-     type: "ScalarConvertStatement",
+     type: "TypeCastStatement",
      typeName
    };
  }
 
 ScalarReturnStatement
  = "="
-  __ typeName: TypeAccess
-  __ conversion: ScalarConvertStatement?
+    __ typeName: TypeAccess
+  __ conversion: TypeCastStatement?
   __ EOS {
    return {
      type: "ScalarReturnStatement",
@@ -131,11 +160,16 @@ ScalarBodyStatementList
    } 
 
 ScalarBody
- = "{" __ ScalarBodyStatementList __ "}" {
-
+ = "{" __ body: ScalarBodyStatementList __ "}" {
+   return {
+     type: "ScalarBody",
+     body,
+   };
  }
 
+// =============== /Scalars ==============
 
+// =============== Imports ==============
 
 ImportAlias
  = AsToken __ aliasName: Identifier {
@@ -145,10 +179,24 @@ ImportAlias
    };
  }
 
+ImportType
+ = StructToken {
+   return "struct";
+ }
+ / EnumToken {
+   return "enum";
+ }
+ / ScalarToken {
+   return "scalar";
+ }
+
 ImportName
- = name: Identifier __ alias: ImportAlias? {
+ = importType: ImportType __
+         name: Identifier __
+        alias: ImportAlias? {
    return {
      type: "ImportName",
+     importType,
      name,
      alias
    };
@@ -171,47 +219,63 @@ ImportStatement
  }
 
 
+// =============== /Imports ==============
 
-ConstStatement
- = ConstToken
-   __ id: Identifier
-   __ "="
-   __ expr: Expression
-   __ EOS {
+
+// =============== Enums ==============
+
+EnumInheritanceStatement
+ = ":" __ parent: Identifier {
    return {
-     type: "ConstStatement",
-     id, expr,
+     type: "EnumInheritanceStatement",
+     parent,
    };
  }
-
-
-
 
 EnumStatement
- = EnumToken __ id: Identifier __ body: EnumBlock {
-   return {
-     type: "EnumStatement",
-     id, body
-   };
- }
- / EnumToken __ id: Identifier __ ":" __ parent: Identifier
- __ body: EnumBlock {
+ =  isExport: ExportToken?
+ __ EnumToken
+ __       id: Identifier
+ __ inherits: EnumInheritanceStatement?
+ __     body: EnumBlock {
    return {
      type: "EnumStatement",
      id,
-     inherits: true,
      body,
-     parent
+     inherits,
+     export: !!isExport
    };
  }
 
+EnumFieldList
+ =  head: EnumField
+    tail:("," __ EnumField)* {
+      return buildList(head, tail, 2);
+    }
+
 EnumBlock
- = "{" __ head: EnumField tail:("," __ EnumField)* __ "}" {}
+ =  "{" __ list: EnumFieldList? __ "}" {
+      return {
+        type: "EnumBlock",
+        list
+      };
+    }
+
+EnumValueLiteral
+ = NumericLiteral
+ / StringLiteral
+
+EnumValue
+ =  "=" __ value: EnumValueLiteral {
+   return {
+     type: "EnumValue",
+     value,
+   };
+ }
 
 EnumField
- = id: Identifier
- __ "="
- __ value: NumericLiteral {
+ =     id: Identifier __
+    value: EnumValue? {
    return {
      type: "EnumField",
      id, value,
@@ -219,14 +283,17 @@ EnumField
  } 
 
 EnumFieldAccess
- = id: Identifier 
- __ "::"
+ =     id: Identifier __ "::"
  __ field: Identifier {
    return {
      type: "EnumFieldAccess",
      id, field,
    };
  }
+
+// =============== /Enums ==============
+
+// =============== Struct ==============
 
 StructInheritStatement
  = ":" __ typeName: TypeAccess {
@@ -245,13 +312,13 @@ StructInheritStatement
   }
 
 StructDefinitionStatement
- = decorators: DecoratorList? 
-   __ isExport: ExportToken?
+ =    decorators: DecoratorList? 
+     __ isExport: ExportToken?
    __ StructToken
-   __ id: Identifier?
-   __ generics: StructGenericStatement?
-   __ inherit: StructInheritStatement?
-   __ body: StructBlock {
+           __ id: Identifier?
+     __ generics: StructGenericStatement?
+      __ inherit: StructInheritStatement?
+         __ body: StructBlock {
    return {
      type: "StructDefinitionStatement",
      decorators,
@@ -262,6 +329,16 @@ StructDefinitionStatement
      export: !!isExport,
    };
   }
+
+StructField
+ = StructReadableField
+ / StructGetterField
+ / EnumStatement
+
+// =============== /Struct ==============
+
+
+// =============== Generics ==============
 
 GenericTypeList
  = head: GenericType
@@ -278,14 +355,16 @@ GenericTypeDefaultStatement
  }
 
 GenericType
- = id: Identifier
-  __ defaultType: (GenericTypeDefaultStatement)? {
+ =            id: Identifier
+  __ defaultType: GenericTypeDefaultStatement? {
     return {
       type: "GenericType",
       id,
       defaultType
     };
   }
+
+// =============== /Generics ==============
 
 // =============== Type Access ==============
 
@@ -310,12 +389,19 @@ TypeAccessArrayExpressionStatement
      size,
    };
  }
+ / "[" __ size: OperatorExpression? __ "]" {
+   return {
+     type: "TypeAccessArrayExpressionStatement",
+     size,
+   };
+ }
 
 TypeAccess
  = StructFieldSwitchStatement
- / id: Identifier
- __ generics: TypeAccessGenericStatement?
- __ array: TypeAccessArrayExpressionStatement?
+ /          id: Identifier
+ __   generics: TypeAccessGenericStatement?
+ __      array: TypeAccessArrayExpressionStatement?
+ __ conversion: TypeCastStatement?
  {
    return {
      type: "TypeAccess",
@@ -324,13 +410,9 @@ TypeAccess
      array
    };
  }
+ / StructDefinitionStatement
 
 // =============== /Type Access ==============
-
-StructField
- = StructReadableField
- / StructGetterField
- / EnumStatement
 
 // =============== Decorators ==============
 
@@ -358,22 +440,36 @@ DecoratorBody
 
 // =============== /Decoratos ==============
 
+// =============== Structs ==============
+
 StructReadableField
  =  decorators: DecoratorList?
- __ id: Identifier __ ":"
- __ typeName: TypeAccess
- __ body: StructFieldBody?
- __ EOS {
+         __ id: Identifier __ ":"
+   __ typeName: TypeAccess
+       __ body: StructFieldBody?
+ __ conversion: TypeCastStatement? __ EOS {
    return {
      type: "StructReadableField",
-     id, typeName,
+     id,
+     typeName,
      body,
+     conversion,
    };
  }
 
 StructGetterStatement
-  = OperatorExpression
-  /  Expression
+  = JSExpression
+  / OperatorExpression
+  / Expression
+  / StructGetterReturnStatement
+
+StructGetterReturnStatement
+ = "=" __ body: StructGetterStatement {
+   return {
+     type: "StructGetterReturnStatement",
+     body,
+   };
+ }
 
 StructGetterStatementList
  = head: StructGetterStatement
@@ -392,7 +488,8 @@ StructGetterBlock
 StructGetterField
  = decorators: DecoratorList? 
  __  GetToken
- __ "@" id: Identifier
+ __    "@" id: Identifier
+ __ ":" __ TypeAccess
  __ body: StructGetterBlock {
    return {
      type: "StructGetterField",
@@ -400,10 +497,15 @@ StructGetterField
    };
  }
 
+SwitchCaseExpressionList
+ = head: Expression
+   tail: (__ "," __ Expression)* {
+     return buildList(head, tail, 3);
+   }
+
 SwitchCaseStatement
   = CaseToken
-  __ expr: Expression
-  __ ":"
+  __   expr: SwitchCaseExpressionList __ ":"
   __ result: ReturnStatement {
     return {
       type: "SwitchCaseStatement",
@@ -413,7 +515,7 @@ SwitchCaseStatement
   }
 
 SwitchCaseStatementList
- = head: SwitchCaseStatement
+ =  head: SwitchCaseStatement
  __ tail: (__ SwitchCaseStatement)* {
    return buildList(head, tail, 1);
  }
@@ -427,21 +529,48 @@ StructFieldSwitchBody
  }
 
 StructFieldSwitchStatement
- = "[]" __ SwitchToken 
- __ "(" __ expr: Expression __ ")" 
+ = isArray: "[]"?
+ __ SwitchToken 
+ __ "(" __ expr: Expression __ ")"
  __ body: StructFieldSwitchBody {
    return {
      type: "StructFieldSwitchStatement",
      expr, body,
-     array: true
+     array: !!isArray
    };
  }
- / SwitchToken 
- __ "(" __ expr: Expression __ ")" 
- __ body: StructFieldSwitchBody {
+
+StructFieldArrayExprItemBody
+ = "{" __ expr: JSExpression __ "}" {
    return {
-     type: "StructFieldSwitchStatement",
-     expr, body,
+     type: "StructFieldArrayExprItemBody",
+     expr,
+   };
+ } 
+
+StructFieldArrayExpr
+ = ExprToken __ 
+   body: StructFieldArrayExprItemBody {
+     return {
+       type: "StructFieldArrayExpr",
+       body,
+     };
+   }
+
+StructFieldArrayExprItem
+ = StructFieldArrayExpr
+
+StructFieldArrayExprItemList
+ = head: StructFieldArrayExprItem
+   tail: (__ StructFieldArrayExprItem)* {
+     return buildList(head, tail, 1);
+   }
+
+StructFieldArrayExprBody
+ = "{" __ body: StructFieldArrayExprItemList __ "}" {
+   return {
+     type: "StructFieldArrayExprBody",
+     expr,
    };
  }
 
@@ -460,17 +589,56 @@ StructFieldBody
     };
   }
 
+StructFieldChildStatementList
+ = head: StructFieldChildStatement
+    tail:( __ StructFieldChildStatement)* {
+    return buildList(head, tail, 1);
+  }
+
 StructFieldBlock
- = "{" __ head: StructFieldChildStatement tail:( __ StructFieldChildStatement)* __ "}" {
-   return buildList(head, tail, 1);
+ = "{"
+ __ body: StructFieldChildStatementList
+ __ "}" {
+   return {
+     type: "StructFieldBlock",
+     body,
+   };
  }
 
+StructFieldRestStatement
+ = "..." __ typeName: TypeAccess __ EOS {
+   return {
+     type: "StructFieldRestStatement",
+     typeName
+   };
+ }
+
+StructVarValueStatement
+ = TypeAccess
+ / Expression
+
+StructVarStatement
+ = VarToken
+  __ id: Identifier
+  __ "="
+  __ value: StructVarValueStatement
+  __ EOS {
+    return {
+      type: "StructVarStatement",
+      value,
+    };
+  }
+
 StructFieldChildStatement
- = WhenStatement
+ = UntilStatement
  / StructField
+ / StructVarStatement
  / ReturnStatement
- / UntilStatement
  / StructDefinitionStatement
+ / StructFieldArrayExprItemList
+ / StructFieldRestStatement
+
+// =============== /Structs ==============
 
 ReturnStatement
  = "=" __ typeExpr: TypeAccess
@@ -482,18 +650,6 @@ ReturnStatement
    };
  }
 
-WhenStatement
- = WhenToken 
- __ "(" 
-    __ expr1: Expression 
-    __ operator: Operator
-    __ expr2: Expression
- __ ")"
- __ body: StructBlock
-  {
-   return;
- }
-
 UntilStatement
  = UntilToken __ body: UntilBlock {
    return {
@@ -502,8 +658,12 @@ UntilStatement
    };
  }
 
+UntilExpression
+ = JSExpression
+ / Expression
+
 UntilBlock
- = "{" __ expr: Expression __ "}" {
+ = "{" __ expr: UntilExpression __ "}" {
    return {
      type: "UntilBlock",
      expr
@@ -511,15 +671,18 @@ UntilBlock
  }
 
 StructBlock
- = "{" __ head: StructFieldChildStatement tail:( __ StructFieldChildStatement)* __ "}" {
-   return buildList(head, tail, 1);
- }
- / "{" __ "}" {
-   return [];
+ = "{" __ body: StructFieldChildStatementList? __ "}" {
+   return {
+     type: "StructBlock",
+     body,
+   };
  }
 
 StatementList
-  = head:BinerStatement tail:(__ BinerStatement)* { return buildList(head, tail, 1); }
+  = head:BinerStatement
+    tail:(__ BinerStatement)* {
+      return buildList(head, tail, 1);
+    }
 
 Block
   = "{" __ body:(StatementList __)? "}" {
@@ -530,13 +693,15 @@ Block
     }
 
 ExpressionList
- = head: Expression __
- tail: (__ "," __ Expression)* {
+ =   head: Expression
+  __ tail: (__ "," __ Expression)* {
    return buildList(head, tail, 1);
  }
 
 FieldAccessExpression
- = id: Identifier __ "." __ field: Identifier {
+ =     id: Identifier
+ __ "."
+ __ field: Identifier {
    return {
      type: "FieldAccessExpression",
      id, field
@@ -544,20 +709,25 @@ FieldAccessExpression
  }
 
 OperatorExpression
- = expr1: Expression 
+ =     expr1: Expression 
  __ operator: Operator
- __ expr2: Expression {
+    __ expr2: Expression {
    return {
      type: "OperatorExpression",
      expr1, operator, expr2
    };
  }
 
+
+// =============== Others ==============
+
+
 Expression
  = FieldAccessExpression
  / StringLiteral
  / NumericLiteral
  / EnumFieldAccess
+ / TypeAccess
  / Identifier
 
 __
@@ -703,7 +873,6 @@ FalseToken       = "false"       !IdentifierPart
 EnumToken        = "enum"        !IdentifierPart
 CaseToken        = "case"        !IdentifierPart
 GetToken         = "get"         !IdentifierPart
-WhenToken        = "when"        !IdentifierPart
 UntilToken       = "until"       !IdentifierPart
 SwitchToken      = "switch"      !IdentifierPart
 ScalarToken      = "scalar"      !IdentifierPart
@@ -712,13 +881,25 @@ ImportToken      = "import"      !IdentifierPart
 ExportToken      = "export"      !IdentifierPart
 FromToken        = "from"        !IdentifierPart
 ConstToken       = "const"       !IdentifierPart
+ExprToken        = "expr"        !IdentifierPart
+VarToken         = "var"         !IdentifierPart
 
 Keyword
   = StructToken
 
 BooleanLiteral
-  = TrueToken  { return { type: "Literal", value: true  }; }
-  / FalseToken { return { type: "Literal", value: false }; }
+  = TrueToken  {
+    return {
+      type: "Literal",
+      value: true
+    };
+  }
+  / FalseToken {
+    return {
+      type: "Literal",
+      value: false
+    };
+  }
 
 
 
@@ -757,10 +938,10 @@ HexDigit
   = [0-9a-f]i
 
 OctDigit
-  = [0-7]i
+  = [0-7]
 
 BinDigit
-  = [01_]i
+  = [01_]
 
 IntDigitLiteral
   = value: DecimalDigit+ {
@@ -771,7 +952,7 @@ IntDigitLiteral
   }
 
 FloatDigitLiteral
-  = p1: DecimalDigit+ "." p2: DecimalDigit+ {
+  = p1: DecimalDigit* "." p2: DecimalDigit+ {
     p1 = p1.join('');
     p2 = p2.join('');
     return {
@@ -791,28 +972,60 @@ NumericLiteral
  / DecimalDigitLiteral
  / IntDigitLiteral
 
+JSExpression
+ = "js" body: CodeStringLiteral  {
+   return {
+     type: "JSExpression",
+     body,
+   };
+ } 
 
-
-
+CodeStringLiteral
+ = '`' chars:CodeStringCharacter* '`' {
+      return {
+        type: "CodeStringLiteral",
+        value: chars.join("")
+      };
+    }
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
-      return { type: "StringLiteral", value: chars.join("") };
+      return {
+        type: "StringLiteral",
+        value: chars.join("")
+      };
     }
 
 DoubleStringCharacter
-  = !('"' / "\\" / LineTerminator) SourceCharacter { return text(); }
-  / "\\" sequence:EscapeSequence { return sequence; }
+  = !('"' / "\\" / LineTerminator) SourceCharacter {
+    return text();
+  }
+  / "\\" sequence:EscapeSequence {
+    return sequence;
+  }
+  / LineContinuation
+
+CodeStringCharacter
+  = !('`' / "\\") SourceCharacter {
+    return text();
+  }
+  / "\\" sequence:EscapeSequence {
+    return sequence;
+  }
   / LineContinuation
 
 EscapeSequence
   = CharacterEscapeSequence
-  / "0" !DecimalDigit { return "\0"; }
+  / "0" !DecimalDigit {
+    return "\0";
+  }
   / HexEscapeSequence
   / UnicodeEscapeSequence
 
 LineContinuation
-  = "\\" LineTerminatorSequence { return ""; }
+  = "\\" LineTerminatorSequence {
+    return "";
+  }
 
 CharacterEscapeSequence
   = SingleEscapeCharacter
@@ -846,3 +1059,4 @@ EscapeCharacter
 Operator
  = "=="
  / "/"
+ / "-"
