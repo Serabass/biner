@@ -5,7 +5,6 @@ import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import * as vm from "vm";
 import { json } from "../src/util";
-import { JSInterpreter } from "./js-interpreter";
 
 export class Proc2 {
   public get mainStruct() {
