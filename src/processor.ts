@@ -202,8 +202,6 @@ export class Processor {
       case "int32":
       case "uint32":
         return 4;
-      case "fstring":
-        return 0;
       default:
         if (!this.structs[typeName]) {
           throw new Error(`unrecognized type: ${typeName}`);
@@ -238,6 +236,9 @@ export class Processor {
   public processStruct(struct: any, result: any = {}): any {
     for (let child of struct.body.body) {
       switch (child.type) {
+        case "ScalarReturnStatement":
+          throw new Error("Under construction");
+
         case "StructReadableField":
           if (!child.id.skip) {
             let res = this.reader.readField(child, result);
@@ -445,5 +446,21 @@ export class Processor {
     }
 
     this.enums[name] = result;
+  }
+
+  public getType(name: string): any {
+    if (this.structs[name]) {
+      return this.structs[name];
+    }
+
+    if (this.scalars[name]) {
+      return this.scalars[name];
+    }
+
+    if (this.enums[name]) {
+      return this.enums[name];
+    }
+
+    throw new Error(`Type not found ${name}`);
   }
 }

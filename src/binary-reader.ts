@@ -2,7 +2,6 @@ import { Endianness } from "./endianness";
 import { Processor } from "./processor";
 
 export class BinaryReader {
-
   public get eof(): boolean {
     return this.offset >= this.buffer.byteLength;
   }
@@ -92,25 +91,24 @@ export class BinaryReader {
       case "int8":
         return this.int8;
 
-        case "uint8":
-            return this.uint8;
+      case "uint8":
+        return this.uint8;
 
       case "uint16":
         return this.uint16;
 
       default:
+        let type = this.processor.getType(node.typeName.id.name);
 
-      let struct = this.processor.structs[node.typeName.id.name];
-
-      if (!struct) {
-          console.log(struct);
+        if (!type) {
+          console.log(type);
         } else {
           let r = {};
-          this.processor.processStruct(struct, r);
+          this.processor.processStruct(type, r);
           return r;
         }
 
-      throw new Error(`Unknown type: ${node.typeName.id.name}`);
+        throw new Error(`Unknown type: ${node.typeName.id.name}`);
     }
   }
 }
