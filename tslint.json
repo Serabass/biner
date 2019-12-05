@@ -10,10 +10,10 @@
         "object-literal-sort-keys": false,
         "indent": true,
         "deprecation": true,
-        "completed-docs": true,
         "trailing-comma": true,
         "no-any": true,
-        "semicolon": true,
+        "interface-name": false,
+        "semicolon": true
     },
     "rulesDirectory": []
 }

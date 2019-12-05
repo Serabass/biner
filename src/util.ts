@@ -1,4 +1,5 @@
 import * as path from "path";
+import { JSONObject } from "./interfaces";
 import { Processor } from "./processor";
 
 /**
@@ -6,7 +7,7 @@ import { Processor } from "./processor";
  * @param obj Значение
  * @param indent Отступ
  */
-export function json(obj: any, indent = 2) {
+export function json(obj: JSONObject, indent = 2) {
   console.log(JSON.stringify(obj, null, indent));
 }
 

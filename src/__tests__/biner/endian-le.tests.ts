@@ -1,5 +1,5 @@
-import { load } from "../../util";
 import { Endianness } from "../../endianness";
+import { load } from "../../util";
 
 describe("No endian", () => {
   it("Scripts with no endian defined must define default BE", () => {

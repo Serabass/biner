@@ -1,11 +1,22 @@
 import { Endianness } from "./endianness";
+import { BinerNode, ResultObject } from "./interfaces";
 import { Processor } from "./processor";
 
+/**
+ * Класс для чтения бинарных данных
+ */
 export class BinaryReader {
+
+  /**
+   * Проверяем, достигнут ли конец файла
+   */
   public get eof(): boolean {
     return this.offset >= this.buffer.byteLength;
   }
 
+  /**
+   * Читаем беззнаковое однобайтовое целое
+   */
   private get uint8() {
     const data = this.buffer.readUInt8(this.offset);
 
@@ -14,6 +25,9 @@ export class BinaryReader {
     return data;
   }
 
+  /**
+   * Читаем знаковое однобайтовое целое
+   */
   private get int8() {
     const data = this.buffer.readInt8(this.offset);
 
@@ -22,6 +36,9 @@ export class BinaryReader {
     return data;
   }
 
+  /**
+   * Читаем беззнаковое двухбайтовое целое
+   */
   private get uint16() {
     let data;
 
@@ -35,6 +52,10 @@ export class BinaryReader {
 
     return data;
   }
+
+  /**
+   * Позиция ридера в буфере
+   */
   private offset: number = 0;
   public constructor(
     public buffer: Buffer,
@@ -42,7 +63,13 @@ export class BinaryReader {
     public endianness: Endianness = Endianness.BE
   ) {}
 
-  public readField(node: any, result: any = {}) {
+  /**
+   * Читаем поле на основании его типа
+   *
+   * @param node Нода
+   * @param result Текущий объект
+   */
+  public readField(node: BinerNode, result: ResultObject = {}) {
     if (node.typeName.array) {
       let res = [];
       if (node.typeName.array.size === null) {
@@ -78,15 +105,15 @@ export class BinaryReader {
     } else {
       return this.read(node, result);
     }
-
-    // ...
-
-    if (node.conversion) {
-      // ...
-    }
   }
 
-  private read(node: any, result: any = {}) {
+  /**
+   * Читаем значение
+   *
+   * @param node Hoдa
+   * @param result Текущий объект
+   */
+  private read(node: BinerNode, result: ResultObject = {}) {
     switch (node.typeName.id.name) {
       case "int8":
         return this.int8;

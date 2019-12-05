@@ -3,10 +3,25 @@ import * as fs from "fs";
 import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
-import { BinaryReader } from "./binary-reader";
-import { ConstStatementNode } from "./nodes/const-node";
 import * as vm from "vm";
+import { BinaryReader } from "./binary-reader";
 import { Endianness } from "./endianness";
+import { AST, BinerNode,
+  ConstMap, ConstStatementNode, DecimalDigitLiteral,
+  DirectiveNode, EnumMap,
+  EnumNode,
+  ExportMap,
+  HexDigitLiteral,
+  ImportMap,
+  ImportNode,
+  JSContext,
+  JSExpression,
+  ObjectMap,
+  ResultObject,
+  ScalarNode,
+  StructDefinitionStatement,
+  StructGetterField,
+  StructGetterReturnStatement} from "./interfaces";
 
 /**
  * Обработчик исходников
@@ -26,6 +41,9 @@ export class Processor {
     return this.directives.endianness || Endianness.BE;
   }
 
+  /**
+   * Проверка, достигнут ли конец файла
+   */
   public get eof() {
     return this.reader.eof;
   }
@@ -47,7 +65,11 @@ export class Processor {
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {
-      makeAST: (line: number, column: number, offset: number, args: any[]) =>
+      makeAST: (line: number,
+                column: number,
+                offset: number,
+                args: any[]  /* tslint:disable-line:no-any */
+      ) =>
         asty.create.apply(asty, args).pos(line, column, offset)
     });
 
@@ -64,42 +86,42 @@ export class Processor {
   /**
    * Все объявленные структуры
    */
-  public structs: any = {};
+  public structs: ObjectMap<StructDefinitionStatement> = {};
 
   /**
    * Все объявленные скалярки
    */
-  public scalars: any = {};
+  public scalars: ObjectMap<ScalarNode> = {};
 
   /**
    * Все экспортируемые сущности
    */
-  public exports: any = {};
+  public exports: ExportMap = {};
 
   /**
    * Константы
    */
-  public consts: any = {};
+  public consts: ConstMap = {};
 
   /**
    * Импорты
    */
-  public imports: any = {};
+  public imports: ImportMap = {};
 
   /**
    * Перечисления
    */
-  public enums: any = {};
+  public enums: EnumMap = {};
 
   /**
    * Директивы (могут быть какими угодно)
    */
-  public directives: any = {};
+  public directives: ObjectMap<string> = {};
 
   private reader: BinaryReader;
 
   public constructor(
-    public ast: any,
+    public ast: AST,
     public buffer: Buffer,
     public scriptPath: string,
     public contents: string
@@ -110,18 +132,18 @@ export class Processor {
   /**
    * Поехали!
    */
-  public run() {
+  public run<T = ResultObject>() {
     this.processBody();
     if (this.mainStruct) {
       let a = this.processStruct(this.mainStruct);
-      return a;
+      return a as T;
     }
   }
 
-  public executeJSExpression(node: any, result: any = {}) {
+  public executeJSExpression(node: JSExpression, result: ResultObject = {}) {
     switch (node.body.type) {
       case "CodeStringLiteral":
-        let ctx: any = {
+        let ctx: JSContext = {
           _: result
         };
         Object.entries(this.consts).forEach(([key, value]) => {
@@ -134,36 +156,36 @@ export class Processor {
     }
   }
 
-  public executeStatement(node: any, result: any = {}): any {
+  public executeStatement(node: BinerNode, result: ResultObject = {}): any { // tslint:disable-line:no-any
     switch (node.type) {
       case "StructGetterField":
-        for (let child of node.body.body) {
+        for (let child of (node as StructGetterField).body.body) {
           console.log(child, result);
         }
 
         break;
 
       case "StructGetterReturnStatement":
-        return this.executeStatement(node.body, result);
+        return this.executeStatement((node as StructGetterReturnStatement).body, result);
 
       case "JSExpression":
-        return this.executeJSExpression(node, result);
+        return this.executeJSExpression((node as JSExpression), result);
 
       case "DecimalDigitLiteral":
-        return parseInt(node.value, 10);
+        return parseInt((node as DecimalDigitLiteral).value, 10);
 
       case "ScalarReturnStatement":
         console.log(node);
         throw new Error(`Under construction`);
 
       case "HexDigitLiteral":
-        return parseInt(node.value, 16);
+        return parseInt((node as HexDigitLiteral).value, 16);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
   }
 
-  public executeGetter(node: any, result: any = {}) {
+  public executeGetter(node: StructGetterField, result: ResultObject = {}) {
     switch (node.type) {
       case "StructGetterField":
         for (let child of node.body.body) {
@@ -183,61 +205,13 @@ export class Processor {
   }
 
   /**
-   * Просчитываем размер структуры
-   *
-   * @param typeName Имя типа
-   * @param arrayData ...
-   */
-  public getStructSize(typeName: string = "", arrayData: any = null): number {
-    if (arrayData) {
-      let arraySize = arrayData.size.value;
-      let structSize = this.getStructSize(typeName);
-
-      return structSize * arraySize;
-    }
-
-    switch (typeName) {
-      case "int8":
-      case "uint8":
-        return 1;
-      case "int16":
-      case "uint16":
-        return 2;
-      case "int32":
-      case "uint32":
-        return 4;
-      default:
-        if (!this.structs[typeName]) {
-          throw new Error(`unrecognized type: ${typeName}`);
-        }
-
-        let struct = this.structs[typeName];
-        let result = 0;
-
-        if (struct.parent) {
-          let name = struct.parent.parent.id.name;
-          result = this.getStructSize(name);
-        }
-
-        for (let field of this.structs[typeName].body) {
-          if (field.type === "ReadableFieldStatement") {
-            let multiplier = field.body.array ? field.body.array.size.value : 1;
-            const typeName2 = field.body.typeName.name;
-            result += this.getStructSize(typeName2) * multiplier;
-          }
-        }
-        return result;
-    }
-  }
-
-  /**
    * Обрабатываем структуру
    *
    * @param struct Структура
    * @param offset Сдвиг
    * @param result Первичный результат (нужен для рекурсии)
    */
-  public processStruct(struct: any, result: any = {}): any {
+  public processStruct(struct: StructDefinitionStatement, result: ResultObject = {}): ResultObject {
     for (let child of struct.body.body) {
       switch (child.type) {
         case "ScalarReturnStatement":
@@ -283,9 +257,9 @@ export class Processor {
 
           switch (typeName.type) {
             case "TypeAccess":
-              let name = typeName.id.name;
-              let struct = this.structs[name];
-              let r = this.processStruct(struct, result);
+              let structName = typeName.id.name;
+              let structInstance = this.structs[structName];
+              let r = this.processStruct(structInstance, result);
               break;
 
             default:
@@ -301,13 +275,29 @@ export class Processor {
     return result;
   }
 
-  public execute(node: any) {
+  public execute(node: BinerNode) {
     switch (node.type) {
       case "HexDigitLiteral":
-        return parseInt(node.value, 16);
+        return parseInt((node as HexDigitLiteral).value, 16);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
+  }
+
+  public getType(name: string): any { // tslint:disable-line:no-any
+    if (this.structs[name]) {
+      return this.structs[name];
+    }
+
+    if (this.scalars[name]) {
+      return this.scalars[name];
+    }
+
+    if (this.enums[name]) {
+      return this.enums[name];
+    }
+
+    throw new Error(`Type not found ${name}`);
   }
 
   /**
@@ -324,26 +314,27 @@ export class Processor {
    * Обрабатываем определённую ноду
    * @param node Нода
    */
-  private registerNode(node: any) {
+  private registerNode(node: BinerNode) {
     switch (node.type) {
       case "DirectiveStatement":
-        return this.defineDirective(node);
+        return this.defineDirective(node as DirectiveNode);
 
       case "ConstStatement":
-        return this.defineConst(node);
+        return this.defineConst(node as ConstStatementNode);
 
       case "StructDefinitionStatement":
-        return this.defineStruct(node);
+        return this.defineStruct(node as StructDefinitionStatement);
 
       case "ImportStatement":
-        return this.defineImport(node);
+        return this.defineImport(node as ImportNode);
 
       case "ScalarDefinitionStatement":
-        return this.defineScalar(node);
+        return this.defineScalar(node as ScalarNode);
 
       case "EnumStatement":
-        return this.defineEnum(node);
-      default:
+        return this.defineEnum(node as EnumNode);
+
+        default:
         throw new Error(`Unknown type: ${node.type}`);
     }
   }
@@ -353,7 +344,7 @@ export class Processor {
    *
    * @param node Нода
    */
-  private defineDirective(node: any) {
+  private defineDirective(node: DirectiveNode) {
     this.directives[node.id.name] = node.contents.name;
   }
 
@@ -362,7 +353,7 @@ export class Processor {
    *
    * @param node Нода
    */
-  private defineImport(node: any) {
+  private defineImport(node: ImportNode) {
     let importPath =
       path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
     let pr = Processor.readFile(importPath);
@@ -392,14 +383,14 @@ export class Processor {
    */
   private defineConst(node: ConstStatementNode) {
     let name = node.id.name;
-    this.consts[name] = this.execute(node.expr);
+    this.consts[name] = this.execute(node.expr as ConstStatementNode);
   }
 
   /**
    * Объявляем структуру
    * @param node Нода
    */
-  private defineStruct(node: any) {
+  private defineStruct(node: StructDefinitionStatement) {
     let name = node.id ? node.id.name : "";
 
     if (this.structs[name]) {
@@ -417,7 +408,7 @@ export class Processor {
    * Объявляем скалярку
    * @param node Нода
    */
-  private defineScalar(node: any) {
+  private defineScalar(node: ScalarNode) {
     let name = node.id.name;
 
     if (this.scalars[name]) {
@@ -431,8 +422,8 @@ export class Processor {
     }
   }
 
-  private defineEnum(node: any) {
-    let result: any = {};
+  private defineEnum(node: EnumNode) {
+    let result: ResultObject = {};
     let name = node.id.name;
     let next = 0;
 
@@ -450,21 +441,5 @@ export class Processor {
     }
 
     this.enums[name] = result;
-  }
-
-  public getType(name: string): any {
-    if (this.structs[name]) {
-      return this.structs[name];
-    }
-
-    if (this.scalars[name]) {
-      return this.scalars[name];
-    }
-
-    if (this.enums[name]) {
-      return this.enums[name];
-    }
-
-    throw new Error(`Type not found ${name}`);
   }
 }

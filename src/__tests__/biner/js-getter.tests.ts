@@ -11,7 +11,7 @@ describe("Executing JS Getters", () => {
     expect(result.m.c).toBe(0x03);
     expect(result.m.sum).toBeDefined();
     expect(result.m.sum).toBe(0x01 + 0x02 + 0x03);
-    
+
     expect(result.n).toBeDefined();
     expect(result.n.a).toBe(0x0A);
     expect(result.n.b).toBe(0x0B);
