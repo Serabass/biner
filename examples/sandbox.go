@@ -1,12 +1,6 @@
-struct vector3<T> {
-  x: T;
-  y: T;
-  z: T;
-}
-
-struct rgb : vector3<uint8> {
-  ^x as r;
-  ^y as g;
-  ^z as b;
+struct rgb {
+  r: uint8;
+  ~: uint8;
+  ~: uint8;
   a: uint8;
 }

@@ -1,17 +1,17 @@
 #endian L;
 
-scalar gpstring {
-  var l1 = uint32;
-  var l2 = uint8;
-  = char[len2] as string;
+struct gpstring {
+  ~: uint32;
+  len2: uint8;
+  value: char[len2] as string;
 }
 
 struct {
   val: fstring8;
   ~: uint8[10];
-  title: gpstring;
-  subtitle: gpstring;
-  artist: gpstring;
+  title: gpstring.value;
+  subtitle: gpstring.value;
+  artist: gpstring.value;
   album: gpstring;
   words: gpstring;
   music: gpstring;

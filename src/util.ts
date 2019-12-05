@@ -7,7 +7,7 @@ import { Processor } from "./processor";
  * @param indent Отступ
  */
 export function json(obj: any, indent = 2) {
-  // console.log(JSON.stringify(obj, null, indent));
+  console.log(JSON.stringify(obj, null, indent));
 }
 
 /**

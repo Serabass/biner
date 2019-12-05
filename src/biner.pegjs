@@ -422,7 +422,18 @@ TypeAccess
      array
    };
  }
- / StructDefinitionStatement
+ /         def: StructDefinitionStatement
+ __   generics: TypeAccessGenericStatement?
+ __      array: TypeAccessArrayExpressionStatement?
+ __ conversion: TypeCastStatement? {
+   return {
+     type: "TypeAccess",
+     def,
+     generics,
+     array,
+     conversion
+   };
+ }
 
 // =============== /Type Access ==============
 
@@ -454,9 +465,23 @@ DecoratorBody
 
 // =============== Structs ==============
 
+StructReadableFieldIdentifier
+ = id: Identifier {
+   return {
+     skip: false,
+     type: "StructReadableFieldIdentifier"
+   };
+ }
+ / id: "~" {
+   return {
+     skip: true,
+     type: "StructReadableFieldIdentifier"
+   };
+ }
+
 StructReadableField
  =  decorators: DecoratorList?
-         __ id: Identifier __ ":"
+         __ id: StructReadableFieldIdentifier __ ":"
    __ typeName: TypeAccess
        __ body: StructFieldBody?
  __ conversion: TypeCastStatement? __ EOS {

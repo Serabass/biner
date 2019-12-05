@@ -41,6 +41,15 @@ struct myObject {
   vecPointer: pointer<vector3i8>;
 }
 
+struct vector3 {
+  x: uint8;
+  y: switch (uint8) {
+  case 0x02: = struct purgeCmd<T> {
+                 errCause: T;
+               }<uint8, A, B, C>[];
+  };
+}
+
 struct main {
   obj: myObject;
 }

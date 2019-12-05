@@ -11,7 +11,8 @@
         "indent": true,
         "deprecation": true,
         "completed-docs": true,
-        "trailing-comma": true
+        "trailing-comma": true,
+        "no-any": true,
     },
     "rulesDirectory": []
 }

@@ -4,6 +4,7 @@ import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import { json } from "../src/util";
+import { ConstStatementNode } from "./nodes/const-node";
 
 /**
  * Обработчик исходников
@@ -32,7 +33,7 @@ export class Processor {
    */
   public static readFile(
     scriptPath: string,
-    buffer: Buffer,
+    buffer: Buffer = Buffer.from([]),
     src = "./src/biner.pegjs"
   ): Processor {
     let contents = fs.readFileSync(scriptPath).toString("utf-8");
@@ -58,6 +59,11 @@ export class Processor {
    * Все объявленные структуры
    */
   public structs: any = {};
+
+  /**
+   * Все объявленные скалярки
+   */
+  public scalars: any = {};
 
   /**
    * Все экспортируемые сущности
@@ -92,8 +98,7 @@ export class Processor {
    * Поехали!
    */
   public run() {
-    // console.log(this.ast);
-    // this.processBody();
+    this.processBody();
 
     if (this.mainStruct) {
       // let a = this.processStruct(this.mainStruct);
@@ -156,7 +161,6 @@ export class Processor {
    */
   private processBody() {
     let nodes = this.ast.body;
-    json(this.ast.body);
     for (let node of nodes) {
       this.registerNode(node);
     }
@@ -177,8 +181,11 @@ export class Processor {
       case "StructDefinitionStatement":
         return this.defineStruct(node);
 
-      case "ImportStatement":
-        return this.defineImport(node);
+        case "ImportStatement":
+          return this.defineImport(node);
+
+          case "ScalarDefinitionStatement":
+            return this.defineScalar(node);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
@@ -190,7 +197,7 @@ export class Processor {
    * @param node Нода
    */
   private defineDirective(node: any) {
-    this.directives[node.id.name] = node.expr.name;
+    this.directives[node.id.name] = node.contents.name;
   }
 
   /**
@@ -201,11 +208,7 @@ export class Processor {
   private defineImport(node: any) {
     let importPath =
       path.join(path.dirname(this.scriptPath), node.moduleName.value) + ".go";
-    let pr = Processor.readFile(
-      importPath,
-      Buffer.from([]),
-      "src/javascript.pegjs"
-    );
+    let pr = Processor.readFile(importPath);
 
     this.imports[importPath] = pr;
 
@@ -230,7 +233,7 @@ export class Processor {
    * Объявляем константу
    * @param node Нода
    */
-  private defineConst(node: any) {
+  private defineConst(node: ConstStatementNode) {
     let name = node.id.name;
     this.consts[name] = node.expr.expression.value;
   }
@@ -247,6 +250,24 @@ export class Processor {
     }
 
     this.structs[name] = node;
+
+    if (node.export) {
+      this.exports[name] = node;
+    }
+  }
+
+  /**
+   * Объявляем скалярку
+   * @param node Нода
+   */
+  private defineScalar(node: any) {
+    let name = node.id.name;
+
+    if (this.scalars[name]) {
+      throw new Error(`Scalar '${name}' already defined`);
+    }
+
+    this.scalars[name] = node;
 
     if (node.export) {
       this.exports[name] = node;
