@@ -465,9 +465,14 @@ DecoratorBody
 
 // =============== Structs ==============
 
+StructFieldName
+ = Identifier
+ / StringLiteral
+
 StructReadableFieldIdentifier
- = id: Identifier {
+ = id: StructFieldName {
    return {
+     id,
      skip: false,
      type: "StructReadableFieldIdentifier"
    };

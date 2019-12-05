@@ -1,3 +1,5 @@
+#endianness BE;
+
 struct {
-  vals: uint16[];
+  "vals a": uint16[];
 }

@@ -5,6 +5,7 @@ import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
 import { json } from "../src/util";
 import { ConstStatementNode } from "./nodes/const-node";
+import { BinaryReader } from "./binary-reader";
 
 /**
  * Обработчик исходников
@@ -83,26 +84,27 @@ export class Processor {
   /**
    * Директивы (могут быть какими угодно)
    */
-  public directives: any = {
-    endianness: "BE"
-  };
+  public directives: any = {};
+
+  private reader: BinaryReader;
 
   public constructor(
     public ast: any,
     public buffer: Buffer,
     public scriptPath: string,
     public contents: string
-  ) {}
+  ) {
+    this.reader = new BinaryReader(buffer);
+  }
 
   /**
    * Поехали!
    */
   public run() {
     this.processBody();
-
     if (this.mainStruct) {
-      // let a = this.processStruct(this.mainStruct);
-      // return a;
+      let a = this.processStruct(this.mainStruct);
+      return a;
     }
   }
 
@@ -181,11 +183,11 @@ export class Processor {
       case "StructDefinitionStatement":
         return this.defineStruct(node);
 
-        case "ImportStatement":
-          return this.defineImport(node);
+      case "ImportStatement":
+        return this.defineImport(node);
 
-          case "ScalarDefinitionStatement":
-            return this.defineScalar(node);
+      case "ScalarDefinitionStatement":
+        return this.defineScalar(node);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
@@ -275,113 +277,44 @@ export class Processor {
   }
 
   /**
-   * Геттер. Скорее всего будет удалён
-   * @param typeName Тип
-   * @param arrayData ...
-   */
-  private defineGetter(
-    typeName: string,
-    arrayData: any
-  ): (offset: number, node: any) => any {
-    return (offset: number, node: any) => {
-      if (arrayData) {
-        let result = [];
-        let arraySize = arrayData.size.value;
-
-        for (let i = 0; i < arraySize; i++) {
-          let fn = this.defineGetter(typeName, null);
-          const l = fn(offset, node);
-          result.push(l);
-          offset += this.getStructSize(typeName);
-        }
-
-        return result;
-      }
-
-      switch (typeName) {
-        case "int8":
-          return this.buffer.readInt8(offset);
-
-        case "uint8":
-          return this.buffer.readUInt8(offset);
-
-        case "uint16":
-          return this.endianness === "BE"
-            ? this.buffer.readUInt16BE(offset)
-            : this.buffer.readUInt16LE(offset);
-
-        case "int16":
-          return this.endianness === "BE"
-            ? this.buffer.readInt16BE(offset)
-            : this.buffer.readInt16LE(offset);
-
-        case "uint32":
-          return this.endianness === "BE"
-            ? this.buffer.readUInt32BE(offset)
-            : this.buffer.readUInt32LE(offset);
-
-        case "int32":
-          return this.endianness === "BE"
-            ? this.buffer.readInt32BE(offset)
-            : this.buffer.readInt32LE(offset);
-
-        case "fstring":
-          let s = [];
-          let len = this.buffer.readUInt8(offset);
-          offset++;
-
-          for (let i = 0; i < len; i++) {
-            let charCode = this.buffer.readUInt8(offset);
-            offset++;
-            let char = String.fromCharCode(charCode);
-            s.push(char);
-          }
-
-          return s.join("");
-        default:
-          if (!this.structs[typeName]) {
-            throw new Error(`unrecognized type: ${typeName}`);
-          }
-
-          return this.readStruct(typeName, offset);
-      }
-    };
-  }
-
-  /**
-   * Читаем структуру из памяти
-   * @param typeName Тип
-   * @param offset сдвиг
-   */
-  private readStruct(typeName: string, offset: number) {
-    let struct = this.structs[typeName];
-    return this.processStruct(struct, offset);
-  }
-
-  /**
    * Обрабатываем структуру
    *
    * @param struct Структура
    * @param offset Сдвиг
    * @param result Первичный результат (нужен для рекурсии)
    */
-  private processStruct(struct: any, offset = 0, result = {}): any {
-    if (struct.parent) {
-      const parentStructName = struct.parent.parent.id.name;
-      let parentStruct = this.structs[parentStructName];
-      this.processStruct(parentStruct, offset, result);
-      offset += this.getStructSize(parentStructName);
-    }
-
-    for (let child of struct.body) {
+  private processStruct(struct: any, result: any = {}): any {
+    for (let child of struct.body.body) {
       switch (child.type) {
-        case "ReadableFieldStatement":
+        case "StructReadableField":
+          if (!child.id.skip) {
+            let res = this.reader.readField(child);
+            let key;
+
+            switch (child.id.id.type) {
+              case "StringLiteral":
+                key = child.id.id.value;
+                break;
+              case "Identifier":
+                key = child.id.id.name;
+                break;
+              default:
+                console.log(child);
+                throw new Error("12313");
+            }
+
+            result[key] = res;
+            return result;
+          }
           break;
         case "Property":
+          throw new Error("Under construction");
           break;
         case "FunctionFieldDefinition":
+          throw new Error("Under construction");
           break;
         case "StructReadableField":
+          throw new Error("Under construction");
           break;
         default:
           throw new Error(`Unknown type: ${child.type}`);
