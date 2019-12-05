@@ -94,7 +94,7 @@ export class Processor {
     public scriptPath: string,
     public contents: string
   ) {
-    this.reader = new BinaryReader(buffer);
+    this.reader = new BinaryReader(buffer, this);
   }
 
   /**
@@ -283,12 +283,12 @@ export class Processor {
    * @param offset Сдвиг
    * @param result Первичный результат (нужен для рекурсии)
    */
-  private processStruct(struct: any, result: any = {}): any {
+  public processStruct(struct: any, result: any = {}): any {
     for (let child of struct.body.body) {
       switch (child.type) {
         case "StructReadableField":
           if (!child.id.skip) {
-            let res = this.reader.readField(child);
+            let res = this.reader.readField(child, result); 
             let key;
 
             switch (child.id.id.type) {
@@ -304,7 +304,8 @@ export class Processor {
             }
 
             result[key] = res;
-            return result;
+          } else {
+            throw new Error("Under construction");
           }
           break;
         case "Property":

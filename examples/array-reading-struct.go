@@ -7,5 +7,5 @@ struct rgb {
 
 struct {
   t: uint8;
-  vals: uint8[2];
+  vals: rgb[t];
 }
