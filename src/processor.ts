@@ -152,6 +152,10 @@ export class Processor {
       case "DecimalDigitLiteral":
         return parseInt(node.value, 10);
 
+      case "ScalarReturnStatement":
+        console.log(node);
+        throw new Error(`Under construction`);
+
       case "HexDigitLiteral":
         return parseInt(node.value, 16);
       default:
@@ -237,7 +241,7 @@ export class Processor {
     for (let child of struct.body.body) {
       switch (child.type) {
         case "ScalarReturnStatement":
-          throw new Error("Under construction");
+          return this.executeStatement(child, result);
 
         case "StructReadableField":
           if (!child.id.skip) {
@@ -275,20 +279,20 @@ export class Processor {
         case "StructReadableField":
           throw new Error("Under construction");
         case "StructFieldRestStatement":
-          throw new Error("Under construction");
           let { typeName } = child;
 
           switch (typeName.type) {
             case "TypeAccess":
               let name = typeName.id.name;
               let struct = this.structs[name];
-              console.log(struct);
+              let r = this.processStruct(struct, result);
               break;
 
             default:
               throw new Error(`Unknown type: ${typeName.type}`);
           }
 
+          break;
         default:
           throw new Error(`Unknown type: ${child.type}`);
       }

@@ -1,13 +1,5 @@
 #endianness BE;
 
-/*
-| r  g  b  |
-| FF 00 00 |
-
-| r  g  b  |
-| 00 00 FF |
-*/
-
 struct arrayStruct {
   a: uint16[2];
 }

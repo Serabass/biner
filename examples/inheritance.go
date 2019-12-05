@@ -16,15 +16,12 @@ struct rgba : rgb {
   a: uint8;
 }
 
-struct rgbax : rgba {
+struct rgbax {
   x: uint16;
 }
 
-struct rgb22 : vector3u8 {
-  ^x as r;
-  ^y as g;
-  ^z as b;
-  a: uint8;
+struct rgbay {
+  x: uint16;
 }
 
 struct {
