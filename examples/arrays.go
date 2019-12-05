@@ -28,3 +28,7 @@ struct eightnumbers {
   n1: twonumbers[2];
   n2: twonumbers[2];
 }
+
+struct {
+  fivenumbers: fivenumbers;
+}

@@ -3,9 +3,10 @@ import * as fs from "fs";
 import * as path from "path";
 import * as peg from "pegjs";
 import * as PEGUtil from "pegjs-util";
-import { json } from "../src/util";
-import { ConstStatementNode } from "./nodes/const-node";
 import { BinaryReader } from "./binary-reader";
+import { ConstStatementNode } from "./nodes/const-node";
+import * as vm from "vm";
+import { Endianness } from "./endianness";
 
 /**
  * Обработчик исходников
@@ -22,7 +23,11 @@ export class Processor {
    * Порядок байт - BE / LE
    */
   public get endianness() {
-    return this.directives.endianness || "BE";
+    return this.directives.endianness || Endianness.BE;
+  }
+
+  public get eof() {
+    return this.reader.eof;
   }
 
   /**
@@ -82,6 +87,11 @@ export class Processor {
   public imports: any = {};
 
   /**
+   * Перечисления
+   */
+  public enums: any = {};
+
+  /**
    * Директивы (могут быть какими угодно)
    */
   public directives: any = {};
@@ -105,6 +115,66 @@ export class Processor {
     if (this.mainStruct) {
       let a = this.processStruct(this.mainStruct);
       return a;
+    }
+  }
+
+  public executeJSExpression(node: any, result: any = {}) {
+    switch (node.body.type) {
+      case "CodeStringLiteral":
+        let ctx: any = {
+          _: result
+        };
+        Object.entries(this.consts).forEach(([key, value]) => {
+          ctx[key] = value;
+        });
+        return vm.runInNewContext(node.body.value, ctx);
+
+      default:
+        throw new Error(`Unknown type: ${node.body.type}`);
+    }
+  }
+
+  public executeStatement(node: any, result: any = {}): any {
+    switch (node.type) {
+      case "StructGetterField":
+        for (let child of node.body.body) {
+          console.log(child, result);
+        }
+
+        break;
+
+      case "StructGetterReturnStatement":
+        return this.executeStatement(node.body, result);
+
+      case "JSExpression":
+        return this.executeJSExpression(node, result);
+
+      case "DecimalDigitLiteral":
+        return parseInt(node.value, 10);
+
+      case "HexDigitLiteral":
+        return parseInt(node.value, 16);
+      default:
+        throw new Error(`Unknown type: ${node.type}`);
+    }
+  }
+
+  public executeGetter(node: any, result: any = {}) {
+    switch (node.type) {
+      case "StructGetterField":
+        for (let child of node.body.body) {
+          switch (child.type) {
+            case "StructGetterReturnStatement":
+              return this.executeStatement(child, result);
+            default:
+              throw new Error(`Unknown type: ${child.type}`);
+          }
+        }
+
+        break;
+
+      default:
+        throw new Error(`Unknown type: ${node.type}`);
     }
   }
 
@@ -159,6 +229,83 @@ export class Processor {
   }
 
   /**
+   * Обрабатываем структуру
+   *
+   * @param struct Структура
+   * @param offset Сдвиг
+   * @param result Первичный результат (нужен для рекурсии)
+   */
+  public processStruct(struct: any, result: any = {}): any {
+    for (let child of struct.body.body) {
+      switch (child.type) {
+        case "StructReadableField":
+          if (!child.id.skip) {
+            let res = this.reader.readField(child, result);
+            let key;
+
+            switch (child.id.id.type) {
+              case "StringLiteral":
+                key = child.id.id.value;
+                break;
+              case "Identifier":
+                key = child.id.id.name;
+                break;
+              default:
+                console.log(child);
+                throw new Error("12313");
+            }
+
+            result[key] = res;
+          } else {
+            throw new Error("Under construction");
+          }
+          break;
+        case "StructGetterField":
+          let name = child.id.name;
+          Object.defineProperty(result, name, {
+            enumerable: true,
+            get: () => this.executeGetter(child, result)
+          });
+          break;
+        case "Property":
+          throw new Error("Under construction");
+        case "FunctionFieldDefinition":
+          throw new Error("Under construction");
+        case "StructReadableField":
+          throw new Error("Under construction");
+        case "StructFieldRestStatement":
+          throw new Error("Under construction");
+          let { typeName } = child;
+
+          switch (typeName.type) {
+            case "TypeAccess":
+              let name = typeName.id.name;
+              let struct = this.structs[name];
+              console.log(struct);
+              break;
+
+            default:
+              throw new Error(`Unknown type: ${typeName.type}`);
+          }
+
+        default:
+          throw new Error(`Unknown type: ${child.type}`);
+      }
+    }
+
+    return result;
+  }
+
+  public execute(node: any) {
+    switch (node.type) {
+      case "HexDigitLiteral":
+        return parseInt(node.value, 16);
+      default:
+        throw new Error(`Unknown type: ${node.type}`);
+    }
+  }
+
+  /**
    * Обрабатываем тело документа
    */
   private processBody() {
@@ -188,6 +335,9 @@ export class Processor {
 
       case "ScalarDefinitionStatement":
         return this.defineScalar(node);
+
+      case "EnumStatement":
+        return this.defineEnum(node);
       default:
         throw new Error(`Unknown type: ${node.type}`);
     }
@@ -237,7 +387,7 @@ export class Processor {
    */
   private defineConst(node: ConstStatementNode) {
     let name = node.id.name;
-    this.consts[name] = node.expr.expression.value;
+    this.consts[name] = this.execute(node.expr);
   }
 
   /**
@@ -276,52 +426,24 @@ export class Processor {
     }
   }
 
-  /**
-   * Обрабатываем структуру
-   *
-   * @param struct Структура
-   * @param offset Сдвиг
-   * @param result Первичный результат (нужен для рекурсии)
-   */
-  public processStruct(struct: any, result: any = {}): any {
-    for (let child of struct.body.body) {
-      switch (child.type) {
-        case "StructReadableField":
-          if (!child.id.skip) {
-            let res = this.reader.readField(child, result); 
-            let key;
+  private defineEnum(node: any) {
+    let result: any = {};
+    let name = node.id.name;
+    let next = 0;
 
-            switch (child.id.id.type) {
-              case "StringLiteral":
-                key = child.id.id.value;
-                break;
-              case "Identifier":
-                key = child.id.id.name;
-                break;
-              default:
-                console.log(child);
-                throw new Error("12313");
-            }
-
-            result[key] = res;
-          } else {
-            throw new Error("Under construction");
-          }
-          break;
-        case "Property":
-          throw new Error("Under construction");
-          break;
-        case "FunctionFieldDefinition":
-          throw new Error("Under construction");
-          break;
-        case "StructReadableField":
-          throw new Error("Under construction");
-          break;
-        default:
-          throw new Error(`Unknown type: ${child.type}`);
+    for (let v of node.body.list) {
+      if (v.value !== null) {
+        let key = v.id.name;
+        let val = this.executeStatement(v.value.value, result);
+        result[key] = val;
+        next = val + 1;
+      } else {
+        let key = v.id.name;
+        result[key] = next;
+        next++;
       }
     }
 
-    return result;
+    this.enums[name] = result;
   }
 }

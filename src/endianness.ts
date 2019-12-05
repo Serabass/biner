@@ -1,4 +1,4 @@
 export enum Endianness {
-  BE,
-  LE,
+  BE = "BE",
+  LE = "LE",
 }

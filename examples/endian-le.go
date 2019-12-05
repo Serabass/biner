@@ -1,3 +1,4 @@
+#endianness LE;
 
 struct {
   b1: uint8;

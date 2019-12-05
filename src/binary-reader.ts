@@ -2,6 +2,40 @@ import { Endianness } from "./endianness";
 import { Processor } from "./processor";
 
 export class BinaryReader {
+
+  public get eof(): boolean {
+    return this.offset >= this.buffer.byteLength;
+  }
+
+  private get uint8() {
+    const data = this.buffer.readUInt8(this.offset);
+
+    this.offset++;
+
+    return data;
+  }
+
+  private get int8() {
+    const data = this.buffer.readInt8(this.offset);
+
+    this.offset++;
+
+    return data;
+  }
+
+  private get uint16() {
+    let data;
+
+    if (this.endianness === Endianness.BE) {
+      data = this.buffer.readUInt16BE(this.offset);
+    } else {
+      data = this.buffer.readUInt16LE(this.offset);
+    }
+
+    this.offset += 2;
+
+    return data;
+  }
   private offset: number = 0;
   public constructor(
     public buffer: Buffer,
@@ -9,37 +43,7 @@ export class BinaryReader {
     public endianness: Endianness = Endianness.BE
   ) {}
 
-  public get eof(): boolean {
-    return this.offset >= this.buffer.byteLength;
-  }
-
-  private read(node: any, result: any = {}) {
-    switch (node.typeName.id.name) {
-      case "uint8":
-        return this.uint8;
-
-      case "uint16":
-        return this.uint16;
-
-      default:
-
-      let struct = this.processor.structs[node.typeName.id.name];
-
-        if (!struct) {
-          console.log(struct)
-        } else {
-          let r = {};
-          this.processor.processStruct(struct, r);
-          return r;
-        }
-
-        throw new Error(`Unknown type: ${node.typeName.id.name}`);
-    }
-  }
-
   public readField(node: any, result: any = {}) {
-    let typeName = node.typeName.id.name;
-
     if (node.typeName.array) {
       let res = [];
       if (node.typeName.array.size === null) {
@@ -83,25 +87,30 @@ export class BinaryReader {
     }
   }
 
-  private get uint8() {
-    const data = this.buffer.readUInt8(this.offset);
+  private read(node: any, result: any = {}) {
+    switch (node.typeName.id.name) {
+      case "int8":
+        return this.int8;
 
-    this.offset++;
+        case "uint8":
+            return this.uint8;
 
-    return data;
-  }
+      case "uint16":
+        return this.uint16;
 
-  private get uint16() {
-    var data;
+      default:
 
-    if (this.endianness === Endianness.BE) {
-      data = this.buffer.readUInt16BE(this.offset);
-    } else {
-      data = this.buffer.readUInt16LE(this.offset);
+      let struct = this.processor.structs[node.typeName.id.name];
+
+      if (!struct) {
+          console.log(struct);
+        } else {
+          let r = {};
+          this.processor.processStruct(struct, r);
+          return r;
+        }
+
+      throw new Error(`Unknown type: ${node.typeName.id.name}`);
     }
-
-    this.offset += 2;
-
-    return data;
   }
 }

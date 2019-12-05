@@ -1,5 +1,11 @@
 #endianness BE;
 
+struct vector3u8 {
+  x: uint8;
+  y: uint8;
+  z: uint8;
+}
+
 struct rgb {
   r: uint8;
   g: uint8;
@@ -14,7 +20,7 @@ struct rgbax : rgba {
   x: uint16;
 }
 
-struct rgb : vector3<uint8> {
+struct rgb22 : vector3u8 {
   ^x as r;
   ^y as g;
   ^z as b;
