@@ -7,6 +7,12 @@ export interface StringLiteral extends BinerNode {
   value: string;
 }
 
+export type ExecuteResult = ObjectValue | number | ResultObject;
+
+export interface ObjectValue {
+  [key: string]: JSONObject;
+}
+
 export interface JSONObject {
   [key: string]: JSONObject;
 }
@@ -60,6 +66,9 @@ export interface TypeAccess {
 
 export interface BinerNode {
   type: string;
+}
+
+export interface TypedBinerNode {
   typeName: TypeAccess;
 }
 
@@ -79,15 +88,17 @@ export interface EnumNode extends BinerNode {
   };
 }
 
+export interface ConstExprNode {
+  expression: {
+    value: any;
+  };
+}
+
 export interface ConstStatementNode extends BinerNode {
   id: {
     name: string,
   };
-  expr: {
-    expression: {
-      value: any;
-    }
-  };
+  expr: ConstExprNode;
 }
 
 export interface DirectiveNode extends BinerNode {
@@ -165,3 +176,5 @@ export interface DecimalDigitLiteral extends BinerNode {
 export interface HexDigitLiteral extends BinerNode {
   value: string;
 }
+
+export type TypeNode = StructDefinitionStatement | ScalarNode | EnumNode;

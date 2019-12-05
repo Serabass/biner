@@ -13,7 +13,8 @@
         "trailing-comma": true,
         "no-any": true,
         "interface-name": false,
-        "semicolon": true
+        "semicolon": true,
+        "typedef": true
     },
     "rulesDirectory": []
 }

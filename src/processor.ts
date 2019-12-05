@@ -6,10 +6,16 @@ import * as PEGUtil from "pegjs-util";
 import * as vm from "vm";
 import { BinaryReader } from "./binary-reader";
 import { Endianness } from "./endianness";
-import { AST, BinerNode,
-  ConstMap, ConstStatementNode, DecimalDigitLiteral,
-  DirectiveNode, EnumMap,
+import {
+  AST,
+  BinerNode,
+  ConstMap,
+  ConstStatementNode,
+  DecimalDigitLiteral,
+  DirectiveNode,
+  EnumMap,
   EnumNode,
+  ExecuteResult,
   ExportMap,
   HexDigitLiteral,
   ImportMap,
@@ -21,7 +27,9 @@ import { AST, BinerNode,
   ScalarNode,
   StructDefinitionStatement,
   StructGetterField,
-  StructGetterReturnStatement} from "./interfaces";
+  StructGetterReturnStatement,
+  TypeNode
+} from "./interfaces";
 
 /**
  * Обработчик исходников
@@ -65,12 +73,12 @@ export class Processor {
     let asty = new ASTY();
     let parser = peg.generate(parserContents);
     let actual = PEGUtil.parse(parser, contents, {
-      makeAST: (line: number,
-                column: number,
-                offset: number,
-                args: any[]  /* tslint:disable-line:no-any */
-      ) =>
-        asty.create.apply(asty, args).pos(line, column, offset)
+      makeAST: (
+        line: number,
+        column: number,
+        offset: number,
+        args: any[] /* tslint:disable-line:no-any */
+      ) => asty.create.apply(asty, args).pos(line, column, offset)
     });
 
     if (actual.error) {
@@ -156,7 +164,8 @@ export class Processor {
     }
   }
 
-  public executeStatement(node: BinerNode, result: ResultObject = {}): any { // tslint:disable-line:no-any
+  public executeStatement(node: BinerNode, result: ResultObject = {}): ExecuteResult | undefined {
+    // tslint:disable-line:no-any
     switch (node.type) {
       case "StructGetterField":
         for (let child of (node as StructGetterField).body.body) {
@@ -166,10 +175,13 @@ export class Processor {
         break;
 
       case "StructGetterReturnStatement":
-        return this.executeStatement((node as StructGetterReturnStatement).body, result);
+        return this.executeStatement(
+          (node as StructGetterReturnStatement).body,
+          result
+        );
 
       case "JSExpression":
-        return this.executeJSExpression((node as JSExpression), result);
+        return this.executeJSExpression(node as JSExpression, result);
 
       case "DecimalDigitLiteral":
         return parseInt((node as DecimalDigitLiteral).value, 10);
@@ -211,7 +223,10 @@ export class Processor {
    * @param offset Сдвиг
    * @param result Первичный результат (нужен для рекурсии)
    */
-  public processStruct(struct: StructDefinitionStatement, result: ResultObject = {}): ResultObject {
+  public processStruct(
+    struct: StructDefinitionStatement,
+    result: ResultObject = {}
+  ): ResultObject {
     for (let child of struct.body.body) {
       switch (child.type) {
         case "ScalarReturnStatement":
@@ -284,7 +299,8 @@ export class Processor {
     }
   }
 
-  public getType(name: string): any { // tslint:disable-line:no-any
+  public getType(name: string): TypeNode {
+    // tslint:disable-line:no-any
     if (this.structs[name]) {
       return this.structs[name];
     }
@@ -334,7 +350,7 @@ export class Processor {
       case "EnumStatement":
         return this.defineEnum(node as EnumNode);
 
-        default:
+      default:
         throw new Error(`Unknown type: ${node.type}`);
     }
   }
@@ -391,7 +407,7 @@ export class Processor {
    * @param node Нода
    */
   private defineStruct(node: StructDefinitionStatement) {
-    let name = node.id ? node.id.name : "";
+    let name: string = node.id ? node.id.name : "";
 
     if (this.structs[name]) {
       throw new Error(`Struct '${name}' already defined`);
@@ -430,9 +446,11 @@ export class Processor {
     for (let v of node.body.list) {
       if (v.value !== null) {
         let key = v.id.name;
-        let val = this.executeStatement(v.value.value, result);
-        result[key] = val;
-        next = val + 1;
+        let val: number | undefined = this.executeStatement(v.value.value, result) as number;
+        if (typeof val === "number") {
+          result[key] = val;
+          next = val + 1;
+        }
       } else {
         let key = v.id.name;
         result[key] = next;
