@@ -158,6 +158,10 @@ _описать_
 
 Подсветка, анализ кода и прочие плюшки
 
+### Аналоги для других языков и платформ
+
+В конце документа буду собирать ссылки на аналогичные PEG-проекты.
+
 ## Варианты названия
 
 Нужно решить, как обозвать проект. Сейчас используется рабочее название Biner, но мне оно не нравится.
@@ -166,3 +170,9 @@ _описать_
 * BiStLang - Binary Structurization Language
 * BinLang
 * ...предлагайте
+
+# Полезные ссылки
+ * [https://github.com/yhirose/cpp-peglib]
+ * [https://github.com/otac0n/Pegasus]
+ * [https://www.developerfusion.com/project/60902/pegsharp/]
+ * [https://pypi.org/project/parsimonious/]

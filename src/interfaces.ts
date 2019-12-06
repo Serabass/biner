@@ -118,15 +118,6 @@ export interface ScalarNode extends BinerNode {
   export: boolean;
 }
 
-export interface StructDefinitionStatement extends BinerNode {
-  type: "StructDefinitionStatement";
-  id: Identifier;
-  export: boolean;
-  body: {
-    body: any[]
-  };
-}
-
 export interface ImportNameNode {
   name: {
     name: string;

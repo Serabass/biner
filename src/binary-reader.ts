@@ -1,12 +1,38 @@
+import "reflect-metadata";
 import { Endianness } from "./endianness";
-import { BinerNode, ResultObject } from "./interfaces";
+import { ResultObject } from "./interfaces";
 import { Processor } from "./processor";
+
+type ReadProp<T = number> = T;
+
+function ReadGetter(nameFragment: string, length: number) {
+  return (target: any, propertyKey: string) => {
+    Reflect.defineProperty(target, propertyKey, {
+      get(this: any) {
+        let readFnName: string = nameFragment;
+
+        switch (nameFragment) {
+          case "UInt8":
+          case "Int8":
+            break;
+          default:
+            readFnName += this.endianness;
+        }
+
+        const data = this.buffer[`read${readFnName}`](this.offset);
+
+        this.offset += length;
+
+        return data;
+      }
+    });
+  };
+}
 
 /**
  * Класс для чтения бинарных данных
  */
 export class BinaryReader {
-
   /**
    * Проверяем, достигнут ли конец файла
    */
@@ -14,54 +40,33 @@ export class BinaryReader {
     return this.offset >= this.buffer.byteLength;
   }
 
-  /**
-   * Читаем беззнаковое однобайтовое целое
-   */
-  private get uint8() {
-    const data = this.buffer.readUInt8(this.offset);
+  @ReadGetter("UInt8", 1) public uint8: ReadProp;
+  @ReadGetter("Int8", 1) public int8: ReadProp;
 
-    this.offset++;
+  @ReadGetter("UInt16", 2) public uint16: ReadProp;
+  @ReadGetter("Int16", 2) public int16: ReadProp;
 
-    return data;
-  }
+  @ReadGetter("UInt32", 4) public uint32: ReadProp;
+  @ReadGetter("Int32", 4) public int32: ReadProp;
 
-  /**
-   * Читаем знаковое однобайтовое целое
-   */
-  private get int8() {
-    const data = this.buffer.readInt8(this.offset);
+  @ReadGetter("BigUInt64", 8) public biguint32: ReadProp;
+  @ReadGetter("BigInt64", 8) public bigint32: ReadProp;
 
-    this.offset++;
+  @ReadGetter("Float", 4) public float: ReadProp;
 
-    return data;
-  }
-
-  /**
-   * Читаем беззнаковое двухбайтовое целое
-   */
-  private get uint16() {
-    let data;
-
-    if (this.endianness === Endianness.BE) {
-      data = this.buffer.readUInt16BE(this.offset);
-    } else {
-      data = this.buffer.readUInt16LE(this.offset);
-    }
-
-    this.offset += 2;
-
-    return data;
-  }
+  @ReadGetter("Double", 8) public double: ReadProp;
 
   /**
    * Позиция ридера в буфере
    */
-  private offset: number = 0;
+  public offset: number = 0;
+
   public constructor(
     public buffer: Buffer,
     public processor: Processor,
     public endianness: Endianness = Endianness.BE
-  ) {}
+  ) {
+  }
 
   /**
    * Читаем поле на основании его типа
@@ -69,7 +74,7 @@ export class BinaryReader {
    * @param node Нода
    * @param result Текущий объект
    */
-  public readField(node: BinerNode, result: ResultObject = {}) {
+  public readField(node: any, result: ResultObject = {}) {
     if (node.typeName.array) {
       let res = [];
       if (node.typeName.array.size === null) {
@@ -113,7 +118,7 @@ export class BinaryReader {
    * @param node Hoдa
    * @param result Текущий объект
    */
-  private read(node: BinerNode, result: ResultObject = {}) {
+  private read(node: any, result: ResultObject = {}) {
     switch (node.typeName.id.name) {
       case "int8":
         return this.int8;
@@ -125,13 +130,13 @@ export class BinaryReader {
         return this.uint16;
 
       default:
-        let type = this.processor.getType(node.typeName.id.name);
+        let type = this.processor.getType(node.typeName.id.name, node);
 
         if (!type) {
           console.log(type);
         } else {
           let r = {};
-          this.processor.processStruct(type, r);
+          this.processor.processStruct(type as any, r);
           return r;
         }
 

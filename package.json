@@ -21,6 +21,7 @@
     "jest": "^24.9.0",
     "pegjs": "^0.10.0",
     "pegjs-util": "^1.4.18",
+    "reflect-metadata": "^0.1.13",
     "ts-jest": "^24.2.0",
     "tsc": "^1.20150623.0",
     "typescript": "^3.7.2"

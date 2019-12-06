@@ -25,11 +25,11 @@ import {
   ObjectMap,
   ResultObject,
   ScalarNode,
-  StructDefinitionStatement,
   StructGetterField,
   StructGetterReturnStatement,
   TypeNode
 } from "./interfaces";
+import { StructDefinitionStatement } from "./nodes/StructDefinitionStatement";
 
 /**
  * Обработчик исходников
@@ -146,6 +146,7 @@ export class Processor {
       let a = this.processStruct(this.mainStruct);
       return a as T;
     }
+    throw new Error("Cannot find main struct");
   }
 
   public executeJSExpression(node: JSExpression, result: ResultObject = {}) {
@@ -226,13 +227,14 @@ export class Processor {
   public processStruct(
     struct: StructDefinitionStatement,
     result: ResultObject = {}
-  ): ResultObject {
+  ): ResultObject | undefined | number {
     for (let child of struct.body.body) {
       switch (child.type) {
         case "ScalarReturnStatement":
           return this.executeStatement(child, result);
 
         case "StructReadableField":
+          child.parent = struct;
           if (!child.id.skip) {
             let res = this.reader.readField(child, result);
             let key;
@@ -299,7 +301,7 @@ export class Processor {
     }
   }
 
-  public getType(name: string): TypeNode {
+  public getType(name: string, node: any): TypeNode {
     // tslint:disable-line:no-any
     if (this.structs[name]) {
       return this.structs[name];
@@ -313,6 +315,7 @@ export class Processor {
       return this.enums[name];
     }
 
+    console.log(node);
     throw new Error(`Type not found ${name}`);
   }
 
@@ -339,7 +342,8 @@ export class Processor {
         return this.defineConst(node as ConstStatementNode);
 
       case "StructDefinitionStatement":
-        return this.defineStruct(node as StructDefinitionStatement);
+        let struct = StructDefinitionStatement.from(node);
+        return this.defineStruct(node as any);
 
       case "ImportStatement":
         return this.defineImport(node as ImportNode);
@@ -399,7 +403,7 @@ export class Processor {
    */
   private defineConst(node: ConstStatementNode) {
     let name = node.id.name;
-    this.consts[name] = this.execute(node.expr as ConstStatementNode);
+    this.consts[name] = this.execute(node.expr as any);
   }
 
   /**
