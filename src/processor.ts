@@ -25,11 +25,11 @@ import {
   ObjectMap,
   ResultObject,
   ScalarNode,
+  StructDefinitionNode,
   StructGetterField,
   StructGetterReturnStatement,
   TypeNode
 } from "./interfaces";
-import { StructDefinitionStatement } from "./nodes/StructDefinitionStatement";
 
 /**
  * Обработчик исходников
@@ -94,7 +94,7 @@ export class Processor {
   /**
    * Все объявленные структуры
    */
-  public structs: ObjectMap<StructDefinitionStatement> = {};
+  public structs: ObjectMap<StructDefinitionNode> = {};
 
   /**
    * Все объявленные скалярки
@@ -137,6 +137,10 @@ export class Processor {
     this.reader = new BinaryReader(buffer, this);
   }
 
+  public get isAModule(): boolean {
+    return Object.keys(this.exports).length > 0;
+  }
+
   /**
    * Поехали!
    */
@@ -146,7 +150,10 @@ export class Processor {
       let a = this.processStruct(this.mainStruct);
       return a as T;
     }
-    throw new Error("Cannot find main struct");
+
+    if (!this.isAModule) {
+      throw new Error("Cannot find main struct");
+    }
   }
 
   public executeJSExpression(node: JSExpression, result: ResultObject = {}) {
@@ -165,7 +172,10 @@ export class Processor {
     }
   }
 
-  public executeStatement(node: BinerNode, result: ResultObject = {}): ExecuteResult | undefined {
+  public executeStatement(
+    node: BinerNode,
+    result: ResultObject = {}
+  ): ExecuteResult | undefined {
     // tslint:disable-line:no-any
     switch (node.type) {
       case "StructGetterField":
@@ -217,6 +227,10 @@ export class Processor {
     }
   }
 
+  public processEnum(type: any, r: ResultObject = {}) {
+    // console.log(type);
+  }
+
   /**
    * Обрабатываем структуру
    *
@@ -225,9 +239,13 @@ export class Processor {
    * @param result Первичный результат (нужен для рекурсии)
    */
   public processStruct(
-    struct: StructDefinitionStatement,
+    struct: StructDefinitionNode,
     result: ResultObject = {}
   ): ResultObject | undefined | number {
+    if (struct.body.body === null) {
+      throw new Error("");
+    }
+
     for (let child of struct.body.body) {
       switch (child.type) {
         case "ScalarReturnStatement":
@@ -302,7 +320,6 @@ export class Processor {
   }
 
   public getType(name: string, node: any): TypeNode {
-    // tslint:disable-line:no-any
     if (this.structs[name]) {
       return this.structs[name];
     }
@@ -342,8 +359,7 @@ export class Processor {
         return this.defineConst(node as ConstStatementNode);
 
       case "StructDefinitionStatement":
-        let struct = StructDefinitionStatement.from(node);
-        return this.defineStruct(node as any);
+        return this.defineStruct(node as StructDefinitionNode);
 
       case "ImportStatement":
         return this.defineImport(node as ImportNode);
@@ -353,6 +369,9 @@ export class Processor {
 
       case "EnumStatement":
         return this.defineEnum(node as EnumNode);
+
+      case "ExportStatement":
+        throw new Error("Under construction");
 
       default:
         throw new Error(`Unknown type: ${node.type}`);
@@ -404,13 +423,17 @@ export class Processor {
   private defineConst(node: ConstStatementNode) {
     let name = node.id.name;
     this.consts[name] = this.execute(node.expr as any);
+
+    if (node.export) {
+      this.exports[name] = node;
+    }
   }
 
   /**
    * Объявляем структуру
    * @param node Нода
    */
-  private defineStruct(node: StructDefinitionStatement) {
+  private defineStruct(node: StructDefinitionNode) {
     let name: string = node.id ? node.id.name : "";
 
     if (this.structs[name]) {
@@ -450,7 +473,10 @@ export class Processor {
     for (let v of node.body.list) {
       if (v.value !== null) {
         let key = v.id.name;
-        let val: number | undefined = this.executeStatement(v.value.value, result) as number;
+        let val: number | undefined = this.executeStatement(
+          v.value.value,
+          result
+        ) as number;
         if (typeof val === "number") {
           result[key] = val;
           next = val + 1;
@@ -462,6 +488,15 @@ export class Processor {
       }
     }
 
-    this.enums[name] = result;
+    let enumNode: any = {
+      type: "EnumStatement",
+      body: result
+    };
+
+    this.enums[name] = enumNode;
+
+    if (node.export) {
+      this.exports[name] = node;
+    }
   }
 }

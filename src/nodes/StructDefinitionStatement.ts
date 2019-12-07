@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { Identifier } from "./Identifier";
 
-export class StructDefinitionStatement {
+export class StructDefinitionStatement1 {
   public static from(node: any) {
     return new this(node);
   }

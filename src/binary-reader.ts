@@ -65,8 +65,7 @@ export class BinaryReader {
     public buffer: Buffer,
     public processor: Processor,
     public endianness: Endianness = Endianness.BE
-  ) {
-  }
+  ) {}
 
   /**
    * Читаем поле на основании его типа
@@ -135,8 +134,16 @@ export class BinaryReader {
         if (!type) {
           console.log(type);
         } else {
-          let r = {};
-          this.processor.processStruct(type as any, r);
+          let r: any = {};
+
+          switch (type.type) {
+            case "StructDefinitionStatement":
+              this.processor.processStruct(type as any, r);
+              break;
+            default:
+              this.processor.processEnum(type as any, r);
+          }
+
           return r;
         }
 

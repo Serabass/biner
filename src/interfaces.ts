@@ -1,7 +1,5 @@
 import { StringLiteral } from "@babel/types";
 
-/* tslint:disable:no-any */
-
 export interface StringLiteral extends BinerNode {
   type: "StringLiteral";
   value: string;
@@ -59,6 +57,13 @@ export interface TypeAccessArray {
   size: TypeAccessArraySize | null;
 }
 
+export type TypeAccessList = TypeAccess[];
+
+export interface TypeAccessGenericStatement {
+  type: "TypeAccessGenericStatement";
+  typeNames: TypeAccessList;
+}
+
 export interface TypeAccess {
   id: Identifier;
   array: TypeAccessArray;
@@ -84,21 +89,15 @@ export interface EnumNode extends BinerNode {
     name: string;
   };
   body: {
-    list: EnumValueNode[]
+    list: EnumValueNode[];
   };
+  export: boolean;
 }
 
 export interface ConstExprNode {
   expression: {
     value: any;
   };
-}
-
-export interface ConstStatementNode extends BinerNode {
-  id: {
-    name: string,
-  };
-  expr: ConstExprNode;
 }
 
 export interface DirectiveNode extends BinerNode {
@@ -109,13 +108,28 @@ export interface DirectiveNode extends BinerNode {
   };
 }
 
-export interface ScalarNode extends BinerNode {
+export interface ExportableBinerNode extends BinerNode {
+  export: boolean;
+}
+
+export interface ConstStatementNode extends ExportableBinerNode {
+  id: {
+    name: string,
+  };
+  expr: ConstExprNode;
+}
+
+export interface ScalarNode extends ExportableBinerNode {
   type: "";
   id: Identifier;
   contents: {
     name: string;
   };
-  export: boolean;
+}
+
+export interface StructDefinitionNode extends ExportableBinerNode {
+  id: Identifier;
+  body: any;
 }
 
 export interface ImportNameNode {
@@ -147,13 +161,23 @@ export interface JSExpression extends BinerNode {
   };
 }
 
+export interface Decorator {
+  type: "DecoratorStatement";
+  id: any;
+  body: any;
+}
+
+export type DecoratorsList = Decorator[];
+
 export interface StructGetterField extends BinerNode {
+  decorators: DecoratorsList;
   type: "StructGetterField";
   body: any;
 }
 
 export interface CodeStringLiteral extends JSExpression {
   type: "CodeStringLiteral";
+  value: string;
 }
 
 export interface StructGetterReturnStatement extends BinerNode {
@@ -168,4 +192,4 @@ export interface HexDigitLiteral extends BinerNode {
   value: string;
 }
 
-export type TypeNode = StructDefinitionStatement | ScalarNode | EnumNode;
+export type TypeNode = StructDefinitionNode | ScalarNode | EnumNode;
