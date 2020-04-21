@@ -6,5 +6,3 @@ module.exports = {
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "node", "go", "pegjs"]
 };
 
-
-///
