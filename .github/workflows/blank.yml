@@ -31,6 +31,12 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+    
+    # 
+    - name: Sandbox
+      run: |
+        echo ${{ secrets.TELEGRAM_TO }}
+        echo ${{ secrets.TELEGRAM_TOKEN }}
         
     - name: Telegram Notify
       uses: appleboy/telegram-action@master
