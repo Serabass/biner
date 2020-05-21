@@ -1,18 +1,14 @@
-struct rgb {
-  r: uint8;
-  ~: uint8;
-  ~: uint8;
-  a: uint8;
-}
 
-scalar val {
-  = switch (int8) {
-    case 1: = int8;
-    case 2: = int16;
-    case 4: = int32;
-  };
-}
-
-struct : rgb {
+@dec(1, 2, 3)
+export struct A : rgb {
   x: uint8;
+}
+
+struct {
+  a: A;
+}
+
+export enum A {
+  A = 1,
+  B = 2
 }
